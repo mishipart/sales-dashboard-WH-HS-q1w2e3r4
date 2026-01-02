@@ -4,125 +4,57 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>방송 매출 대시보드</title>
-
-  <!-- 검색 노출 최소화 -->
   <meta name="robots" content="noindex,nofollow" />
-
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     :root{
-      --bg:#f5f7fb;
-      --card:#ffffff;
-      --muted:#6b7280;
-      --primary:#111827;
-      --soft:#eaf2ff;
-      --border:#e5e7eb;
+      --bg:#f5f7fb; --card:#fff; --muted:#6b7280; --text:#111827;
+      --border:#e5e7eb; --soft:#eaf2ff; --accent:#2563eb;
       --radius:14px;
     }
-    body{
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-      background: var(--bg);
-      margin: 0;
-      padding: 22px;
-      color: var(--primary);
-    }
-    header{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-bottom:14px;
-    }
-    header h1{
-      font-size: 30px;
-      margin: 0;
-      letter-spacing: -0.4px;
-    }
-    .sub{
-      color: var(--muted);
-      margin: 0 0 18px 0;
-      font-size: 14px;
-    }
+    body{ font-family: system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+      background:var(--bg); margin:0; padding:18px; color:var(--text); }
+    header{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    header h1{ margin:0; font-size:28px; letter-spacing:-.4px; }
+    .sub{ margin:0 0 14px 0; color:var(--muted); font-size:13px; }
 
-    .status{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 10px 12px;
-      margin: 0 0 14px 0;
-      font-size: 13px;
-      color: var(--muted);
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content: space-between;
-    }
-    .status b{ color: var(--primary); }
-    .status .right{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap: wrap;
-      justify-content:flex-end;
-    }
-    .btn{
-      border: 1px solid var(--border);
-      background: #fff;
-      border-radius: 10px;
-      padding: 8px 10px;
-      cursor:pointer;
-      font-size: 13px;
-    }
+    .grid{ display:grid; grid-template-columns: 360px 1fr; gap:14px; align-items:start; }
+    @media(max-width:1050px){ .grid{ grid-template-columns:1fr; } }
+
+    .panel{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:12px; }
+    .panel h2{ margin:0 0 8px 0; font-size:16px; }
+    .hint{ color:var(--muted); font-size:12px; margin-top:6px; }
+
+    .status{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+      border:1px solid var(--border); border-radius:var(--radius); background:var(--card); padding:10px 12px; }
+    .status b{ font-weight:800; }
+    .btn{ border:1px solid var(--border); background:#fff; border-radius:10px; padding:8px 10px; cursor:pointer; font-size:13px; }
     .btn:hover{ background:#f9fafb; }
+    .btn.primary{ border-color:#c7d2fe; background:#eef2ff; }
 
-    .kpis{
-      display:grid;
-      grid-template-columns: repeat(4, minmax(150px, 1fr));
-      gap: 12px;
-      margin: 14px 0 22px 0;
-    }
-    .kpi{
-      background: var(--soft);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      min-height: 74px;
-    }
-    .kpi .label{
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 6px;
-    }
-    .kpi .value{
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.4px;
-    }
+    .kpis{ display:grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap:12px; margin-top:12px; }
+    @media(max-width:920px){ .kpis{ grid-template-columns: repeat(2, minmax(150px, 1fr)); } }
+    @media(max-width:520px){ .kpis{ grid-template-columns:1fr; } }
+    .kpi{ background:var(--soft); border-radius:var(--radius); padding:14px 16px; }
+    .kpi .label{ color:var(--muted); font-size:12px; margin-bottom:6px; }
+    .kpi .value{ font-size:22px; font-weight:900; letter-spacing:-.4px; }
 
-    .section{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 14px 10px 14px;
-      margin-top: 14px;
+    .slicer{ margin-top:10px; }
+    .slicer-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .slicer-head .title{ font-weight:800; }
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .chip{
+      border:1px solid var(--border); background:#fff; border-radius:999px;
+      padding:7px 10px; font-size:13px; cursor:pointer; user-select:none;
     }
-    .section h2{
-      font-size: 18px;
-      margin: 4px 0 10px 0;
-      letter-spacing: -0.2px;
-    }
-    canvas{
-      width:100% !important;
-      max-height: 360px;
-    }
+    .chip.on{ border-color:#bfdbfe; background:#eff6ff; color:#1d4ed8; font-weight:700; }
+    .chip:active{ transform: translateY(1px); }
 
-    @media (max-width: 980px){
-      .kpis{ grid-template-columns: repeat(2, minmax(150px, 1fr)); }
-      header h1{ font-size: 26px; }
-    }
-    @media (max-width: 520px){
-      body{ padding: 14px; }
-      .kpis{ grid-template-columns: 1fr; }
-    }
+    .section{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+      padding:12px; margin-top:12px; }
+    .section h3{ margin:0 0 10px 0; font-size:16px; }
+    canvas{ width:100% !important; max-height:380px; }
   </style>
 </head>
 
@@ -131,172 +63,306 @@
     <div style="font-size:30px">📊</div>
     <h1>방송 매출 대시보드</h1>
   </header>
-  <p class="sub">Google Sheets(data 시트) → Apps Script API → GitHub Pages (실시간 반영)</p>
+  <p class="sub">엑셀 슬라이서처럼 버튼을 눌러 필터링하면 KPI/차트가 즉시 변경됩니다.</p>
 
-  <div class="status" id="statusBox">
+  <div class="status">
+    <div>상태: <b id="statusText">로딩…</b> <span id="statusHint" style="color:var(--muted)"></span></div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <span id="lastUpdated" style="color:var(--muted); font-size:13px;"></span>
+      <button class="btn" id="resetBtn">전체 해제</button>
+      <button class="btn primary" id="refreshBtn">새로고침</button>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:14px;">
+    <!-- LEFT: slicers -->
+    <div class="panel">
+      <h2>필터(슬라이서)</h2>
+
+      <div class="slicer" id="slicerYears"></div>
+      <div class="slicer" id="slicerMonths"></div>
+      <div class="slicer" id="slicerDows"></div>
+      <div class="slicer" id="slicerItems"></div>
+      <div class="slicer" id="slicerChannels"></div>
+
+      <div class="hint">팁: 여러 개를 동시에 선택할 수 있어요(엑셀 슬라이서와 동일).</div>
+    </div>
+
+    <!-- RIGHT: KPIs + Charts -->
     <div>
-      상태: <b id="statusText">로딩 중…</b>
-      <span id="statusHint"></span>
+      <div class="kpis" id="kpis"></div>
+
+      <div class="section">
+        <h3>방송채널별 달성율</h3>
+        <canvas id="channelChart"></canvas>
+      </div>
+
+      <div class="section">
+        <h3>아이템별 달성율</h3>
+        <canvas id="itemChart"></canvas>
+      </div>
+
+      <div class="section">
+        <h3>월별 달성율</h3>
+        <canvas id="monthChart"></canvas>
+      </div>
+
+      <div class="section">
+        <h3>요일별 달성율</h3>
+        <canvas id="dowChart"></canvas>
+      </div>
     </div>
-    <div class="right">
-      <span id="lastUpdated" style="color:var(--muted)"></span>
-      <button class="btn" id="refreshBtn">지금 새로고침</button>
+  </div>
+
+<script>
+/*** ✅ 본인 Apps Script exec URL 입력 ***/
+const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec"; // ← 이것만 바꾸세요
+
+/*** JSONP 유틸 ***/
+function jsonp(url){
+  return new Promise((resolve, reject) => {
+    const cb = "cb_" + Math.random().toString(36).slice(2);
+    const script = document.createElement("script");
+    window[cb] = (data) => {
+      resolve(data);
+      try{ delete window[cb]; }catch(e){ window[cb]=undefined; }
+      script.remove();
+    };
+    const sep = url.includes("?") ? "&" : "?";
+    script.src = url + sep + "callback=" + cb;
+    script.onerror = () => {
+      reject(new Error("JSONP load failed"));
+      try{ delete window[cb]; }catch(e){ window[cb]=undefined; }
+      script.remove();
+    };
+    document.body.appendChild(script);
+  });
+}
+
+/*** 상태/UI ***/
+function setStatus(ok, text, hint=""){
+  const el = document.getElementById("statusText");
+  const hintEl = document.getElementById("statusHint");
+  el.textContent = text;
+  hintEl.textContent = hint ? ` · ${hint}` : "";
+  el.style.color = ok ? "#059669" : "#dc2626";
+}
+function updateTimestamp(){
+  document.getElementById("lastUpdated").textContent =
+    "업데이트: " + new Date().toLocaleString("ko-KR");
+}
+function fmtNumber(x){
+  const n = Number(x);
+  if(!isFinite(n)) return "-";
+  return Math.round(n).toLocaleString("ko-KR");
+}
+function fmtPercent01(x){
+  const n = Number(x);
+  if(!isFinite(n)) return "-";
+  return Math.round(n*100) + "%";
+}
+
+/*** 선택 상태(엑셀 슬라이서처럼 멀티) ***/
+const state = {
+  years: new Set(),
+  months: new Set(),
+  dows: new Set(),
+  items: new Set(),
+  channels: new Set(),
+};
+
+// URL 쿼리에 선택상태 저장/복원 (공유 링크에도 유지)
+function readStateFromUrl(){
+  const sp = new URLSearchParams(location.search);
+  ["years","months","dows","items","channels"].forEach(k=>{
+    state[k].clear();
+    const v = sp.get(k);
+    if(v){
+      v.split(",").map(s=>s.trim()).filter(Boolean).forEach(x=>state[k].add(x));
+    }
+  });
+}
+function writeStateToUrl(){
+  const sp = new URLSearchParams();
+  ["years","months","dows","items","channels"].forEach(k=>{
+    if(state[k].size) sp.set(k, [...state[k]].join(","));
+  });
+  const newUrl = location.pathname + (sp.toString()?("?"+sp.toString()):"");
+  history.replaceState(null, "", newUrl);
+}
+
+function buildQueryFromState(){
+  const sp = new URLSearchParams();
+  ["years","months","dows","items","channels"].forEach(k=>{
+    if(state[k].size) sp.set(k, [...state[k]].join(","));
+  });
+  return sp.toString();
+}
+
+/*** 슬라이서 렌더(칩 버튼) ***/
+function renderSlicer(containerId, title, key, options){
+  const container = document.getElementById(containerId);
+  const selected = state[key];
+
+  const chipsHtml = (options || []).map(v=>{
+    const on = selected.has(String(v));
+    return `<div class="chip ${on?'on':''}" data-key="${key}" data-val="${String(v)}">${String(v)}</div>`;
+  }).join("");
+
+  container.innerHTML = `
+    <div class="slicer-head">
+      <div class="title">${title}</div>
+      <div style="display:flex; gap:6px;">
+        <button class="btn" data-action="all" data-key="${key}">전체선택</button>
+        <button class="btn" data-action="none" data-key="${key}">해제</button>
+      </div>
     </div>
-  </div>
+    <div class="chips">${chipsHtml || '<span style="color:var(--muted);font-size:13px;">(옵션 없음)</span>'}</div>
+  `;
+}
 
-  <div class="kpis" id="kpis">
-    <!-- KPI가 여기에 렌더링 -->
-  </div>
+/*** KPI ***/
+function renderKpis(d){
+  document.getElementById("kpis").innerHTML = `
+    <div class="kpi"><div class="label">방송횟수</div><div class="value">${fmtNumber(d["방송횟수"])}</div></div>
+    <div class="kpi"><div class="label">특약횟수</div><div class="value">${fmtNumber(d["특약횟수"])}</div></div>
+    <div class="kpi"><div class="label">평균달성율</div><div class="value">${fmtPercent01(d["평균달성율"])}</div></div>
+    <div class="kpi"><div class="label">시간당매출</div><div class="value">${fmtNumber(d["시간당매출"])}</div></div>
+  `;
+}
 
-  <div class="section">
-    <h2>방송채널별 달성율</h2>
-    <canvas id="channelChart"></canvas>
-  </div>
+/*** Charts ***/
+let charts = {};
+function drawBarChart(canvasId, labels, values01, labelText){
+  const ctx = document.getElementById(canvasId);
+  if(charts[canvasId]) charts[canvasId].destroy();
 
-  <script>
-    /********************************************************
-     * ✅ 1) 본인 Apps Script 웹앱 exec URL을 넣어주세요.
-     * 예) https://script.google.com/macros/s/XXXX/exec
-     ********************************************************/
-    const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec"; // ← 여기만 바꾸세요
-
-    /********************************************************
-     * JSONP 호출 유틸 (GitHub Pages CORS 회피)
-     ********************************************************/
-    function jsonp(url) {
-      return new Promise((resolve, reject) => {
-        const cb = "cb_" + Math.random().toString(36).slice(2);
-        const script = document.createElement("script");
-
-        window[cb] = (data) => {
-          resolve(data);
-          try { delete window[cb]; } catch(e) { window[cb] = undefined; }
-          script.remove();
-        };
-
-        const sep = url.includes("?") ? "&" : "?";
-        script.src = url + sep + "callback=" + cb;
-
-        script.onerror = () => {
-          reject(new Error("JSONP load failed"));
-          try { delete window[cb]; } catch(e) { window[cb] = undefined; }
-          script.remove();
-        };
-
-        document.body.appendChild(script);
-      });
+  charts[canvasId] = new Chart(ctx, {
+    type:"bar",
+    data:{
+      labels: labels || [],
+      datasets:[{
+        label: labelText,
+        data: (values01 || []).map(v => Number(v) * 100)
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      scales:{ y:{ beginAtZero:true } }
     }
+  });
+}
 
-    /********************************************************
-     * 화면 표시용 유틸
-     ********************************************************/
-    function setStatus(ok, text, hint="") {
-      const statusText = document.getElementById("statusText");
-      const statusHint = document.getElementById("statusHint");
-      statusText.textContent = text;
-      statusHint.textContent = hint ? ` · ${hint}` : "";
-      statusText.style.color = ok ? "#059669" : "#dc2626";
+/*** 데이터 로드 (필터 반영) ***/
+async function loadOptions(){
+  // options는 필터 없이도 되지만, “필터된 옵션”을 원하면 query 붙여도 됨
+  const d = await jsonp(API_URL + "?action=options");
+  if(d && d.error) throw new Error(d.error);
+
+  // 옵션이 없을 때도 안전하게
+  renderSlicer("slicerYears", "연도", "years", d.years || []);
+  renderSlicer("slicerMonths", "월", "months", d.months || []);
+  renderSlicer("slicerDows", "요일", "dows", d.dows || []);
+  renderSlicer("slicerItems", "아이템", "items", d.items || []);
+  renderSlicer("slicerChannels", "방송채널", "channels", d.channels || []);
+}
+
+async function loadSummary(){
+  const q = buildQueryFromState();
+  const d = await jsonp(API_URL + "?action=summary" + (q ? "&" + q : ""));
+  if(d && d.error) throw new Error(d.error);
+  renderKpis(d);
+}
+
+async function loadCharts(){
+  const q = buildQueryFromState();
+  const suffix = q ? "&" + q : "";
+
+  const ch = await jsonp(API_URL + "?action=bar&by=방송채널&metric=달성율&agg=mean&top=30" + suffix);
+  if(ch && ch.error) throw new Error(ch.error);
+  drawBarChart("channelChart", ch.labels, ch.values, "달성율(%)");
+
+  const it = await jsonp(API_URL + "?action=bar&by=아이템&metric=달성율&agg=mean&top=30" + suffix);
+  if(it && it.error) throw new Error(it.error);
+  drawBarChart("itemChart", it.labels, it.values, "달성율(%)");
+
+  const mo = await jsonp(API_URL + "?action=bar&by=월&metric=달성율&agg=mean&top=12" + suffix);
+  if(mo && mo.error) throw new Error(mo.error);
+  drawBarChart("monthChart", mo.labels, mo.values, "달성율(%)");
+
+  const dw = await jsonp(API_URL + "?action=bar&by=요일&metric=달성율&agg=mean&top=7" + suffix);
+  if(dw && dw.error) throw new Error(dw.error);
+  drawBarChart("dowChart", dw.labels, dw.values, "달성율(%)");
+}
+
+async function refreshAll(){
+  try{
+    setStatus(true, "로딩 중…");
+    writeStateToUrl();
+    await loadSummary();
+    await loadCharts();
+    updateTimestamp();
+    setStatus(true, "정상", "필터 적용 완료");
+  }catch(err){
+    console.error(err);
+    setStatus(false, "오류", err.message || String(err));
+  }
+}
+
+/*** 이벤트: 칩 클릭/전체선택/해제 ***/
+document.addEventListener("click", async (ev) => {
+  const chip = ev.target.closest(".chip");
+  if(chip){
+    const key = chip.dataset.key;
+    const val = chip.dataset.val;
+    if(state[key].has(val)) state[key].delete(val);
+    else state[key].add(val);
+
+    // UI 즉시 반영
+    chip.classList.toggle("on");
+
+    // KPI/차트 즉시 갱신 (엑셀 슬라이서 느낌)
+    await refreshAll();
+    return;
+  }
+
+  const actionBtn = ev.target.closest("button[data-action]");
+  if(actionBtn){
+    const key = actionBtn.dataset.key;
+    const action = actionBtn.dataset.action;
+    const parent = actionBtn.closest(".slicer");
+    const chipEls = parent ? parent.querySelectorAll(`.chip[data-key="${key}"]`) : [];
+
+    if(action === "none"){
+      state[key].clear();
+      chipEls.forEach(c=>c.classList.remove("on"));
+      await refreshAll();
     }
-
-    function fmtNumber(x) {
-      const n = Number(x);
-      if (!isFinite(n)) return "-";
-      return n.toLocaleString("ko-KR");
+    if(action === "all"){
+      chipEls.forEach(c=>state[key].add(c.dataset.val));
+      chipEls.forEach(c=>c.classList.add("on"));
+      await refreshAll();
     }
+  }
+});
 
-    function fmtPercent01(x) {
-      const n = Number(x);
-      if (!isFinite(n)) return "-";
-      return Math.round(n * 100) + "%";
-    }
+document.getElementById("resetBtn").addEventListener("click", async ()=>{
+  ["years","months","dows","items","channels"].forEach(k=>state[k].clear());
+  await loadOptions(); // UI 다시 그림
+  await refreshAll();
+});
 
-    function updateTimestamp() {
-      const el = document.getElementById("lastUpdated");
-      const now = new Date();
-      el.textContent = `마지막 업데이트: ${now.toLocaleString("ko-KR")}`;
-    }
+document.getElementById("refreshBtn").addEventListener("click", async ()=>{
+  await refreshAll();
+});
 
-    /********************************************************
-     * KPI 렌더
-     ********************************************************/
-    function renderKpis(d) {
-      const el = document.getElementById("kpis");
-      el.innerHTML = `
-        <div class="kpi"><div class="label">방송횟수</div><div class="value">${fmtNumber(d["방송횟수"])}</div></div>
-        <div class="kpi"><div class="label">특약횟수</div><div class="value">${fmtNumber(d["특약횟수"])}</div></div>
-        <div class="kpi"><div class="label">평균달성율</div><div class="value">${fmtPercent01(d["평균달성율"])}</div></div>
-        <div class="kpi"><div class="label">시간당매출</div><div class="value">${fmtNumber(Math.round(Number(d["시간당매출"])))}</div></div>
-      `;
-    }
-
-    /********************************************************
-     * Chart.js: 채널 차트
-     ********************************************************/
-    let channelChartInstance = null;
-
-    function renderChannelChart(labels, values01) {
-      const ctx = document.getElementById("channelChart");
-
-      if (channelChartInstance) channelChartInstance.destroy();
-
-      channelChartInstance = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels,
-          datasets: [{
-            label: "달성율(%)",
-            data: values01.map(v => Number(v) * 100)
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
-      });
-    }
-
-    /********************************************************
-     * 데이터 로더
-     ********************************************************/
-    async function loadSummary() {
-      const d = await jsonp(API_URL + "?action=summary");
-      if (d && d.error) throw new Error(d.error);
-      renderKpis(d);
-    }
-
-    async function loadChannel() {
-      const d = await jsonp(API_URL + "?action=bar&by=방송채널&metric=달성율&agg=mean&top=30");
-      if (d && d.error) throw new Error(d.error);
-      renderChannelChart(d.labels || [], d.values || []);
-    }
-
-    async function refreshAll() {
-      try {
-        setStatus(true, "로딩 중…");
-        await loadSummary();
-        await loadChannel();
-        updateTimestamp();
-        setStatus(true, "정상", "데이터 로드 완료");
-      } catch (err) {
-        console.error(err);
-        setStatus(false, "오류", err.message || String(err));
-      }
-    }
-
-    // 버튼
-    document.getElementById("refreshBtn").addEventListener("click", () => {
-      refreshAll();
-    });
-
-    // 최초 로드
-    refreshAll();
-
-    // 자동 갱신(원하면 주기 조절)
-    setInterval(() => { loadSummary().then(updateTimestamp).catch(console.error); }, 10000); // 10초마다 KPI
-    setInterval(() => { loadChannel().catch(console.error); }, 30000); // 30초마다 차트
-  </script>
+/*** 초기 실행 ***/
+(async function init(){
+  readStateFromUrl();
+  await loadOptions();   // 슬라이서 옵션 생성
+  await refreshAll();    // 현재 선택값으로 KPI/차트 로드
+})();
+</script>
 </body>
 </html>
