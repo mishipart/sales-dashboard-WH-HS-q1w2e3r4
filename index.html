@@ -24,7 +24,7 @@
     .btn.primary{border-color:#b8ccff;background:#eaf1ff}
     .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;color:var(--muted);font-size:13px}
 
-    /* ✅ 필터 여닫기: grid가 2열/1열로 전환됨 */
+    /* ✅ 필터 여닫기: grid가 2열/1열로 전환 */
     .grid{display:grid;grid-template-columns:320px 1fr;gap:14px}
     .grid.filters-collapsed{grid-template-columns:1fr;}
 
@@ -71,13 +71,10 @@
     .status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
     .status .left{display:flex;gap:10px;align-items:center}
 
-    /* ✅ 필터 접힘 상태에서 왼쪽 필터 카드는 숨김 */
-    .filtersWrap{transition:opacity .18s ease, transform .18s ease}
-    .grid.filters-collapsed .filtersWrap{
-      display:none;
-    }
+    /* ✅ 필터 접힘 상태에서 왼쪽 필터 카드 숨김 */
+    .grid.filters-collapsed .filtersWrap{display:none;}
 
-    /* ✅ 상단 오른쪽 버튼 그룹 안에 "필터 접기/펼치기" 버튼 스타일 */
+    /* ✅ 상단 버튼 */
     .btn.toggle{
       display:inline-flex;
       align-items:center;
@@ -117,7 +114,7 @@
       <div style="display:flex;gap:10px;align-items:center">
         <span class="pill" id="statusPill">상태: -</span>
 
-        <!-- ✅ 추가: 필터 접기/펼치기 -->
+        <!-- ✅ 필터 접기/펼치기 -->
         <button class="btn toggle" id="btnToggleFilters" title="필터를 접거나 펼칩니다">
           <span class="arrow" id="toggleArrow">▾</span>
           <span id="toggleLabel">필터 접기</span>
@@ -129,7 +126,6 @@
       </div>
     </div>
 
-    <!-- ✅ id 부여 -->
     <div class="grid" id="gridRoot">
       <!-- filters -->
       <div class="card filters filtersWrap" id="filtersCard">
@@ -186,20 +182,10 @@
   </div>
 
 <script>
-/** =========================
- *  ✅ 여기만 바꿔!
- *  ========================= */
 const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec";
 const DEFAULT_KEY = "WHHS-PSM-221035";
-
-/** =========================
- *  ✅ 필터 접힘 상태 저장 키
- *  ========================= */
 const FILTER_UI_KEY = "dash_filters_collapsed";
 
-/** =========================
- *  State
- *  ========================= */
 const DOW_ORDER = ['일','월','화','수','목','금','토'];
 const store = {
   key: localStorage.getItem('dash_key') || DEFAULT_KEY,
@@ -207,6 +193,7 @@ const store = {
   options: null,
   charts: { channel:null, month:null, dow:null, day:null, item:null },
   renderQueued: false,
+  lastData: null, // ✅ 마지막 dashboard 데이터를 저장
 };
 
 const elStatusPill = document.getElementById('statusPill');
@@ -215,9 +202,7 @@ const elUpdated = document.getElementById('updatedText');
 const elFilters = document.getElementById('filters');
 const elKpis = document.getElementById('kpis');
 
-/** =========================
- *  ✅ 필터 여닫기 UI
- *  ========================= */
+/** ✅ 필터 여닫기 UI */
 const gridRoot = document.getElementById("gridRoot");
 const btnToggleFilters = document.getElementById("btnToggleFilters");
 const toggleLabel = document.getElementById("toggleLabel");
@@ -232,9 +217,11 @@ function setFiltersCollapsed(collapsed){
 
   localStorage.setItem(FILTER_UI_KEY, collapsed ? "1" : "0");
 
-  // ✅ 접었다 펼치면 차트 컨테이너 폭이 바뀌므로 리렌더(다시 그림)
-  // (지금 코드 구조상 가장 안전한 방법: 한 번 loadAll(false)로 재그림)
-  loadAll(false);
+  // ✅ 여기서 loadAll(false) 호출하지 않음!
+  // ✅ 대신 "이미 받은 데이터"로 차트만 다시 그림(폭 변경 반영)
+  requestAnimationFrame(()=> {
+    if (store.lastData) renderFromData(store.lastData);
+  });
 }
 
 btnToggleFilters.addEventListener("click", ()=>{
@@ -242,16 +229,13 @@ btnToggleFilters.addEventListener("click", ()=>{
   setFiltersCollapsed(!collapsed);
 });
 
-// 초기 상태 적용
+// 초기 상태 적용 (페이지 로드시 1번만)
 (function initFiltersCollapsed(){
   const saved = localStorage.getItem(FILTER_UI_KEY);
-  if (saved === "1") setFiltersCollapsed(true);
-  else setFiltersCollapsed(false);
+  setFiltersCollapsed(saved === "1");
 })();
 
-/** =========================
- *  Buttons
- *  ========================= */
+/** Buttons */
 document.getElementById('btnKey').addEventListener('click', () => {
   const k = prompt("접속 키를 입력하세요", store.key || "");
   if (k == null) return;
@@ -267,9 +251,7 @@ document.getElementById('btnReset').addEventListener('click', ()=>{
   loadAll(true);
 });
 
-/** =========================
- *  Helpers
- *  ========================= */
+/** Helpers */
 function setStatus(ok, msg){
   const t = ok ? `상태: 정상 · ${msg}` : `상태: 오류 · ${msg}`;
   elStatusPill.textContent = t;
@@ -306,9 +288,7 @@ function debounceRender(fn){
   });
 }
 
-/** =========================
- *  API
- *  ========================= */
+/** API */
 function jsonp(url){
   return new Promise((resolve,reject)=>{
     const cb = "CB_" + Math.random().toString(36).slice(2);
@@ -352,9 +332,7 @@ async function apiFetch(action){
   return res;
 }
 
-/** =========================
- *  UI: Filters
- *  ========================= */
+/** UI: Filters */
 function toggleInList(list, v){
   const i = list.indexOf(v);
   if (i>=0) list.splice(i,1);
@@ -426,9 +404,7 @@ function renderFilters(){
   });
 }
 
-/** =========================
- *  Charts
- *  ========================= */
+/** Charts */
 function destroyChart(ch){
   if (ch && typeof ch.destroy === 'function') ch.destroy();
 }
@@ -507,9 +483,7 @@ function makeComboChart(canvasId, labels, goal, actual, ratePct, count){
   store.charts[canvasIdMap(canvasId)] = c;
 }
 
-/** =========================
- *  Render
- *  ========================= */
+/** Render */
 function renderKpis(k){
   const items = [
     ['방송횟수', fmt(k.broadcastCount)],
@@ -525,9 +499,62 @@ function renderKpis(k){
 }
 function safeArr(a){ return Array.isArray(a) ? a : []; }
 
-/** =========================
- *  Main load
- *  ========================= */
+function renderFromData(data){
+  // KPI
+  renderKpis(data.kpis);
+
+  // 차트
+  debounceRender(()=>{
+    const ch = data.charts.channel;
+    const idx = safeArr(ch.labels).map((v,i)=>[String(v), i])
+      .filter(([v])=>v && v!=='(비어있음)')
+      .sort((a,b)=>a[0].localeCompare(b[0], 'en'));
+
+    const pick = (arr)=> idx.map(([_,i])=> arr[i]);
+
+    makeComboChart('chChannel',
+      idx.map(x=>x[0]),
+      pick(ch.goal),
+      pick(ch.actual),
+      pick(ch.ratePct),
+      pick(ch.count)
+    );
+
+    makeComboChart('chMonth',
+      data.charts.month.labels,
+      data.charts.month.goal,
+      data.charts.month.actual,
+      data.charts.month.ratePct,
+      data.charts.month.count
+    );
+
+    makeComboChart('chDow',
+      data.charts.dow.labels,
+      data.charts.dow.goal,
+      data.charts.dow.actual,
+      data.charts.dow.ratePct,
+      data.charts.dow.count
+    );
+
+    makeComboChart('chDay',
+      data.charts.day.labels,
+      data.charts.day.goal,
+      data.charts.day.actual,
+      data.charts.day.ratePct,
+      data.charts.day.count
+    );
+
+    makeComboChart('chItem',
+      data.charts.item.labels,
+      data.charts.item.goal,
+      data.charts.item.actual,
+      data.charts.item.ratePct,
+      data.charts.item.count
+    );
+  });
+}
+
+/** Main load */
 async function loadAll(force){
   try{
     setStatus(true, '로딩 중...');
@@ -539,59 +566,12 @@ async function loadAll(force){
     }
 
     const data = await apiFetch('dashboard');
+    store.lastData = data; // ✅ 저장
 
     elUpdated.textContent = `업데이트: ${data.updated || '-'}`;
     setStatus(true, '필터 적용 완료');
-    renderKpis(data.kpis);
 
-    debounceRender(()=>{
-      const ch = data.charts.channel;
-      const idx = safeArr(ch.labels).map((v,i)=>[String(v), i])
-        .filter(([v])=>v && v!=='(비어있음)')
-        .sort((a,b)=>a[0].localeCompare(b[0], 'en'));
-
-      const pick = (arr)=> idx.map(([_,i])=> arr[i]);
-
-      makeComboChart('chChannel',
-        idx.map(x=>x[0]),
-        pick(ch.goal),
-        pick(ch.actual),
-        pick(ch.ratePct),
-        pick(ch.count)
-      );
-
-      makeComboChart('chMonth',
-        data.charts.month.labels,
-        data.charts.month.goal,
-        data.charts.month.actual,
-        data.charts.month.ratePct,
-        data.charts.month.count
-      );
-
-      makeComboChart('chDow',
-        data.charts.dow.labels,
-        data.charts.dow.goal,
-        data.charts.dow.actual,
-        data.charts.dow.ratePct,
-        data.charts.dow.count
-      );
-
-      makeComboChart('chDay',
-        data.charts.day.labels,
-        data.charts.day.goal,
-        data.charts.day.actual,
-        data.charts.day.ratePct,
-        data.charts.day.count
-      );
-
-      makeComboChart('chItem',
-        data.charts.item.labels,
-        data.charts.item.goal,
-        data.charts.item.actual,
-        data.charts.item.ratePct,
-        data.charts.item.count
-      );
-    });
+    renderFromData(data);
 
   } catch(err){
     console.error(err);
