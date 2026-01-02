@@ -24,7 +24,10 @@
     .btn.primary{border-color:#b8ccff;background:#eaf1ff}
     .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;color:var(--muted);font-size:13px}
 
+    /* ✅ 필터 여닫기: grid가 2열/1열로 전환됨 */
     .grid{display:grid;grid-template-columns:320px 1fr;gap:14px}
+    .grid.filters-collapsed{grid-template-columns:1fr;}
+
     .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 8px 24px rgba(17,24,39,.04)}
     .card .hd{padding:14px 14px 0}
     .card .bd{padding:14px}
@@ -50,7 +53,6 @@
     }
     .charts .span2{grid-column:1 / -1}
 
-    /* ✅ chartBox는 높이 고정 */
     .chartBox{
       position:relative;
       height:320px;
@@ -60,8 +62,6 @@
     .chartBox.tall{height:360px;min-height:360px}
     .chartBox.short{height:280px;min-height:280px}
 
-    /* ✅ 핵심: canvas에 100% 강제 금지!
-       chartBox 안에 절대배치로 "딱 붙게" */
     .chartBox canvas{
       position:absolute;
       inset:0;
@@ -71,8 +71,31 @@
     .status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
     .status .left{display:flex;gap:10px;align-items:center}
 
+    /* ✅ 필터 접힘 상태에서 왼쪽 필터 카드는 숨김 */
+    .filtersWrap{transition:opacity .18s ease, transform .18s ease}
+    .grid.filters-collapsed .filtersWrap{
+      display:none;
+    }
+
+    /* ✅ 상단 오른쪽 버튼 그룹 안에 "필터 접기/펼치기" 버튼 스타일 */
+    .btn.toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      padding:9px 14px;
+    }
+    .btn.toggle .arrow{
+      display:inline-block;
+      width:18px;
+      text-align:center;
+      font-weight:700;
+      color:#64748b;
+    }
+
     @media (max-width: 1100px){
       .grid{grid-template-columns:1fr}
+      .grid.filters-collapsed{grid-template-columns:1fr;}
       .kpis{grid-template-columns:repeat(2,1fr)}
       .charts{grid-template-columns:1fr}
       .charts .span2{grid-column:auto}
@@ -93,15 +116,23 @@
       </div>
       <div style="display:flex;gap:10px;align-items:center">
         <span class="pill" id="statusPill">상태: -</span>
+
+        <!-- ✅ 추가: 필터 접기/펼치기 -->
+        <button class="btn toggle" id="btnToggleFilters" title="필터를 접거나 펼칩니다">
+          <span class="arrow" id="toggleArrow">▾</span>
+          <span id="toggleLabel">필터 접기</span>
+        </button>
+
         <button class="btn" id="btnReset">전체 해제</button>
         <button class="btn primary" id="btnRefresh">새로고침</button>
         <button class="btn" id="btnKey">키 변경</button>
       </div>
     </div>
 
-    <div class="grid">
+    <!-- ✅ id 부여 -->
+    <div class="grid" id="gridRoot">
       <!-- filters -->
-      <div class="card filters">
+      <div class="card filters filtersWrap" id="filtersCard">
         <div class="hd"><h3 style="margin:0;font-size:16px">필터(슬라이서)</h3></div>
         <div class="bd" id="filters"></div>
         <div class="bd" style="padding-top:0;color:var(--muted);font-size:12px">
@@ -162,6 +193,11 @@ const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_
 const DEFAULT_KEY = "WHHS-PSM-221035";
 
 /** =========================
+ *  ✅ 필터 접힘 상태 저장 키
+ *  ========================= */
+const FILTER_UI_KEY = "dash_filters_collapsed";
+
+/** =========================
  *  State
  *  ========================= */
 const DOW_ORDER = ['일','월','화','수','목','금','토'];
@@ -179,6 +215,43 @@ const elUpdated = document.getElementById('updatedText');
 const elFilters = document.getElementById('filters');
 const elKpis = document.getElementById('kpis');
 
+/** =========================
+ *  ✅ 필터 여닫기 UI
+ *  ========================= */
+const gridRoot = document.getElementById("gridRoot");
+const btnToggleFilters = document.getElementById("btnToggleFilters");
+const toggleLabel = document.getElementById("toggleLabel");
+const toggleArrow = document.getElementById("toggleArrow");
+
+function setFiltersCollapsed(collapsed){
+  if (collapsed) gridRoot.classList.add("filters-collapsed");
+  else gridRoot.classList.remove("filters-collapsed");
+
+  toggleLabel.textContent = collapsed ? "필터 펼치기" : "필터 접기";
+  toggleArrow.textContent = collapsed ? "▸" : "▾";
+
+  localStorage.setItem(FILTER_UI_KEY, collapsed ? "1" : "0");
+
+  // ✅ 접었다 펼치면 차트 컨테이너 폭이 바뀌므로 리렌더(다시 그림)
+  // (지금 코드 구조상 가장 안전한 방법: 한 번 loadAll(false)로 재그림)
+  loadAll(false);
+}
+
+btnToggleFilters.addEventListener("click", ()=>{
+  const collapsed = gridRoot.classList.contains("filters-collapsed");
+  setFiltersCollapsed(!collapsed);
+});
+
+// 초기 상태 적용
+(function initFiltersCollapsed(){
+  const saved = localStorage.getItem(FILTER_UI_KEY);
+  if (saved === "1") setFiltersCollapsed(true);
+  else setFiltersCollapsed(false);
+})();
+
+/** =========================
+ *  Buttons
+ *  ========================= */
 document.getElementById('btnKey').addEventListener('click', () => {
   const k = prompt("접속 키를 입력하세요", store.key || "");
   if (k == null) return;
@@ -372,11 +445,9 @@ function canvasIdMap(id){
 function makeComboChart(canvasId, labels, goal, actual, ratePct, count){
   const canvas = document.getElementById(canvasId);
 
-  // 기존 차트 제거
   destroyChart(store.charts[canvasIdMap(canvasId)]);
 
-  // ✅ 핵심: 부모(.chartBox) 크기를 읽어서 canvas를 픽셀로 고정 (ResizeObserver 루프 차단)
-  const box = canvas.parentElement; // .chartBox
+  const box = canvas.parentElement;
   const rect = box.getBoundingClientRect();
   const w = Math.max(10, Math.floor(rect.width));
   const h = Math.max(10, Math.floor(rect.height));
@@ -401,7 +472,6 @@ function makeComboChart(canvasId, labels, goal, actual, ratePct, count){
       ]
     },
     options: {
-      // ✅ 핵심: 자동 리사이즈 끔
       responsive:false,
       maintainAspectRatio:false,
       animation:false,
@@ -475,7 +545,6 @@ async function loadAll(force){
     renderKpis(data.kpis);
 
     debounceRender(()=>{
-      // 방송채널: a~z 정렬
       const ch = data.charts.channel;
       const idx = safeArr(ch.labels).map((v,i)=>[String(v), i])
         .filter(([v])=>v && v!=='(비어있음)')
