@@ -4,668 +4,360 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>방송 매출 대시보드</title>
-
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
   <style>
     :root{
-      --bg:#f6f8fb;
-      --card:#ffffff;
-      --text:#111827;
-      --muted:#6b7280;
-      --line:#e5e7eb;
-      --accent:#60a5fa;
-      --accent2:#fb7185;
-      --accent3:#f59e0b;
-      --shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.06);
-      --radius: 16px;
+      --bg:#f5f7fb; --card:#fff; --line:#e7ecf5; --text:#111827; --muted:#6b7280;
+      --primary:#2563eb;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", "Apple SD Gothic Neo", Arial;
-      background:var(--bg);
-      color:var(--text);
-    }
-    header{
-      padding:18px 18px 10px;
-      max-width:1280px;
-      margin:0 auto;
-    }
-    .title{
-      display:flex; align-items:center; gap:10px;
-      font-size:28px; font-weight:900;
-    }
-    .subtitle{
-      margin-top:6px;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .topbar{
-      margin-top:12px;
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding:10px 12px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-    }
-    .status{
-      font-size:13px;
-      color:var(--muted);
-    }
-    .status b{color:#065f46}
-    .status .err b{color:#b91c1c}
-    .actions{
-      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
-      color:var(--muted);
-      font-size:12px;
-    }
-    .btn{
-      border:1px solid var(--line);
-      background:#fff;
-      padding:7px 10px;
-      border-radius: 10px;
-      cursor:pointer;
-      font-weight:700;
-      font-size:12px;
-    }
-    .btn.primary{
-      background:#eef2ff;
-      border-color:#c7d2fe;
-      color:#1d4ed8;
-    }
-
-    main{
-      max-width:1280px;
-      margin: 14px auto 36px;
-      padding:0 18px;
-      display:grid;
-      grid-template-columns: 320px 1fr;
-      gap:14px;
-      align-items:start;
-    }
-
-    /* Filters */
-    .panel{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding:12px;
-    }
-    .panel h3{
-      margin:0 0 10px;
-      font-size:14px;
-      font-weight:900;
-    }
-    .filterBlock{
-      margin-top:10px;
-      border-top:1px dashed #eef0f4;
-      padding-top:10px;
-    }
-    .filterHeader{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:8px;
-      margin-bottom:8px;
-    }
-    .filterHeader .label{
-      font-size:13px;
-      font-weight:900;
-    }
-    .filterHeader .miniBtns{
-      display:flex; gap:6px;
-    }
-    .mini{
-      border:1px solid var(--line);
-      background:#fff;
-      padding:5px 8px;
-      border-radius: 10px;
-      cursor:pointer;
-      font-weight:800;
-      font-size:11px;
-      color:#111827;
-    }
-
-    .chips{
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-    }
-    .chip{
-      border:1px solid var(--line);
-      background:#fff;
-      padding:6px 10px;
-      border-radius: 999px;
-      font-size:12px;
-      cursor:pointer;
-      user-select:none;
-    }
-    .chip.on{
-      border-color:#93c5fd;
-      background:#eff6ff;
-      color:#1d4ed8;
-      font-weight:900;
-    }
-
-    /* Content */
-    .content{
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-    }
-
-    .kpis{
-      display:grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap:10px;
-    }
-    .kpi{
-      background:#eaf2ff;
-      border-radius: 14px;
-      padding:12px 14px;
-      min-height:74px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:4px;
-    }
-    .kpi .k{
-      color:#375a8c;
-      font-size:12px;
-      font-weight:800;
-    }
-    .kpi .v{
-      font-size:20px;
-      font-weight:1000;
-      color:#0f172a;
-    }
-
-    .grid2{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:14px;
-    }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding:12px;
-    }
-    .card h4{
-      margin:0 0 10px;
-      font-size:13px;
-      font-weight:1000;
-    }
-    .chartWrap{
-      height:260px; /* 그래프 크기 줄임 */
-    }
-    .chartWrap.tall{
-      height:320px;
-    }
-
-    .footnote{
-      margin-top:10px;
-      color:var(--muted);
-      font-size:11px;
-    }
-
-    /* Modal */
-    .modalOverlay{
-      position:fixed; inset:0;
-      background:rgba(0,0,0,.45);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      z-index:1000;
-    }
-    .modal{
-      width:min(520px, 100%);
-      background:#fff;
-      border-radius: 18px;
-      padding:16px;
-      box-shadow: 0 12px 48px rgba(0,0,0,.25);
-      border:1px solid rgba(0,0,0,.08);
-    }
-    .modal h3{margin:0 0 8px; font-size:16px; font-weight:1000}
-    .modal p{margin:0 0 12px; color:var(--muted); font-size:13px; line-height:1.4}
-    .row{
-      display:flex; gap:8px; align-items:center;
-    }
-    input[type="password"], input[type="text"]{
-      width:100%;
-      padding:10px 12px;
-      border:1px solid var(--line);
-      border-radius: 12px;
-      outline:none;
-      font-size:14px;
-    }
-    .msg{
-      margin-top:10px;
-      font-size:12px;
-      color:#b91c1c;
-      display:none;
-      font-weight:800;
-    }
-
-    @media (max-width: 1100px){
-      main{grid-template-columns: 1fr;}
-      .kpis{grid-template-columns: repeat(3, minmax(0, 1fr));}
-      .grid2{grid-template-columns: 1fr;}
+    body{ margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial; background:var(--bg); color:var(--text); }
+    header{ padding:18px 18px 8px; }
+    h1{ margin:0; font-size:22px; display:flex; gap:10px; align-items:center; }
+    .sub{ margin-top:6px; color:var(--muted); font-size:12px; }
+    .topbar{ margin: 10px 18px 0; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; gap:10px;}
+    .status{ font-size:13px; color:var(--muted); }
+    .actions{ display:flex; gap:8px; align-items:center; }
+    button{ border:1px solid var(--line); background:#fff; border-radius:10px; padding:8px 10px; cursor:pointer; }
+    button.primary{ background:#e8efff; border-color:#cfe0ff; color:#1d4ed8; font-weight:600; }
+    .wrap{ display:grid; grid-template-columns: 300px 1fr; gap:14px; padding: 12px 18px 24px; }
+    .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow: 0 1px 8px rgba(0,0,0,.03); }
+    .filters{ padding:12px; }
+    .filters h3{ margin:0 0 10px; font-size:14px; }
+    .filterBlock{ margin-bottom:12px; padding-bottom:12px; border-bottom:1px dashed var(--line); }
+    .filterHead{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
+    .filterTitle{ font-weight:700; font-size:13px; }
+    .miniBtns{ display:flex; gap:6px; }
+    .miniBtns button{ padding:6px 8px; font-size:12px; border-radius:9px; }
+    .pills{ display:flex; flex-wrap:wrap; gap:6px; }
+    .pill{ padding:7px 9px; border:1px solid var(--line); border-radius:999px; font-size:12px; background:#fff; cursor:pointer; user-select:none; }
+    .pill.on{ background:#e8efff; border-color:#cfe0ff; color:#1d4ed8; font-weight:700; }
+    .grid{ display:grid; gap:14px; }
+    .kpis{ display:grid; grid-template-columns: repeat(6, minmax(140px, 1fr)); gap:10px; padding:12px; }
+    .kpi{ background:#eaf3ff; border-radius:14px; padding:12px; }
+    .kpi .t{ font-size:12px; color:#334155; }
+    .kpi .v{ margin-top:4px; font-size:20px; font-weight:800; }
+    .charts{ padding:12px; display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+    .chartCard{ padding:12px; }
+    .chartTitle{ font-weight:800; font-size:14px; margin-bottom:8px; }
+    canvas{ width:100% !important; height:260px !important; }
+    .full{ grid-column: 1 / -1; }
+    .note{ padding:0 12px 12px; color:var(--muted); font-size:12px; }
+    @media (max-width:1100px){
+      .wrap{ grid-template-columns: 1fr; }
+      .kpis{ grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+      .charts{ grid-template-columns: 1fr; }
+      canvas{ height:280px !important; }
     }
   </style>
 </head>
 <body>
 <header>
-  <div class="title">📊 방송 매출 대시보드</div>
-  <div class="subtitle">엑셀 슬라이서처럼 선택하면 KPI/차트가 즉시 변경됩니다.</div>
-
-  <div class="topbar">
-    <div class="status" id="statusText">상태: <b>대기</b> · 키 인증 필요</div>
-    <div class="actions">
-      <span id="updatedAt">업데이트: -</span>
-      <button class="btn" id="btnReset">전체 해제</button>
-      <button class="btn primary" id="btnReload">새로고침</button>
-    </div>
-  </div>
+  <h1>📊 방송 매출 대시보드</h1>
+  <div class="sub">엑셀 슬라이서처럼 선택하면 KPI/차트가 즉시 변경됩니다.</div>
 </header>
 
-<main>
+<div class="topbar card">
+  <div class="status" id="status">상태: 대기</div>
+  <div class="actions">
+    <div class="status" id="updated"></div>
+    <button id="btnReset">전체 해제</button>
+    <button class="primary" id="btnRefresh">새로고침</button>
+  </div>
+</div>
+
+<div class="wrap">
   <!-- Filters -->
-  <section class="panel">
+  <div class="card filters">
     <h3>필터(슬라이서)</h3>
 
-    <div class="filterBlock" id="blkYears">
-      <div class="filterHeader">
-        <div class="label">연도</div>
+    <div class="filterBlock">
+      <div class="filterHead">
+        <div class="filterTitle">연도</div>
         <div class="miniBtns">
-          <button class="mini" data-act="all" data-k="years">전체</button>
-          <button class="mini" data-act="clear" data-k="years">해제</button>
+          <button data-all="years">전체</button>
+          <button data-clear="years">해제</button>
         </div>
       </div>
-      <div class="chips" id="chipsYears"></div>
+      <div class="pills" id="years"></div>
     </div>
 
-    <div class="filterBlock" id="blkMonths">
-      <div class="filterHeader">
-        <div class="label">월</div>
+    <div class="filterBlock">
+      <div class="filterHead">
+        <div class="filterTitle">월</div>
         <div class="miniBtns">
-          <button class="mini" data-act="all" data-k="months">전체</button>
-          <button class="mini" data-act="clear" data-k="months">해제</button>
+          <button data-all="months">전체</button>
+          <button data-clear="months">해제</button>
         </div>
       </div>
-      <div class="chips" id="chipsMonths"></div>
+      <div class="pills" id="months"></div>
     </div>
 
-    <div class="filterBlock" id="blkDays">
-      <div class="filterHeader">
-        <div class="label">일</div>
+    <div class="filterBlock">
+      <div class="filterHead">
+        <div class="filterTitle">일</div>
         <div class="miniBtns">
-          <button class="mini" data-act="all" data-k="days">전체</button>
-          <button class="mini" data-act="clear" data-k="days">해제</button>
+          <button data-all="days">전체</button>
+          <button data-clear="days">해제</button>
         </div>
       </div>
-      <div class="chips" id="chipsDays"></div>
+      <div class="pills" id="days"></div>
     </div>
 
-    <div class="filterBlock" id="blkDows">
-      <div class="filterHeader">
-        <div class="label">요일</div>
+    <div class="filterBlock">
+      <div class="filterHead">
+        <div class="filterTitle">요일</div>
         <div class="miniBtns">
-          <button class="mini" data-act="all" data-k="dows">전체</button>
-          <button class="mini" data-act="clear" data-k="dows">해제</button>
+          <button data-all="dows">전체</button>
+          <button data-clear="dows">해제</button>
         </div>
       </div>
-      <div class="chips" id="chipsDows"></div>
+      <div class="pills" id="dows"></div>
     </div>
 
-    <div class="filterBlock" id="blkItems">
-      <div class="filterHeader">
-        <div class="label">아이템</div>
+    <div class="filterBlock">
+      <div class="filterHead">
+        <div class="filterTitle">아이템</div>
         <div class="miniBtns">
-          <button class="mini" data-act="all" data-k="items">전체</button>
-          <button class="mini" data-act="clear" data-k="items">해제</button>
+          <button data-all="items">전체</button>
+          <button data-clear="items">해제</button>
         </div>
       </div>
-      <div class="chips" id="chipsItems"></div>
+      <div class="pills" id="items"></div>
     </div>
 
-    <div class="filterBlock" id="blkChannels">
-      <div class="filterHeader">
-        <div class="label">방송채널</div>
+    <div class="filterBlock" style="border-bottom:none;padding-bottom:0;margin-bottom:0;">
+      <div class="filterHead">
+        <div class="filterTitle">방송채널</div>
         <div class="miniBtns">
-          <button class="mini" data-act="all" data-k="channels">전체</button>
-          <button class="mini" data-act="clear" data-k="channels">해제</button>
+          <button data-all="channels">전체</button>
+          <button data-clear="channels">해제</button>
         </div>
       </div>
-      <div class="chips" id="chipsChannels"></div>
+      <div class="pills" id="channels"></div>
+      <div class="note">※ 키를 모르면 데이터를 불러올 수 없습니다.</div>
     </div>
+  </div>
 
-    <div class="footnote">※ 키를 모르면 데이터를 불러올 수 없습니다.</div>
-  </section>
-
-  <!-- Content -->
-  <section class="content">
-    <div class="kpis">
-      <div class="kpi"><div class="k">방송횟수</div><div class="v" id="kpiCnt">-</div></div>
-      <div class="kpi"><div class="k">특약횟수</div><div class="v" id="kpiSpCnt">-</div></div>
-      <div class="kpi"><div class="k">특약비용</div><div class="v" id="kpiSpCost">-</div></div>
-      <div class="kpi"><div class="k">평균달성율</div><div class="v" id="kpiAch">-</div></div>
-      <div class="kpi"><div class="k">방송시간(분)</div><div class="v" id="kpiMin">-</div></div>
-      <div class="kpi"><div class="k">시간당매출</div><div class="v" id="kpiHr">-</div></div>
-    </div>
-
-    <div class="grid2">
-      <div class="card">
-        <h4>방송채널별 (목표/실적/달성율)</h4>
-        <div class="chartWrap"><canvas id="chChannel"></canvas></div>
-      </div>
-      <div class="card">
-        <h4>월별 (목표/실적/달성율)</h4>
-        <div class="chartWrap"><canvas id="chMonth"></canvas></div>
-      </div>
-      <div class="card">
-        <h4>요일별 (목표/실적/달성율)</h4>
-        <div class="chartWrap"><canvas id="chDow"></canvas></div>
-      </div>
-      <div class="card">
-        <h4>일자별 (목표/실적/달성율) - TOP 30</h4>
-        <div class="chartWrap tall"><canvas id="chDay"></canvas></div>
-      </div>
-    </div>
-
+  <!-- Main -->
+  <div class="grid">
+    <!-- KPI -->
     <div class="card">
-      <h4>아이템별 (목표/실적/달성율)</h4>
-      <div class="chartWrap tall"><canvas id="chItem"></canvas></div>
+      <div class="kpis">
+        <div class="kpi"><div class="t">방송횟수</div><div class="v" id="k_bcnt">-</div></div>
+        <div class="kpi"><div class="t">특약횟수</div><div class="v" id="k_scnt">-</div></div>
+        <div class="kpi"><div class="t">특약비용</div><div class="v" id="k_scost">-</div></div>
+        <div class="kpi"><div class="t">평균달성율</div><div class="v" id="k_ach">-</div></div>
+        <div class="kpi"><div class="t">방송시간(분)</div><div class="v" id="k_time">-</div></div>
+        <div class="kpi"><div class="t">시간당매출</div><div class="v" id="k_hr">-</div></div>
+      </div>
     </div>
-  </section>
-</main>
 
-<!-- Key modal -->
-<div class="modalOverlay" id="keyModal">
-  <div class="modal">
-    <h3>키 인증</h3>
-    <p>이 페이지는 비공개 데이터입니다. 접근 키를 입력하세요.</p>
-    <div class="row">
-      <input id="keyInput" type="password" placeholder="키를 입력하세요" autocomplete="current-password" />
-      <button class="btn primary" id="keyOk">확인</button>
-    </div>
-    <div class="msg" id="keyMsg">키가 올바르지 않습니다.</div>
-    <div style="margin-top:10px; color:var(--muted); font-size:12px;">
-      · 키는 브라우저에만 저장됩니다(서버 저장 없음).<br/>
-      · 키를 변경했다면 저장된 키를 지우고 다시 입력하세요.
+    <!-- Charts -->
+    <div class="card charts">
+      <div class="card chartCard">
+        <div class="chartTitle">방송채널별 (목표/실적/달성율)</div>
+        <canvas id="ch_channel"></canvas>
+      </div>
+      <div class="card chartCard">
+        <div class="chartTitle">월별 (목표/실적/달성율)</div>
+        <canvas id="ch_month"></canvas>
+      </div>
+
+      <div class="card chartCard">
+        <div class="chartTitle">요일별 (목표/실적/달성율)</div>
+        <canvas id="ch_dow"></canvas>
+      </div>
+      <div class="card chartCard">
+        <div class="chartTitle">일자별 (목표/실적/달성율) - TOP 30</div>
+        <canvas id="ch_dateTop"></canvas>
+      </div>
+
+      <div class="card chartCard full">
+        <div class="chartTitle">아이템별 (목표/실적/달성율)</div>
+        <canvas id="ch_item"></canvas>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-/** ===========================
- *  0) 반드시 여기만 수정하세요
- * =========================== */
+/** =========================
+ * ✅ 여기 2개만 바꾸면 됨
+ * ========================= */
+const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec"; // .../exec
+const API_KEY = "WHHS-PSM-221035"; // Code.gs의 DASH_KEY와 동일
 
-// ✅ 1) Apps Script 웹앱 실행 URL (끝이 /exec 로 끝나는 주소)
-const API_EXEC_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec";
+/** ========================= */
+const nf = new Intl.NumberFormat('ko-KR');
+const state = {
+  selected: { years:new Set(), months:new Set(), days:new Set(), dows:new Set(), items:new Set(), channels:new Set() },
+  options:  { years:[], months:[], days:[], dows:[], items:[], channels:[] },
+  charts: {}
+};
 
-// ✅ 2) 기본 키(원하면 비워두고, 팝업에서만 입력하게 해도 됨)
-//    - 사용자가 바꿔둔 키로 수정 가능하도록 표기만 해둠
-const DEFAULT_KEY = "WHHS-PSM-221035"; // 예: "WHHS-ONLY-2026-SECRET"
+function setStatus(text){ document.getElementById('status').textContent = text; }
+function setUpdated(text){ document.getElementById('updated').textContent = text ? `업데이트: ${text}` : ''; }
 
-
-/** ===========================
- *  1) 유틸
- * =========================== */
-const $ = (id)=>document.getElementById(id);
-
-function setStatus(ok, msg){
-  const el = $("statusText");
-  if(ok){
-    el.innerHTML = `상태: <b>정상</b> · ${msg || "로드 완료"}`;
-  }else{
-    el.innerHTML = `상태: <span class="err"><b>오류</b></span> · ${msg || "문제 발생"}`;
-  }
-}
-
-function fmtInt(n){
-  n = Number(n||0);
-  return n.toLocaleString("ko-KR");
-}
-function fmtMoney(n){
-  n = Number(n||0);
-  return n.toLocaleString("ko-KR");
-}
-function fmtPctFromRatio(ratio){
-  // ratio: 0~1
-  const v = Number(ratio||0) * 100;
-  return `${v.toFixed(0)}%`;
-}
-function toPctValue(v){
-  // 어떤 입력이 와도 최종적으로 "퍼센트 숫자(예: 82)"로 변환
-  if (v === null || v === undefined) return 0;
-  if (typeof v === "string"){
-    const s = v.trim().replace(/,/g,'');
-    if (!s) return 0;
-    if (s.endsWith("%")){
-      const n = parseFloat(s.slice(0,-1));
-      return isFinite(n) ? n : 0;
-    }
-    const n = parseFloat(s);
-    if (!isFinite(n)) return 0;
-    // 0~1이면 비율로 보고 %로 환산
-    if (n <= 1.5) return n * 100;
-    // 82 같은 값이면 이미 %로 간주
-    return n;
-  }
-  const n = Number(v);
-  if (!isFinite(n)) return 0;
-  if (n <= 1.5) return n * 100;
-  return n;
-}
-
-function loadFromStorageKey(){
-  return localStorage.getItem("dash_key") || "";
-}
-function saveToStorageKey(k){
-  localStorage.setItem("dash_key", k);
-}
-
-/** JSONP 호출 */
-function jsonp(url, timeoutMs=15000){
+function jsonp(url){
   return new Promise((resolve, reject)=>{
-    const cb = "cb_" + Math.random().toString(16).slice(2);
-    const script = document.createElement("script");
-    let timer = null;
+    const cb = "cb_" + Math.random().toString(36).slice(2);
+    const script = document.createElement('script');
+    const sep = url.includes('?') ? '&' : '?';
+    const full = url + sep + "callback=" + cb;
+
+    let timer = setTimeout(()=>{
+      cleanup();
+      reject(new Error("JSONP timeout"));
+    }, 15000);
+
+    function cleanup(){
+      clearTimeout(timer);
+      if (script.parentNode) script.parentNode.removeChild(script);
+      try{ delete window[cb]; }catch(e){ window[cb]=undefined; }
+    }
 
     window[cb] = (data)=>{
       cleanup();
       resolve(data);
     };
 
-    function cleanup(){
-      if(timer) clearTimeout(timer);
-      delete window[cb];
-      if(script && script.parentNode) script.parentNode.removeChild(script);
-    }
-
-    timer = setTimeout(()=>{
-      cleanup();
-      reject(new Error("JSONP timeout"));
-    }, timeoutMs);
-
-    script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb + "&_ts=" + Date.now();
     script.onerror = ()=>{
       cleanup();
       reject(new Error("JSONP load failed"));
     };
-    document.head.appendChild(script);
+    script.src = full;
+    document.body.appendChild(script);
   });
 }
 
-/** 쿼리 만들기 */
-function qs(params){
-  const sp = new URLSearchParams();
-  Object.entries(params).forEach(([k,v])=>{
-    if(v === undefined || v === null) return;
-    if(Array.isArray(v)){
-      v.forEach(x=> sp.append(k, x));
-    }else{
-      sp.set(k, v);
+function buildQuery(){
+  const p = new URLSearchParams();
+  p.set("action","dashboard");
+  p.set("key", API_KEY);
+
+  for (const k of ["years","months","days","dows","items","channels"]){
+    const arr = [...state.selected[k]];
+    if (arr.length) p.set(k, arr.join(','));
+  }
+  return p.toString();
+}
+
+async function loadDashboard(){
+  setStatus("상태: 로딩 중...");
+  try{
+    const url = API_URL + "?" + buildQuery();
+    const data = await jsonp(url);
+
+    if (!data || data.ok !== true){
+      if (data && data.error === 'unauthorized'){
+        setStatus("상태: 오류 - 키가 올바르지 않습니다");
+      } else {
+        setStatus("상태: 오류 - 데이터 형식 문제");
+      }
+      return;
     }
-  });
-  return sp.toString();
-}
 
-/** ===========================
- *  2) 상태/필터
- * =========================== */
-const state = {
-  key: "",
-  filters: {
-    years: [],
-    months: [],
-    days: [],
-    dows: [],
-    items: [],
-    channels: []
-  },
-  options: null,
-  charts: {}
-};
+    setUpdated(data.updated || "");
+    state.options = data.options || state.options;
 
-function clearFilters(){
-  state.filters = { years:[], months:[], days:[], dows:[], items:[], channels:[] };
-  renderAllChips();
-}
-
-function setAll(k){
-  if(!state.options) return;
-  state.filters[k] = (state.options[k] || []).slice();
-  renderChips(k);
-}
-
-function toggleFilter(k, val){
-  const arr = state.filters[k];
-  const idx = arr.indexOf(val);
-  if(idx >= 0) arr.splice(idx,1);
-  else arr.push(val);
-  renderChips(k);
-}
-
-/** ===========================
- *  3) 렌더(칩)
- * =========================== */
-function makeChip(containerId, k, val){
-  const el = document.createElement("div");
-  el.className = "chip";
-  el.textContent = val;
-  el.onclick = ()=>{
-    toggleFilter(k, val);
-    fetchDashboard();
-  };
-  return el;
-}
-
-function renderChips(k){
-  const map = {
-    years: "chipsYears",
-    months: "chipsMonths",
-    days: "chipsDays",
-    dows: "chipsDows",
-    items: "chipsItems",
-    channels: "chipsChannels"
-  };
-  const wrap = $(map[k]);
-  wrap.innerHTML = "";
-  const all = (state.options && state.options[k]) ? state.options[k] : [];
-  all.forEach(val=>{
-    const chip = makeChip(map[k], k, val);
-    if(state.filters[k].includes(val)) chip.classList.add("on");
-    wrap.appendChild(chip);
-  });
-}
-
-function renderAllChips(){
-  ["years","months","days","dows","items","channels"].forEach(renderChips);
-}
-
-/** mini buttons */
-document.addEventListener("click", (e)=>{
-  const t = e.target;
-  if(t && t.classList.contains("mini")){
-    const act = t.dataset.act;
-    const k = t.dataset.k;
-    if(act === "all") setAll(k);
-    if(act === "clear") state.filters[k] = [];
-    renderChips(k);
-    fetchDashboard();
+    renderFilters();
+    renderKpis(data.kpis || {});
+    renderCharts(data.charts || {});
+    setStatus("상태: 정상 · 필터 적용 완료");
+  }catch(err){
+    console.error(err);
+    setStatus("상태: 오류 · JSONP load failed");
   }
+}
+
+function fmtMoney(n){
+  return nf.format(Math.round(Number(n)||0));
+}
+function fmtPct(n){
+  // ✅ 백엔드에서 이미 % 값(예: 82.35)을 줌. 소수 0~1로 변환 금지
+  const v = Number(n)||0;
+  return `${Math.round(v)}%`;
+}
+
+function renderKpis(k){
+  document.getElementById('k_bcnt').textContent  = fmtMoney(k.방송횟수);
+  document.getElementById('k_scnt').textContent  = fmtMoney(k.특약횟수);
+  document.getElementById('k_scost').textContent = fmtMoney(k.특약비용);
+  document.getElementById('k_ach').textContent   = fmtPct(k.평균달성율);
+  document.getElementById('k_time').textContent  = fmtMoney(k.방송시간_분);
+  document.getElementById('k_hr').textContent    = fmtMoney(k.시간당매출);
+}
+
+/** ========= Filters ========= */
+function makePills(containerId, values, key){
+  const box = document.getElementById(containerId);
+  box.innerHTML = "";
+  values.forEach(v=>{
+    const pill = document.createElement('div');
+    pill.className = "pill" + (state.selected[key].has(v) ? " on" : "");
+    pill.textContent = v;
+    pill.onclick = ()=>{
+      if (state.selected[key].has(v)) state.selected[key].delete(v);
+      else state.selected[key].add(v);
+      loadDashboard(); // 즉시 반영
+    };
+    box.appendChild(pill);
+  });
+}
+
+function renderFilters(){
+  // 월/일은 숫자 정렬된 options가 백엔드에서 내려옴
+  makePills("years", state.options.years || [], "years");
+  makePills("months", state.options.months || [], "months");
+  makePills("days", state.options.days || [], "days");
+  makePills("dows", state.options.dows || [], "dows");
+  makePills("items", state.options.items || [], "items");
+  makePills("channels", state.options.channels || [], "channels");
+}
+
+// 전체/해제 버튼
+document.querySelectorAll("[data-all]").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const k = btn.getAttribute("data-all");
+    (state.options[k]||[]).forEach(v=> state.selected[k].add(v));
+    loadDashboard();
+  });
 });
+document.querySelectorAll("[data-clear]").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const k = btn.getAttribute("data-clear");
+    state.selected[k].clear();
+    loadDashboard();
+  });
+});
+document.getElementById("btnReset").onclick = ()=>{
+  for (const k of Object.keys(state.selected)) state.selected[k].clear();
+  loadDashboard();
+};
+document.getElementById("btnRefresh").onclick = ()=> loadDashboard();
 
-/** ===========================
- *  4) 차트 생성/업데이트
- * =========================== */
-function destroyChart(id){
-  if(state.charts[id]){
-    state.charts[id].destroy();
-    delete state.charts[id];
-  }
-}
+/** ========= Charts =========
+ * - 목표/실적: bar
+ * - 달성율: 선 연결 X (scatter 점만) + 점 크게
+ */
+function buildComboChart(ctx, labels, goal, actual, ach, opts={}){
+  const achPoints = ach.map((v,i)=>({ x: labels[i], y: v }));
 
-function makeComboChart(canvasId, payload, opts={}){
-  // payload: { labels, goals, actuals, achs } where achs is ratio (0~1) recommended
-  const ctx = $(canvasId);
-  if(!ctx) return;
-
-  const labels = payload.labels || [];
-  const goals = (payload.goals || []).map(Number);
-  const actuals = (payload.actuals || []).map(Number);
-
-  // ✅ 달성율은 화면에서는 %로!
-  const achPct = (payload.achs || []).map(toPctValue);
-
-  destroyChart(canvasId);
-
-  state.charts[canvasId] = new Chart(ctx, {
-    type: opts.type || "bar",
+  return new Chart(ctx, {
+    type: 'bar',
     data: {
       labels,
       datasets: [
+        { label:'목표', data: goal, yAxisID:'y', order: 2 },
+        { label:'실적', data: actual, yAxisID:'y', order: 2 },
         {
-          label: "목표",
-          data: goals,
-          backgroundColor: "rgba(96,165,250,.55)",
-          borderColor: "rgba(96,165,250,1)",
-          borderWidth: 1,
-          order: 2
-        },
-        {
-          label: "실적",
-          data: actuals,
-          backgroundColor: "rgba(251,113,133,.45)",
-          borderColor: "rgba(251,113,133,1)",
-          borderWidth: 1,
-          order: 2
-        },
-        {
-          // ✅ 달성율: 선을 잇지 않고 점만 크게 표시
-          type: "scatter",
-          label: "달성율(%)",
-          data: achPct.map((v,i)=>({ x: i, y: v })),
-          yAxisID: "y1",
-          showLine: false,
-          pointRadius: 6,           // ← 요청: 점 크게
-          pointHoverRadius: 8,
-          borderColor: "rgba(245,158,11,1)",
-          backgroundColor: "rgba(245,158,11,.55)",
+          type:'scatter',
+          label:'달성율(%)',
+          data: achPoints,
+          yAxisID:'pct',
+          showLine: false,          // ✅ 선 연결 X
+          pointRadius: 7,           // ✅ 점 크게
+          pointHoverRadius: 9,
           order: 1
         }
       ]
@@ -674,254 +366,153 @@ function makeComboChart(canvasId, payload, opts={}){
       responsive:true,
       maintainAspectRatio:false,
       plugins:{
-        legend:{ position:"top" },
         tooltip:{
           callbacks:{
-            label:(ctx)=>{
-              const ds = ctx.dataset;
-              const label = ds.label || "";
-              if(label.includes("달성율")){
-                const v = ctx.parsed.y;
-                return `달성율: ${Number(v||0).toFixed(0)}%`;
+            label: (c)=>{
+              if (c.dataset.type === 'scatter'){
+                return `달성율: ${Math.round(c.raw.y)}%`;
               }
-              const v = ctx.parsed.y ?? ctx.parsed;
-              return `${label}: ${Number(v||0).toLocaleString("ko-KR")}`;
+              return `${c.dataset.label}: ${fmtMoney(c.raw)}`;
             }
           }
-        }
+        },
+        legend:{ position:'top' }
       },
       scales:{
-        x: {
-          grid:{ color:"rgba(229,231,235,.7)" }
-        },
-        y: {
+        y:{
           beginAtZero:true,
-          grid:{ color:"rgba(229,231,235,.7)" },
-          ticks:{
-            callback:(v)=>Number(v).toLocaleString("ko-KR")
-          }
+          ticks:{ callback:(v)=> fmtMoney(v) }
         },
-        y1: {
-          position:"right",
+        pct:{
+          position:'right',
           beginAtZero:true,
           grid:{ drawOnChartArea:false },
-          ticks:{
-            callback:(v)=> `${v}%`
-          }
+          ticks:{ callback:(v)=> `${v}%` },
+          suggestedMax: opts.suggestedMaxPct || 200
+        },
+        x:{
+          ticks:{ autoSkip: true, maxRotation: 45, minRotation: 0 }
         }
       }
     }
   });
 }
 
-function makeHComboChart(canvasId, payload){
-  // 가로막대형(일자 TOP30 등)
-  const labels = payload.labels || [];
-  const goals = (payload.goals || []).map(Number);
-  const actuals = (payload.actuals || []).map(Number);
-  const achPct = (payload.achs || []).map(toPctValue);
+function buildComboChartHorizontal(ctx, labels, goal, actual, ach){
+  // 수평 bar + scatter
+  const achPoints = ach.map((v,i)=>({ y: labels[i], x: v }));
 
-  destroyChart(canvasId);
-
-  state.charts[canvasId] = new Chart($(canvasId), {
-    type: "bar",
+  return new Chart(ctx, {
+    type: 'bar',
     data: {
       labels,
       datasets: [
+        { label:'목표', data: goal, indexAxis:'y', yAxisID:'y', order: 2 },
+        { label:'실적', data: actual, indexAxis:'y', yAxisID:'y', order: 2 },
         {
-          label:"목표",
-          data: goals,
-          backgroundColor: "rgba(96,165,250,.55)",
-          borderWidth:1
-        },
-        {
-          label:"실적",
-          data: actuals,
-          backgroundColor: "rgba(251,113,133,.45)",
-          borderWidth:1
-        },
-        {
-          type:"scatter",
-          label:"달성율(%)",
-          data: achPct.map((v,i)=>({ x: v, y: i })),
-          xAxisID:"x1",
+          type:'scatter',
+          label:'달성율(%)',
+          data: achPoints,
+          xAxisID:'pct',
+          yAxisID:'x',
           showLine:false,
-          pointRadius:6,
-          pointHoverRadius:8,
-          borderColor:"rgba(245,158,11,1)",
-          backgroundColor:"rgba(245,158,11,.55)"
+          pointRadius:7,
+          pointHoverRadius:9,
+          order: 1
         }
       ]
     },
-    options:{
+    options: {
       responsive:true,
       maintainAspectRatio:false,
-      indexAxis:"y",
       plugins:{
-        legend:{ position:"top" },
         tooltip:{
           callbacks:{
-            label:(ctx)=>{
-              const label = ctx.dataset.label || "";
-              if(label.includes("달성율")){
-                return `달성율: ${Number(ctx.parsed.x||0).toFixed(0)}%`;
+            label:(c)=>{
+              if (c.dataset.type === 'scatter'){
+                return `달성율: ${Math.round(c.raw.x)}%`;
               }
-              return `${label}: ${Number(ctx.parsed.x||0).toLocaleString("ko-KR")}`;
+              return `${c.dataset.label}: ${fmtMoney(c.raw)}`;
             }
           }
-        }
-      },
-      scales:{
-        x:{
-          beginAtZero:true,
-          grid:{ color:"rgba(229,231,235,.7)" },
-          ticks:{ callback:(v)=>Number(v).toLocaleString("ko-KR") }
         },
-        x1:{
-          position:"top",
+        legend:{ position:'top' }
+      },
+      indexAxis:'y',
+      scales:{
+        y:{ beginAtZero:true, ticks:{ callback:(v)=> fmtMoney(v) } },
+        pct:{
+          position:'top',
           beginAtZero:true,
           grid:{ drawOnChartArea:false },
-          ticks:{ callback:(v)=>`${v}%` }
-        },
-        y:{
-          grid:{ color:"rgba(229,231,235,.7)" }
+          ticks:{ callback:(v)=> `${v}%` },
+          suggestedMax: 200
         }
       }
     }
   });
 }
 
-/** ===========================
- *  5) API 호출
- * =========================== */
-async function fetchOptions(){
-  const url = API_EXEC_URL + "?" + qs({
-    action:"options",
-    key: state.key
-  });
-  const data = await jsonp(url, 20000);
-  if(data && data.error) throw new Error(data.message || data.error);
-  return data;
+function destroyIf(chart){
+  if (chart) chart.destroy();
 }
 
-async function fetchDashboard(){
-  try{
-    setStatus(true, "불러오는 중...");
-    const p = state.filters;
+function renderCharts(ch){
+  // 방송채널별: 문자열 내림차순, (비어있음) 백엔드에서 이미 제외
+  destroyIf(state.charts.channel);
+  state.charts.channel = buildComboChart(
+    document.getElementById("ch_channel"),
+    ch.channel.labels, ch.channel.goal, ch.channel.actual, ch.channel.ach,
+    { suggestedMaxPct: 250 }
+  );
 
-    const url = API_EXEC_URL + "?" + qs({
-      action:"dashboard",
-      key: state.key,
-      years: p.years,
-      months: p.months,
-      days: p.days,
-      dows: p.dows,
-      items: p.items,
-      channels: p.channels
-    });
+  // 월별
+  destroyIf(state.charts.month);
+  state.charts.month = buildComboChart(
+    document.getElementById("ch_month"),
+    ch.month.labels, ch.month.goal, ch.month.actual, ch.month.ach,
+    { suggestedMaxPct: 200 }
+  );
 
-    const data = await jsonp(url, 25000);
-    if(data && data.error) throw new Error(data.message || data.error);
+  // 요일별
+  destroyIf(state.charts.dow);
+  state.charts.dow = buildComboChart(
+    document.getElementById("ch_dow"),
+    ch.dow.labels, ch.dow.goal, ch.dow.actual, ch.dow.ach,
+    { suggestedMaxPct: 200 }
+  );
 
-    renderDashboard(data);
-    $("updatedAt").textContent = "업데이트: " + new Date().toLocaleString("ko-KR");
-    setStatus(true, "필터 적용 완료");
-  }catch(err){
-    console.error(err);
-    setStatus(false, err.message || "JSONP load failed");
-  }
+  // 일자별 TOP30: 수평으로 가독성
+  destroyIf(state.charts.dateTop);
+  state.charts.dateTop = buildComboChartHorizontal(
+    document.getElementById("ch_dateTop"),
+    ch.dateTop.labels, ch.dateTop.goal, ch.dateTop.actual, ch.dateTop.ach
+  );
+
+  // 아이템별: 세로막대 + scatter(점)
+  destroyIf(state.charts.item);
+  state.charts.item = buildComboChart(
+    document.getElementById("ch_item"),
+    ch.item.labels, ch.item.goal, ch.item.actual, ch.item.ach,
+    { suggestedMaxPct: 200 }
+  );
 }
 
-/** ===========================
- *  6) 렌더(대시보드)
- * =========================== */
-function renderDashboard(d){
-  const s = d.summary || {};
-  $("kpiCnt").textContent = fmtInt(s.방송횟수);
-  $("kpiSpCnt").textContent = fmtInt(s.특약횟수);
-  $("kpiSpCost").textContent = fmtMoney(s.특약비용);
-  $("kpiAch").textContent = fmtPctFromRatio(s.평균달성율); // ✅ 0~1 → 80%
-  $("kpiMin").textContent = fmtInt(s.방송시간_분);
-  $("kpiHr").textContent = fmtMoney(s.시간당매출);
+/** ====== Start ====== */
+(async function init(){
+  // 키 팝업 방식은 브라우저에서만 가능하고 "보안"은 약해요.
+  // 그래도 원하셨으니: 로컬스토리지에 키 저장 → API 호출 시 key 파라미터로 전달.
+  // (이미 API_KEY 상수로 넣는 방식이라면 팝업은 생략 가능)
 
-  // 차트
-  // 1) 채널: 문자열 내림차순 / (비어있음 제거는 백엔드에서 처리)
-  makeComboChart("chChannel", d.channel, { type:"bar" });
-
-  // 2) 월
-  makeComboChart("chMonth", d.month, { type:"bar" });
-
-  // 3) 요일
-  makeComboChart("chDow", d.dow, { type:"bar" });
-
-  // 4) 일자: 가로 막대
-  makeHComboChart("chDay", d.day);
-
-  // 5) 아이템: 세로 막대(요청) + 달성율 점만
-  makeComboChart("chItem", d.item, { type:"bar" });
-}
-
-/** ===========================
- *  7) 키 인증 흐름
- * =========================== */
-function openKeyModal(){
-  $("keyModal").style.display = "flex";
-  $("keyInput").value = state.key || "";
-  $("keyMsg").style.display = "none";
-  $("keyInput").focus();
-}
-function closeKeyModal(){
-  $("keyModal").style.display = "none";
-}
-
-async function verifyKeyAndInit(){
-  try{
-    setStatus(true, "키 확인 중...");
-    // options 호출로 키 검증 + 필터 목록 가져오기
-    const opt = await fetchOptions();
-    state.options = opt;
-    renderAllChips();
-    closeKeyModal();
-    setStatus(true, "키 인증 완료");
-    await fetchDashboard();
-  }catch(err){
-    console.error(err);
-    $("keyMsg").style.display = "block";
-    setStatus(false, "키 인증 실패");
-  }
-}
-
-/** ===========================
- *  8) 이벤트
- * =========================== */
-$("btnReload").onclick = ()=> fetchDashboard();
-$("btnReset").onclick = ()=>{
-  clearFilters();
-  fetchDashboard();
-};
-
-$("keyOk").onclick = ()=>{
-  const k = $("keyInput").value.trim();
-  state.key = k;
-  saveToStorageKey(k);
-  verifyKeyAndInit();
-};
-$("keyInput").addEventListener("keydown", (e)=>{
-  if(e.key === "Enter") $("keyOk").click();
-});
-
-/** ===========================
- *  9) 시작
- * =========================== */
-(function init(){
-  // 키 불러오기: localStorage → DEFAULT_KEY
-  state.key = loadFromStorageKey() || (DEFAULT_KEY || "");
-  if(!state.key){
-    openKeyModal();
+  if (!API_URL.includes("script.google.com/macros/s/") || API_URL.includes("PASTE_")){
+    setStatus("상태: 설정 필요 - API_URL을 index.html 상단에 입력하세요");
     return;
   }
-  // 키가 있으면 바로 검증/로드
-  verifyKeyAndInit();
+  if (API_KEY === "CHANGE_ME_TO_YOUR_KEY"){
+    setStatus("상태: 설정 필요 - API_KEY를 index.html 상단에 입력하세요");
+    return;
+  }
+  await loadDashboard();
 })();
 </script>
 </body>
