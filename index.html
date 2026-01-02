@@ -50,11 +50,7 @@
     }
     .charts .span2{grid-column:1 / -1}
 
-    /* ✅ 차트가 무한히 길어지는 현상 방지 핵심:
-       - chartBox에 고정 높이(혹은 min-height) 주기
-       - overflow hidden
-       - canvas는 부모에 100%로 맞추고 Chart.js는 maintainAspectRatio:false
-    */
+    /* ✅ chartBox는 높이 고정 */
     .chartBox{
       position:relative;
       height:320px;
@@ -63,7 +59,14 @@
     }
     .chartBox.tall{height:360px;min-height:360px}
     .chartBox.short{height:280px;min-height:280px}
-    canvas{width:100% !important;height:100% !important;display:block}
+
+    /* ✅ 핵심: canvas에 100% 강제 금지!
+       chartBox 안에 절대배치로 "딱 붙게" */
+    .chartBox canvas{
+      position:absolute;
+      inset:0;
+      display:block;
+    }
 
     .status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
     .status .left{display:flex;gap:10px;align-items:center}
@@ -155,8 +158,8 @@
 /** =========================
  *  ✅ 여기만 바꿔!
  *  ========================= */
-const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec"; // 예: https://script.google.com/macros/s/....../exec
-const DEFAULT_KEY = "WHHS-PSM-221035"; // 원하면 기본 키(비워도 됨)
+const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec";
+const DEFAULT_KEY = "WHHS-PSM-221035";
 
 /** =========================
  *  State
@@ -206,7 +209,6 @@ function fmt(n, d=0){
   return x.toLocaleString(undefined,{maximumFractionDigits:d});
 }
 function fmtPct(p, d=1){
-  // p가 0~1로 오든 0~100으로 오든 "사람이 보는 %"로 정규화
   let v = Number(p||0);
   if (v <= 1.5) v = v * 100;
   return `${v.toFixed(d)}%`;
@@ -238,20 +240,27 @@ function jsonp(url){
   return new Promise((resolve,reject)=>{
     const cb = "CB_" + Math.random().toString(36).slice(2);
     const s = document.createElement('script');
+    let done = false;
+
     const cleanup = () => {
-      delete window[cb];
+      if (done) return;
+      done = true;
+      try { delete window[cb]; } catch(e){}
       s.remove();
     };
+
     window[cb] = (data) => { cleanup(); resolve(data); };
     s.onerror = () => { cleanup(); reject(new Error("JSONP load failed")); };
+
     s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
     document.body.appendChild(s);
+
     setTimeout(()=>{ cleanup(); reject(new Error("JSONP timeout")); }, 20000);
   });
 }
 
 async function apiFetch(action){
-  if (!API_URL || API_URL.includes("PASTE_YOUR")) throw new Error("API_URL을 설정해야 합니다.");
+  if (!API_URL) throw new Error("API_URL을 설정해야 합니다.");
   if (!store.key) throw new Error("키가 없습니다. 우측 상단 '키 변경'에서 입력하세요.");
 
   const payload = {
@@ -292,12 +301,12 @@ function renderFilters(){
   const opts = store.options;
 
   const sections = [
-    { key:'years', label:'연도', values: opts.years || [], sort: (a)=>a },
-    { key:'months', label:'월', values: sortMonth(opts.months||[]), sort: sortMonth },
-    { key:'days', label:'일', values: sortDay(opts.days||[]), sort: sortDay },
-    { key:'dows', label:'요일', values: sortDow(opts.dows||[]), sort: sortDow },
-    { key:'items', label:'아이템', values: (opts.items||[]).filter(v=>v && v!=='(비어있음)'), sort: (a)=>a },
-    { key:'channels', label:'방송채널', values: (opts.channels||[]).filter(v=>v && v!=='(비어있음)').sort((a,b)=>String(a).localeCompare(String(b))), sort: (a)=>a },
+    { key:'years', label:'연도', values: opts.years || [] },
+    { key:'months', label:'월', values: sortMonth(opts.months||[]) },
+    { key:'days', label:'일', values: sortDay(opts.days||[]) },
+    { key:'dows', label:'요일', values: sortDow(opts.dows||[]) },
+    { key:'items', label:'아이템', values: (opts.items||[]).filter(v=>v && v!=='(비어있음)') },
+    { key:'channels', label:'방송채널', values: (opts.channels||[]).filter(v=>v && v!=='(비어있음)').sort((a,b)=>String(a).localeCompare(String(b))) },
   ];
 
   elFilters.innerHTML = sections.map(sec=>{
@@ -336,11 +345,8 @@ function renderFilters(){
       const act = btn.dataset.act;
       const sec = sections.find(s=>s.key===k);
       if (!sec) return;
-      if (act==='all'){
-        store.filters[k] = sec.values.map(String);
-      } else {
-        store.filters[k] = [];
-      }
+      if (act==='all') store.filters[k] = sec.values.map(String);
+      else store.filters[k] = [];
       renderFilters();
       loadAll(false);
     });
@@ -353,26 +359,51 @@ function renderFilters(){
 function destroyChart(ch){
   if (ch && typeof ch.destroy === 'function') ch.destroy();
 }
+function canvasIdMap(id){
+  return {
+    chChannel:'channel',
+    chMonth:'month',
+    chDow:'dow',
+    chDay:'day',
+    chItem:'item'
+  }[id];
+}
 
-function makeComboChart(canvasId, title, labels, goal, actual, ratePct, count){
-  const ctx = document.getElementById(canvasId);
-  // ✅ 무한 길어짐 방지 1: 기존 차트 제거
+function makeComboChart(canvasId, labels, goal, actual, ratePct, count){
+  const canvas = document.getElementById(canvasId);
+
+  // 기존 차트 제거
   destroyChart(store.charts[canvasIdMap(canvasId)]);
-  // ✅ 무한 길어짐 방지 2: 캔버스 사이즈 리셋(간혹 브라우저에서 누적됨)
-  ctx.width = ctx.width;
 
-  const c = new Chart(ctx, {
+  // ✅ 핵심: 부모(.chartBox) 크기를 읽어서 canvas를 픽셀로 고정 (ResizeObserver 루프 차단)
+  const box = canvas.parentElement; // .chartBox
+  const rect = box.getBoundingClientRect();
+  const w = Math.max(10, Math.floor(rect.width));
+  const h = Math.max(10, Math.floor(rect.height));
+
+  canvas.style.width = w + "px";
+  canvas.style.height = h + "px";
+  canvas.width = w;
+  canvas.height = h;
+
+  const rate100 = (ratePct||[]).map(v=>{
+    const n = Number(v||0);
+    return (n <= 1.5) ? n*100 : n;
+  });
+
+  const c = new Chart(canvas, {
     data: {
       labels,
       datasets: [
         { type:'bar', label:'목표(합계)', data: goal, yAxisID:'y', borderWidth:0, barPercentage:.8, categoryPercentage:.7 },
         { type:'bar', label:'실적(합계)', data: actual, yAxisID:'y', borderWidth:0, barPercentage:.8, categoryPercentage:.7 },
-        { type:'scatter', label:'달성율(%)', data: ratePct.map((v,i)=>({x:labels[i], y:v})), yAxisID:'y1', pointRadius:4, pointHoverRadius:8 },
+        { type:'line', label:'달성율(%)', data: rate100, yAxisID:'y1', tension:0.25, pointRadius:3, pointHoverRadius:6 }
       ]
     },
     options: {
-      responsive:true,
-      maintainAspectRatio:false, // ✅ 핵심
+      // ✅ 핵심: 자동 리사이즈 끔
+      responsive:false,
+      maintainAspectRatio:false,
       animation:false,
       plugins:{
         legend:{ position:'top' },
@@ -383,14 +414,13 @@ function makeComboChart(canvasId, title, labels, goal, actual, ratePct, count){
             afterBody:(items)=>{
               const i = items?.[0]?.dataIndex ?? -1;
               if (i<0) return '';
-              const lines = [];
-              lines.push(`방송횟수: ${fmt(count?.[i] ?? 0)}`);
-              lines.push(`달성율: ${fmtPct(ratePct?.[i] ?? 0, 1)}`);
-              return lines;
+              return [
+                `방송횟수: ${fmt(count?.[i] ?? 0)}`,
+                `달성율: ${fmtPct(rate100?.[i] ?? 0, 1)}`
+              ];
             }
           }
-        },
-        title:{ display:false, text:title }
+        }
       },
       scales:{
         y:{ beginAtZero:true },
@@ -405,16 +435,6 @@ function makeComboChart(canvasId, title, labels, goal, actual, ratePct, count){
   });
 
   store.charts[canvasIdMap(canvasId)] = c;
-}
-
-function canvasIdMap(id){
-  return {
-    chChannel:'channel',
-    chMonth:'month',
-    chDow:'dow',
-    chDay:'day',
-    chItem:'item'
-  }[id];
 }
 
 /** =========================
@@ -433,7 +453,6 @@ function renderKpis(k){
     <div class="kpi"><div class="k">${k}</div><div class="v">${v}</div></div>
   `).join('');
 }
-
 function safeArr(a){ return Array.isArray(a) ? a : []; }
 
 /** =========================
@@ -442,37 +461,29 @@ function safeArr(a){ return Array.isArray(a) ? a : []; }
 async function loadAll(force){
   try{
     setStatus(true, '로딩 중...');
-    const [opt, dash] = await Promise.all([
-      (async()=>{ 
-        // 옵션이 없으면 옵션부터
-        if (!store.options || force){
-          const o = await apiFetch('options');
-          store.options = o.options || o; 
-          renderFilters();
-        }
-      })(),
-      apiFetch('dashboard'),
-    ]);
 
-    const data = dash;
+    if (!store.options || force){
+      const o = await apiFetch('options');
+      store.options = o.options || o;
+      renderFilters();
+    }
+
+    const data = await apiFetch('dashboard');
 
     elUpdated.textContent = `업데이트: ${data.updated || '-'}`;
     setStatus(true, '필터 적용 완료');
-
     renderKpis(data.kpis);
 
-    // ✅ 차트가 길어지는 문제는 "매번 destroy + 고정 높이 + maintainAspectRatio:false"로 해결
     debounceRender(()=>{
       // 방송채널: a~z 정렬
       const ch = data.charts.channel;
       const idx = safeArr(ch.labels).map((v,i)=>[String(v), i])
         .filter(([v])=>v && v!=='(비어있음)')
         .sort((a,b)=>a[0].localeCompare(b[0], 'en'));
+
       const pick = (arr)=> idx.map(([_,i])=> arr[i]);
 
-      makeComboChart(
-        'chChannel',
-        '방송채널별',
+      makeComboChart('chChannel',
         idx.map(x=>x[0]),
         pick(ch.goal),
         pick(ch.actual),
@@ -480,7 +491,7 @@ async function loadAll(force){
         pick(ch.count)
       );
 
-      makeComboChart('chMonth','월별',
+      makeComboChart('chMonth',
         data.charts.month.labels,
         data.charts.month.goal,
         data.charts.month.actual,
@@ -488,7 +499,7 @@ async function loadAll(force){
         data.charts.month.count
       );
 
-      makeComboChart('chDow','요일별',
+      makeComboChart('chDow',
         data.charts.dow.labels,
         data.charts.dow.goal,
         data.charts.dow.actual,
@@ -496,7 +507,7 @@ async function loadAll(force){
         data.charts.dow.count
       );
 
-      makeComboChart('chDay','일자별',
+      makeComboChart('chDay',
         data.charts.day.labels,
         data.charts.day.goal,
         data.charts.day.actual,
@@ -504,7 +515,7 @@ async function loadAll(force){
         data.charts.day.count
       );
 
-      makeComboChart('chItem','아이템별',
+      makeComboChart('chItem',
         data.charts.item.labels,
         data.charts.item.goal,
         data.charts.item.actual,
