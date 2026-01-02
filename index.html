@@ -8,510 +8,505 @@
   <style>
     :root{
       --bg:#f5f7fb; --card:#fff; --line:#e7ecf5; --text:#111827; --muted:#6b7280;
-      --primary:#2563eb;
+      --primary:#60a5fa; --pink:#fda4af; --orange:#fb923c;
+      --pill:#ffffff; --pillOn:#e8f1ff;
+      --radius:14px;
     }
-    body{ margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial; background:var(--bg); color:var(--text); }
-    header{ padding:18px 18px 8px; }
-    h1{ margin:0; font-size:22px; display:flex; gap:10px; align-items:center; }
-    .sub{ margin-top:6px; color:var(--muted); font-size:12px; }
-    .topbar{ margin: 10px 18px 0; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; gap:10px;}
-    .status{ font-size:13px; color:var(--muted); }
-    .actions{ display:flex; gap:8px; align-items:center; }
-    button{ border:1px solid var(--line); background:#fff; border-radius:10px; padding:8px 10px; cursor:pointer; }
-    button.primary{ background:#e8efff; border-color:#cfe0ff; color:#1d4ed8; font-weight:600; }
-    .wrap{ display:grid; grid-template-columns: 300px 1fr; gap:14px; padding: 12px 18px 24px; }
-    .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow: 0 1px 8px rgba(0,0,0,.03); }
-    .filters{ padding:12px; }
-    .filters h3{ margin:0 0 10px; font-size:14px; }
-    .filterBlock{ margin-bottom:12px; padding-bottom:12px; border-bottom:1px dashed var(--line); }
-    .filterHead{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
-    .filterTitle{ font-weight:700; font-size:13px; }
-    .miniBtns{ display:flex; gap:6px; }
-    .miniBtns button{ padding:6px 8px; font-size:12px; border-radius:9px; }
-    .pills{ display:flex; flex-wrap:wrap; gap:6px; }
-    .pill{ padding:7px 9px; border:1px solid var(--line); border-radius:999px; font-size:12px; background:#fff; cursor:pointer; user-select:none; }
-    .pill.on{ background:#e8efff; border-color:#cfe0ff; color:#1d4ed8; font-weight:700; }
-    .grid{ display:grid; gap:14px; }
-    .kpis{ display:grid; grid-template-columns: repeat(6, minmax(140px, 1fr)); gap:10px; padding:12px; }
-    .kpi{ background:#eaf3ff; border-radius:14px; padding:12px; }
-    .kpi .t{ font-size:12px; color:#334155; }
-    .kpi .v{ margin-top:4px; font-size:20px; font-weight:800; }
-    .charts{ padding:12px; display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
-    .chartCard{ padding:12px; }
-    .chartTitle{ font-weight:800; font-size:14px; margin-bottom:8px; }
-    canvas{ width:100% !important; height:260px !important; }
-    .full{ grid-column: 1 / -1; }
-    .note{ padding:0 12px 12px; color:var(--muted); font-size:12px; }
-    @media (max-width:1100px){
-      .wrap{ grid-template-columns: 1fr; }
-      .kpis{ grid-template-columns: repeat(2, minmax(140px, 1fr)); }
-      .charts{ grid-template-columns: 1fr; }
-      canvas{ height:280px !important; }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,sans-serif;}
+    .wrap{max-width:1360px;margin:18px auto;padding:0 14px;}
+    h1{margin:0 0 6px;font-size:28px;display:flex;align-items:center;gap:10px}
+    .sub{color:var(--muted);font-size:12px;margin-bottom:12px}
+    .statusbar{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .status{font-size:13px}
+    .btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 10px;font-size:12px;cursor:pointer}
+    .btn.primary{border-color:#cfe0ff;background:#edf4ff}
+    .grid{display:grid;grid-template-columns:340px 1fr;gap:14px;margin-top:14px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+    .kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+    .kpi{background:#eaf2ff;border-radius:14px;padding:10px 12px;min-height:62px}
+    .kpi .t{font-size:12px;color:#335;opacity:.9}
+    .kpi .v{font-size:20px;font-weight:800;margin-top:4px}
+    .filters h3{margin:0 0 10px;font-size:14px}
+    .fblock{margin-bottom:10px}
+    .fhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+    .fname{font-weight:700;font-size:13px}
+    .pillbox{display:flex;flex-wrap:wrap;gap:6px}
+    .pill{
+      border:1px solid var(--line);background:var(--pill);
+      border-radius:999px;padding:6px 9px;font-size:12px;cursor:pointer;user-select:none;
     }
+    .pill.on{background:var(--pillOn);border-color:#cfe0ff}
+    .chartGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .chartCard{padding:10px 12px}
+    .chartTitle{font-weight:800;margin:2px 0 8px}
+    canvas{width:100%!important;height:260px!important;} /* ✅ 그래프 크기 줄임 */
+    .wide canvas{height:260px!important;}
+    .wide2 canvas{height:300px!important;}
+    .footnote{color:var(--muted);font-size:11px;margin-top:8px}
+    /* --- Modal --- */
+    .modalBg{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:12px}
+    .modal{background:#fff;border-radius:16px;max-width:420px;width:100%;padding:14px;border:1px solid var(--line)}
+    .modal h2{margin:0 0 8px;font-size:16px}
+    .modal p{margin:0 0 10px;color:var(--muted);font-size:12px}
+    .modal input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font-size:14px}
+    .modal .row{display:flex;gap:8px;margin-top:10px}
+    .modal .row button{flex:1}
   </style>
 </head>
 <body>
-<header>
-  <h1>📊 방송 매출 대시보드</h1>
-  <div class="sub">엑셀 슬라이서처럼 선택하면 KPI/차트가 즉시 변경됩니다.</div>
-</header>
+  <div class="wrap">
+    <h1>📊 방송 매출 대시보드</h1>
+    <div class="sub">엑셀 슬라이서처럼 선택하면 KPI/차트가 즉시 변경됩니다.</div>
 
-<div class="topbar card">
-  <div class="status" id="status">상태: 대기</div>
-  <div class="actions">
-    <div class="status" id="updated"></div>
-    <button id="btnReset">전체 해제</button>
-    <button class="primary" id="btnRefresh">새로고침</button>
-  </div>
-</div>
-
-<div class="wrap">
-  <!-- Filters -->
-  <div class="card filters">
-    <h3>필터(슬라이서)</h3>
-
-    <div class="filterBlock">
-      <div class="filterHead">
-        <div class="filterTitle">연도</div>
-        <div class="miniBtns">
-          <button data-all="years">전체</button>
-          <button data-clear="years">해제</button>
-        </div>
+    <div class="statusbar">
+      <div class="status" id="statusText">상태: 준비 중</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <div style="font-size:12px;color:var(--muted)" id="updatedText"></div>
+        <button class="btn" id="btnReset">전체 해제</button>
+        <button class="btn primary" id="btnReload">새로고침</button>
+        <button class="btn" id="btnKey">키 변경</button>
       </div>
-      <div class="pills" id="years"></div>
     </div>
 
-    <div class="filterBlock">
-      <div class="filterHead">
-        <div class="filterTitle">월</div>
-        <div class="miniBtns">
-          <button data-all="months">전체</button>
-          <button data-clear="months">해제</button>
-        </div>
-      </div>
-      <div class="pills" id="months"></div>
-    </div>
+    <div class="grid">
+      <div class="card filters">
+        <h3>필터(슬라이서)</h3>
 
-    <div class="filterBlock">
-      <div class="filterHead">
-        <div class="filterTitle">일</div>
-        <div class="miniBtns">
-          <button data-all="days">전체</button>
-          <button data-clear="days">해제</button>
-        </div>
-      </div>
-      <div class="pills" id="days"></div>
-    </div>
+        <div id="filters"></div>
 
-    <div class="filterBlock">
-      <div class="filterHead">
-        <div class="filterTitle">요일</div>
-        <div class="miniBtns">
-          <button data-all="dows">전체</button>
-          <button data-clear="dows">해제</button>
-        </div>
+        <div class="footnote">※ 키를 모르면 데이터를 불러올 수 없습니다.</div>
       </div>
-      <div class="pills" id="dows"></div>
-    </div>
 
-    <div class="filterBlock">
-      <div class="filterHead">
-        <div class="filterTitle">아이템</div>
-        <div class="miniBtns">
-          <button data-all="items">전체</button>
-          <button data-clear="items">해제</button>
-        </div>
-      </div>
-      <div class="pills" id="items"></div>
-    </div>
+      <div class="card">
+        <div class="kpis" id="kpis"></div>
 
-    <div class="filterBlock" style="border-bottom:none;padding-bottom:0;margin-bottom:0;">
-      <div class="filterHead">
-        <div class="filterTitle">방송채널</div>
-        <div class="miniBtns">
-          <button data-all="channels">전체</button>
-          <button data-clear="channels">해제</button>
+        <div style="height:10px"></div>
+
+        <div class="chartGrid">
+          <div class="card chartCard">
+            <div class="chartTitle">방송채널별 (목표/실적/달성율)</div>
+            <canvas id="chChannel"></canvas>
+          </div>
+
+          <div class="card chartCard">
+            <div class="chartTitle">월별 (목표/실적/달성율)</div>
+            <canvas id="chMonth"></canvas>
+          </div>
+
+          <div class="card chartCard">
+            <div class="chartTitle">요일별 (목표/실적/달성율)</div>
+            <canvas id="chDow"></canvas>
+          </div>
+
+          <div class="card chartCard wide">
+            <div class="chartTitle">일자별 (목표/실적/달성율) - TOP 30</div>
+            <canvas id="chDay"></canvas>
+          </div>
+
+          <div class="card chartCard wide2" style="grid-column:1/-1;">
+            <div class="chartTitle">아이템별 (목표/실적/달성율)</div>
+            <canvas id="chItem"></canvas>
+          </div>
         </div>
       </div>
-      <div class="pills" id="channels"></div>
-      <div class="note">※ 키를 모르면 데이터를 불러올 수 없습니다.</div>
     </div>
   </div>
 
-  <!-- Main -->
-  <div class="grid">
-    <!-- KPI -->
-    <div class="card">
-      <div class="kpis">
-        <div class="kpi"><div class="t">방송횟수</div><div class="v" id="k_bcnt">-</div></div>
-        <div class="kpi"><div class="t">특약횟수</div><div class="v" id="k_scnt">-</div></div>
-        <div class="kpi"><div class="t">특약비용</div><div class="v" id="k_scost">-</div></div>
-        <div class="kpi"><div class="t">평균달성율</div><div class="v" id="k_ach">-</div></div>
-        <div class="kpi"><div class="t">방송시간(분)</div><div class="v" id="k_time">-</div></div>
-        <div class="kpi"><div class="t">시간당매출</div><div class="v" id="k_hr">-</div></div>
-      </div>
-    </div>
-
-    <!-- Charts -->
-    <div class="card charts">
-      <div class="card chartCard">
-        <div class="chartTitle">방송채널별 (목표/실적/달성율)</div>
-        <canvas id="ch_channel"></canvas>
-      </div>
-      <div class="card chartCard">
-        <div class="chartTitle">월별 (목표/실적/달성율)</div>
-        <canvas id="ch_month"></canvas>
-      </div>
-
-      <div class="card chartCard">
-        <div class="chartTitle">요일별 (목표/실적/달성율)</div>
-        <canvas id="ch_dow"></canvas>
-      </div>
-      <div class="card chartCard">
-        <div class="chartTitle">일자별 (목표/실적/달성율) - TOP 30</div>
-        <canvas id="ch_dateTop"></canvas>
-      </div>
-
-      <div class="card chartCard full">
-        <div class="chartTitle">아이템별 (목표/실적/달성율)</div>
-        <canvas id="ch_item"></canvas>
+  <!-- Key Modal -->
+  <div class="modalBg" id="modalBg">
+    <div class="modal">
+      <h2>접근 키 입력</h2>
+      <p>키를 입력해야 데이터를 불러올 수 있습니다. (저장은 브라우저 로컬에만 저장됩니다)</p>
+      <input id="keyInput" placeholder="예: WHHS-XXXX-XXXX" />
+      <div class="row">
+        <button class="btn" id="btnCancel">취소</button>
+        <button class="btn primary" id="btnSaveKey">확인</button>
       </div>
     </div>
   </div>
-</div>
 
 <script>
-/** =========================
- * ✅ 여기 2개만 바꾸면 됨
+/*** =========================
+ *  1) 설정
  * ========================= */
-const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec"; // .../exec
-const API_KEY = "WHHS-PSM-221035"; // Code.gs의 DASH_KEY와 동일
+// ✅ 너의 Apps Script 웹앱 URL (exec로 끝나는 URL)
+const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec";
 
-/** ========================= */
-const nf = new Intl.NumberFormat('ko-KR');
+// (키는 팝업에서 입력)
+const KEY_STORAGE = "WHHS-PSM-221035";
+
+/*** =========================
+ *  2) 상태/필터 상태
+ * ========================= */
 const state = {
-  selected: { years:new Set(), months:new Set(), days:new Set(), dows:new Set(), items:new Set(), channels:new Set() },
-  options:  { years:[], months:[], days:[], dows:[], items:[], channels:[] },
-  charts: {}
+  filters: {
+    years: [],
+    months: [],
+    days: [],
+    dows: [],
+    items: [],
+    channels: []
+  },
+  options: null,
+  charts: {},
+  chartObjs: {}
 };
 
-function setStatus(text){ document.getElementById('status').textContent = text; }
-function setUpdated(text){ document.getElementById('updated').textContent = text ? `업데이트: ${text}` : ''; }
+const DOW_ORDER = ['일','월','화','수','목','금','토'];
 
-function jsonp(url){
+/*** =========================
+ *  3) JSONP
+ * ========================= */
+function jsonp(url, params){
   return new Promise((resolve, reject)=>{
     const cb = "cb_" + Math.random().toString(36).slice(2);
-    const script = document.createElement('script');
-    const sep = url.includes('?') ? '&' : '?';
-    const full = url + sep + "callback=" + cb;
+    const qs = new URLSearchParams(params);
+    qs.set("callback", cb);
+    const src = url + (url.includes("?") ? "&" : "?") + qs.toString();
 
-    let timer = setTimeout(()=>{
-      cleanup();
-      reject(new Error("JSONP timeout"));
-    }, 15000);
-
-    function cleanup(){
-      clearTimeout(timer);
-      if (script.parentNode) script.parentNode.removeChild(script);
-      try{ delete window[cb]; }catch(e){ window[cb]=undefined; }
-    }
+    const s = document.createElement("script");
+    let done = false;
 
     window[cb] = (data)=>{
+      done = true;
       cleanup();
       resolve(data);
     };
 
-    script.onerror = ()=>{
+    function cleanup(){
+      try { delete window[cb]; } catch(e){ window[cb]=undefined; }
+      if (s && s.parentNode) s.parentNode.removeChild(s);
+    }
+
+    s.onerror = ()=>{
+      if (done) return;
       cleanup();
       reject(new Error("JSONP load failed"));
     };
-    script.src = full;
-    document.body.appendChild(script);
+
+    document.head.appendChild(s);
+    s.src = src;
+
+    setTimeout(()=>{
+      if (done) return;
+      cleanup();
+      reject(new Error("JSONP timeout"));
+    }, 15000);
   });
 }
 
-function buildQuery(){
-  const p = new URLSearchParams();
-  p.set("action","dashboard");
-  p.set("key", API_KEY);
-
-  for (const k of ["years","months","days","dows","items","channels"]){
-    const arr = [...state.selected[k]];
-    if (arr.length) p.set(k, arr.join(','));
-  }
-  return p.toString();
+/*** =========================
+ *  4) UI 렌더
+ * ========================= */
+function setStatus(text, isError=false){
+  const el = document.getElementById("statusText");
+  el.textContent = text;
+  el.style.color = isError ? "#b91c1c" : "#111827";
 }
 
-async function loadDashboard(){
-  setStatus("상태: 로딩 중...");
-  try{
-    const url = API_URL + "?" + buildQuery();
-    const data = await jsonp(url);
-
-    if (!data || data.ok !== true){
-      if (data && data.error === 'unauthorized'){
-        setStatus("상태: 오류 - 키가 올바르지 않습니다");
-      } else {
-        setStatus("상태: 오류 - 데이터 형식 문제");
-      }
-      return;
-    }
-
-    setUpdated(data.updated || "");
-    state.options = data.options || state.options;
-
-    renderFilters();
-    renderKpis(data.kpis || {});
-    renderCharts(data.charts || {});
-    setStatus("상태: 정상 · 필터 적용 완료");
-  }catch(err){
-    console.error(err);
-    setStatus("상태: 오류 · JSONP load failed");
-  }
+function fmtNum(x){
+  const n = Number(x||0);
+  return n.toLocaleString('ko-KR', { maximumFractionDigits: 2 });
 }
-
-function fmtMoney(n){
-  return nf.format(Math.round(Number(n)||0));
-}
-function fmtPct(n){
-  // ✅ 백엔드에서 이미 % 값(예: 82.35)을 줌. 소수 0~1로 변환 금지
-  const v = Number(n)||0;
-  return `${Math.round(v)}%`;
+function fmtPct(x){
+  const n = Number(x||0);
+  return n.toLocaleString('ko-KR', { maximumFractionDigits: 1 }) + "%";
 }
 
 function renderKpis(k){
-  document.getElementById('k_bcnt').textContent  = fmtMoney(k.방송횟수);
-  document.getElementById('k_scnt').textContent  = fmtMoney(k.특약횟수);
-  document.getElementById('k_scost').textContent = fmtMoney(k.특약비용);
-  document.getElementById('k_ach').textContent   = fmtPct(k.평균달성율);
-  document.getElementById('k_time').textContent  = fmtMoney(k.방송시간_분);
-  document.getElementById('k_hr').textContent    = fmtMoney(k.시간당매출);
+  const kpis = [
+    { t:"방송횟수", v: fmtNum(k.방송횟수) },
+    { t:"특약횟수", v: fmtNum(k.특약횟수) },
+    { t:"특약비용", v: fmtNum(k.특약비용) },
+    { t:"평균달성율", v: fmtPct(k.평균달성율) },          // ✅ 80% 형태
+    { t:"방송시간(분)", v: fmtNum(k.방송시간_분) },
+    { t:"시간당매출", v: fmtNum(k.시간당매출) }
+  ];
+  const box = document.getElementById("kpis");
+  box.innerHTML = kpis.map(x=>`
+    <div class="kpi">
+      <div class="t">${x.t}</div>
+      <div class="v">${x.v}</div>
+    </div>
+  `).join("");
 }
 
-/** ========= Filters ========= */
-function makePills(containerId, values, key){
-  const box = document.getElementById(containerId);
-  box.innerHTML = "";
-  values.forEach(v=>{
-    const pill = document.createElement('div');
-    pill.className = "pill" + (state.selected[key].has(v) ? " on" : "");
-    pill.textContent = v;
-    pill.onclick = ()=>{
-      if (state.selected[key].has(v)) state.selected[key].delete(v);
-      else state.selected[key].add(v);
-      loadDashboard(); // 즉시 반영
-    };
-    box.appendChild(pill);
+function renderFilters(options){
+  state.options = options;
+  const root = document.getElementById("filters");
+
+  // 정렬 보정(혹시 서버 옵션이 섞여도 프론트에서 한 번 더 보정)
+  const years = (options.years||[]).slice().sort((a,b)=>Number(a)-Number(b));
+  const months = (options.months||[]).slice().sort((a,b)=>Number(a)-Number(b));
+  const days = (options.days||[]).slice().sort((a,b)=>Number(a)-Number(b));
+  const dows = DOW_ORDER.filter(d => (options.dows||[]).includes(d));
+  const items = (options.items||[]).slice().sort((a,b)=>a.localeCompare(b,'ko'));
+  const channels = (options.channels||[]).slice().sort((a,b)=>a.localeCompare(b,'ko'));
+
+  const blocks = [
+    { key:"years", label:"연도", values: years },
+    { key:"months", label:"월", values: months },
+    { key:"days", label:"일", values: days },
+    { key:"dows", label:"요일", values: dows },
+    { key:"items", label:"아이템", values: items },
+    { key:"channels", label:"방송채널", values: channels },
+  ];
+
+  root.innerHTML = blocks.map(b=>{
+    return `
+      <div class="fblock">
+        <div class="fhead">
+          <div class="fname">${b.label}</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn" data-act="all" data-key="${b.key}">전체</button>
+            <button class="btn" data-act="clear" data-key="${b.key}">해제</button>
+          </div>
+        </div>
+        <div class="pillbox">
+          ${b.values.map(v=>{
+            const on = state.filters[b.key].includes(String(v));
+            return `<div class="pill ${on?'on':''}" data-key="${b.key}" data-val="${String(v)}">${String(v)}</div>`;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  // pill click
+  root.querySelectorAll(".pill").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const k = el.dataset.key;
+      const v = el.dataset.val;
+      const arr = state.filters[k];
+      const i = arr.indexOf(v);
+      if (i >= 0) arr.splice(i,1);
+      else arr.push(v);
+      reloadDashboard();
+    });
+  });
+
+  // all/clear
+  root.querySelectorAll("button[data-act]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const act = btn.dataset.act;
+      const k = btn.dataset.key;
+      if (act === "clear") state.filters[k] = [];
+      if (act === "all") {
+        // 전체 선택은 너무 무거울 수 있어: 여기서는 "전부 선택" 대신 "비움(=전체)"로 동작시킴
+        state.filters[k] = [];
+      }
+      reloadDashboard();
+    });
   });
 }
 
-function renderFilters(){
-  // 월/일은 숫자 정렬된 options가 백엔드에서 내려옴
-  makePills("years", state.options.years || [], "years");
-  makePills("months", state.options.months || [], "months");
-  makePills("days", state.options.days || [], "days");
-  makePills("dows", state.options.dows || [], "dows");
-  makePills("items", state.options.items || [], "items");
-  makePills("channels", state.options.channels || [], "channels");
-}
-
-// 전체/해제 버튼
-document.querySelectorAll("[data-all]").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    const k = btn.getAttribute("data-all");
-    (state.options[k]||[]).forEach(v=> state.selected[k].add(v));
-    loadDashboard();
-  });
-});
-document.querySelectorAll("[data-clear]").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    const k = btn.getAttribute("data-clear");
-    state.selected[k].clear();
-    loadDashboard();
-  });
-});
-document.getElementById("btnReset").onclick = ()=>{
-  for (const k of Object.keys(state.selected)) state.selected[k].clear();
-  loadDashboard();
-};
-document.getElementById("btnRefresh").onclick = ()=> loadDashboard();
-
-/** ========= Charts =========
- * - 목표/실적: bar
- * - 달성율: 선 연결 X (scatter 점만) + 점 크게
- */
-function buildComboChart(ctx, labels, goal, actual, ach, opts={}){
-  const achPoints = ach.map((v,i)=>({ x: labels[i], y: v }));
+/*** =========================
+ *  5) Chart.js 생성/업데이트
+ *  - 달성율: 점(Scatter), 크기 크게
+ *  - 선 연결 없음(showLine:false)
+ * ========================= */
+function buildComboChart(ctx, title, labels, goal, actual, rate, opts={}){
+  const pointR = opts.pointRadius ?? 6;         // ✅ 점 크게
+  const pointHR = opts.pointHoverRadius ?? 8;
 
   return new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
       datasets: [
-        { label:'목표', data: goal, yAxisID:'y', order: 2 },
-        { label:'실적', data: actual, yAxisID:'y', order: 2 },
+        { label:'목표', data: goal, backgroundColor:'rgba(96,165,250,0.55)' },
+        { label:'실적', data: actual, backgroundColor:'rgba(253,164,175,0.65)' },
         {
-          type:'scatter',
+          type: 'scatter',
           label:'달성율(%)',
-          data: achPoints,
-          yAxisID:'pct',
-          showLine: false,          // ✅ 선 연결 X
-          pointRadius: 7,           // ✅ 점 크게
-          pointHoverRadius: 9,
-          order: 1
+          data: rate.map((y,i)=>({x:i, y})),
+          yAxisID: 'y1',
+          showLine: false,                      // ✅ 선 없음
+          pointRadius: pointR,
+          pointHoverRadius: pointHR,
+          pointBackgroundColor:'rgba(251,146,60,0.9)'
         }
       ]
     },
     options: {
       responsive:true,
       maintainAspectRatio:false,
-      plugins:{
-        tooltip:{
+      plugins: {
+        legend: { position:'top' },
+        tooltip: {
           callbacks:{
-            label: (c)=>{
-              if (c.dataset.type === 'scatter'){
-                return `달성율: ${Math.round(c.raw.y)}%`;
-              }
-              return `${c.dataset.label}: ${fmtMoney(c.raw)}`;
+            label: (ctx)=>{
+              if (ctx.dataset.type === 'scatter') return `달성율: ${Number(ctx.raw.y||0).toFixed(1)}%`;
+              return `${ctx.dataset.label}: ${fmtNum(ctx.raw)}`;
             }
           }
-        },
-        legend:{ position:'top' }
+        }
       },
-      scales:{
-        y:{
-          beginAtZero:true,
-          ticks:{ callback:(v)=> fmtMoney(v) }
+      scales: {
+        x: {
+          ticks: { maxRotation: 45, minRotation: 45 }
         },
-        pct:{
+        y: {
+          beginAtZero:true,
+          grid: { color:'rgba(0,0,0,0.06)' }
+        },
+        y1: {
           position:'right',
           beginAtZero:true,
-          grid:{ drawOnChartArea:false },
-          ticks:{ callback:(v)=> `${v}%` },
-          suggestedMax: opts.suggestedMaxPct || 200
-        },
-        x:{
-          ticks:{ autoSkip: true, maxRotation: 45, minRotation: 0 }
+          grid: { drawOnChartArea:false },
+          ticks: {
+            callback:(v)=> v + "%"
+          }
         }
       }
     }
   });
 }
 
-function buildComboChartHorizontal(ctx, labels, goal, actual, ach){
-  // 수평 bar + scatter
-  const achPoints = ach.map((v,i)=>({ y: labels[i], x: v }));
-
+function buildHorizontalCombo(ctx, labels, goal, actual, rate){
   return new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
       datasets: [
-        { label:'목표', data: goal, indexAxis:'y', yAxisID:'y', order: 2 },
-        { label:'실적', data: actual, indexAxis:'y', yAxisID:'y', order: 2 },
+        { label:'목표', data: goal, backgroundColor:'rgba(96,165,250,0.55)' },
+        { label:'실적', data: actual, backgroundColor:'rgba(253,164,175,0.65)' },
         {
           type:'scatter',
           label:'달성율(%)',
-          data: achPoints,
-          xAxisID:'pct',
-          yAxisID:'x',
+          data: rate.map((y,i)=>({x:y, y:i})),
+          xAxisID:'x1',
           showLine:false,
-          pointRadius:7,
-          pointHoverRadius:9,
-          order: 1
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          pointBackgroundColor:'rgba(251,146,60,0.9)'
         }
       ]
     },
     options: {
       responsive:true,
       maintainAspectRatio:false,
-      plugins:{
-        tooltip:{
-          callbacks:{
-            label:(c)=>{
-              if (c.dataset.type === 'scatter'){
-                return `달성율: ${Math.round(c.raw.x)}%`;
-              }
-              return `${c.dataset.label}: ${fmtMoney(c.raw)}`;
-            }
-          }
-        },
-        legend:{ position:'top' }
-      },
       indexAxis:'y',
+      plugins:{ legend:{position:'top'} },
       scales:{
-        y:{ beginAtZero:true, ticks:{ callback:(v)=> fmtMoney(v) } },
-        pct:{
+        x:{ beginAtZero:true, grid:{ color:'rgba(0,0,0,0.06)'} },
+        x1:{
           position:'top',
           beginAtZero:true,
           grid:{ drawOnChartArea:false },
-          ticks:{ callback:(v)=> `${v}%` },
-          suggestedMax: 200
-        }
+          ticks:{ callback:(v)=>v+'%' }
+        },
+        y:{ grid:{ color:'rgba(0,0,0,0.06)'} }
       }
     }
   });
 }
 
-function destroyIf(chart){
-  if (chart) chart.destroy();
+function upsertChart(id, builder){
+  const ctx = document.getElementById(id).getContext('2d');
+  if (state.chartObjs[id]) state.chartObjs[id].destroy();
+  state.chartObjs[id] = builder(ctx);
 }
 
-function renderCharts(ch){
-  // 방송채널별: 문자열 내림차순, (비어있음) 백엔드에서 이미 제외
-  destroyIf(state.charts.channel);
-  state.charts.channel = buildComboChart(
-    document.getElementById("ch_channel"),
-    ch.channel.labels, ch.channel.goal, ch.channel.actual, ch.channel.ach,
-    { suggestedMaxPct: 250 }
-  );
-
-  // 월별
-  destroyIf(state.charts.month);
-  state.charts.month = buildComboChart(
-    document.getElementById("ch_month"),
-    ch.month.labels, ch.month.goal, ch.month.actual, ch.month.ach,
-    { suggestedMaxPct: 200 }
-  );
-
-  // 요일별
-  destroyIf(state.charts.dow);
-  state.charts.dow = buildComboChart(
-    document.getElementById("ch_dow"),
-    ch.dow.labels, ch.dow.goal, ch.dow.actual, ch.dow.ach,
-    { suggestedMaxPct: 200 }
-  );
-
-  // 일자별 TOP30: 수평으로 가독성
-  destroyIf(state.charts.dateTop);
-  state.charts.dateTop = buildComboChartHorizontal(
-    document.getElementById("ch_dateTop"),
-    ch.dateTop.labels, ch.dateTop.goal, ch.dateTop.actual, ch.dateTop.ach
-  );
-
-  // 아이템별: 세로막대 + scatter(점)
-  destroyIf(state.charts.item);
-  state.charts.item = buildComboChart(
-    document.getElementById("ch_item"),
-    ch.item.labels, ch.item.goal, ch.item.actual, ch.item.ach,
-    { suggestedMaxPct: 200 }
-  );
+/*** =========================
+ *  6) 데이터 로드
+ * ========================= */
+function getKey(){
+  return localStorage.getItem(KEY_STORAGE) || "";
+}
+function openKeyModal(){
+  document.getElementById("modalBg").style.display="flex";
+  document.getElementById("keyInput").value = getKey();
+  document.getElementById("keyInput").focus();
+}
+function closeKeyModal(){
+  document.getElementById("modalBg").style.display="none";
 }
 
-/** ====== Start ====== */
+async function loadDashboard(){
+  const key = getKey();
+  if (!key) {
+    openKeyModal();
+    setStatus("상태: 키 입력 필요", true);
+    return;
+  }
+
+  setStatus("상태: 로딩 중...");
+  const params = {
+    action: "dashboard",
+    key,
+    years: state.filters.years.join(","),
+    months: state.filters.months.join(","),
+    days: state.filters.days.join(","),
+    dows: state.filters.dows.join(","),
+    items: state.filters.items.join(","),
+    channels: state.filters.channels.join(",")
+  };
+
+  try{
+    const data = await jsonp(API_URL, params);
+    if (!data.ok) {
+      setStatus(`상태: 오류 - ${data.message || data.error}`, true);
+      return;
+    }
+
+    document.getElementById("updatedText").textContent = `업데이트: ${data.updated || ""}`;
+    setStatus("상태: 정상 · 필터 적용 완료");
+
+    renderKpis(data.kpis || {});
+    if (!state.options) renderFilters(data.options || {});
+
+    // charts
+    const c = data.charts || {};
+    // 1) 채널: 서버에서 문자열 내림차순 + (비어있음) 제거 처리됨
+    upsertChart("chChannel", (ctx)=>buildComboChart(ctx, "채널", c.channel?.labels||[], c.channel?.goal||[], c.channel?.actual||[], c.channel?.rate||[], {pointRadius:7}));
+
+    // 2) 월, 요일: 세로막대
+    upsertChart("chMonth", (ctx)=>buildComboChart(ctx, "월", c.month?.labels||[], c.month?.goal||[], c.month?.actual||[], c.month?.rate||[], {pointRadius:7}));
+    upsertChart("chDow", (ctx)=>buildComboChart(ctx, "요일", c.dow?.labels||[], c.dow?.goal||[], c.dow?.actual||[], c.dow?.rate||[], {pointRadius:7}));
+
+    // 3) 일자: 가로막대(Top30)
+    upsertChart("chDay", (ctx)=>buildHorizontalCombo(ctx, c.day?.labels||[], c.day?.goal||[], c.day?.actual||[], c.day?.rate||[]));
+
+    // 4) 아이템: 세로막대 + 달성율 점(선 없음)
+    upsertChart("chItem", (ctx)=>buildComboChart(ctx, "아이템", c.item?.labels||[], c.item?.goal||[], c.item?.actual||[], c.item?.rate||[], {pointRadius:7}));
+
+  }catch(err){
+    setStatus("상태: 오류 · JSONP load failed", true);
+    console.error(err);
+  }
+}
+
+function reloadDashboard(){
+  // 필터 UI를 즉시 다시 그려서 on/off 표시 반영
+  if (state.options) renderFilters(state.options);
+  loadDashboard();
+}
+
+/*** =========================
+ *  7) 이벤트 바인딩
+ * ========================= */
+document.getElementById("btnReload").addEventListener("click", ()=>loadDashboard());
+document.getElementById("btnReset").addEventListener("click", ()=>{
+  state.filters = { years:[], months:[], days:[], dows:[], items:[], channels:[] };
+  reloadDashboard();
+});
+document.getElementById("btnKey").addEventListener("click", ()=>openKeyModal());
+
+document.getElementById("btnCancel").addEventListener("click", ()=>closeKeyModal());
+document.getElementById("btnSaveKey").addEventListener("click", ()=>{
+  const v = document.getElementById("keyInput").value.trim();
+  if (!v) return;
+  localStorage.setItem(KEY_STORAGE, v);
+  closeKeyModal();
+  // 옵션 아직 없으면 첫 로드에서 받아오고, 있으면 그대로
+  loadDashboard();
+});
+
+// 시작
 (async function init(){
-  // 키 팝업 방식은 브라우저에서만 가능하고 "보안"은 약해요.
-  // 그래도 원하셨으니: 로컬스토리지에 키 저장 → API 호출 시 key 파라미터로 전달.
-  // (이미 API_KEY 상수로 넣는 방식이라면 팝업은 생략 가능)
-
-  if (!API_URL.includes("script.google.com/macros/s/") || API_URL.includes("PASTE_")){
-    setStatus("상태: 설정 필요 - API_URL을 index.html 상단에 입력하세요");
-    return;
-  }
-  if (API_KEY === "CHANGE_ME_TO_YOUR_KEY"){
-    setStatus("상태: 설정 필요 - API_KEY를 index.html 상단에 입력하세요");
-    return;
-  }
+  if (!getKey()) openKeyModal();
   await loadDashboard();
 })();
 </script>
