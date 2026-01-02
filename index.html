@@ -1,356 +1,664 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>방송 매출 대시보드</title>
-  <meta name="robots" content="noindex,nofollow" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
     :root{
-      --bg:#f5f7fb; --card:#fff; --muted:#6b7280; --text:#111827;
-      --border:#e5e7eb; --soft:#eaf2ff; --radius:14px;
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --line:#e7edf5;
+      --text:#0f172a;
+      --muted:#64748b;
+      --primary:#2563eb;
+      --danger:#dc2626;
+      --pill:#eef2ff;
+      --shadow: 0 6px 20px rgba(15,23,42,.06);
+      --radius:14px;
     }
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
-      background:var(--bg); margin:0; padding:14px; color:var(--text);}
-    header{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
-    header h1{margin:0;font-size:24px;letter-spacing:-.4px;}
-    .sub{margin:0 0 10px 0;color:var(--muted);font-size:12px;}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+    .wrap{max-width:1400px;margin:18px auto;padding:0 14px}
+    .top{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px
+    }
+    h1{margin:0;font-size:26px;display:flex;gap:10px;align-items:center}
+    .sub{margin-top:4px;color:var(--muted);font-size:12px}
+    .statusbar{
+      background:var(--card);border:1px solid var(--line);border-radius:12px;
+      padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+      box-shadow:var(--shadow);margin:10px 0 12px
+    }
+    .statusleft{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .badge{padding:4px 8px;border-radius:999px;background:#ecfeff;color:#155e75;font-weight:700;font-size:12px}
+    .badge.err{background:#fef2f2;color:#991b1b}
+    .btns{display:flex;gap:8px;align-items:center}
+    button{
+      border:1px solid var(--line);background:var(--card);padding:7px 10px;border-radius:10px;
+      cursor:pointer;font-weight:700
+    }
+    button.primary{background:var(--primary);border-color:var(--primary);color:white}
+    button.danger{background:#fff;border-color:#fecaca;color:var(--danger)}
+    button:disabled{opacity:.55;cursor:not-allowed}
 
-    .status{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
-      border:1px solid var(--border);border-radius:var(--radius);background:var(--card);padding:8px 10px;}
-    .status b{font-weight:900;}
-    .btn{border:1px solid var(--border);background:#fff;border-radius:10px;padding:7px 9px;cursor:pointer;font-size:12px;}
-    .btn:hover{background:#f9fafb;}
-    .btn.primary{border-color:#c7d2fe;background:#eef2ff;}
+    .grid{
+      display:grid;
+      grid-template-columns: 300px 1fr;
+      gap:12px;
+      align-items:start;
+    }
+    @media (max-width: 1080px){
+      .grid{grid-template-columns:1fr}
+    }
 
-    .grid{display:grid;grid-template-columns:300px 1fr;gap:12px;align-items:start;margin-top:12px;}
-    @media(max-width:1050px){.grid{grid-template-columns:1fr;}}
+    .card{
+      background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .filters{padding:12px}
+    .filters h2{margin:0 0 8px;font-size:15px}
+    .group{margin:10px 0 14px}
+    .ghead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+    .gtitle{font-weight:900}
+    .gactions{display:flex;gap:6px}
+    .mini{padding:5px 8px;font-size:12px;border-radius:9px}
+    .pills{display:flex;flex-wrap:wrap;gap:6px}
+    .pill{
+      padding:7px 9px;border-radius:999px;border:1px solid var(--line);
+      background:#fff;cursor:pointer;user-select:none;
+      font-weight:700;font-size:12px
+    }
+    .pill.on{
+      background:var(--pill);
+      border-color:#c7d2fe;
+      outline: 2px solid #dbeafe;
+    }
 
-    .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px;}
-    .panel h2{margin:0 0 8px 0;font-size:14px;}
+    .main{display:grid;gap:12px}
+    .kpis{display:grid;grid-template-columns: repeat(6, 1fr);gap:10px;padding:12px}
+    @media (max-width: 1080px){
+      .kpis{grid-template-columns: repeat(2, 1fr)}
+    }
+    .kpi{background:#eaf2ff;border:1px solid #dbeafe;border-radius:14px;padding:12px}
+    .kpi .t{color:var(--muted);font-weight:900;font-size:12px}
+    .kpi .v{font-size:20px;font-weight:1000;margin-top:3px}
 
-    .kpis{display:grid;grid-template-columns:repeat(6,minmax(140px,1fr));gap:10px;margin-bottom:10px;}
-    @media(max-width:1180px){.kpis{grid-template-columns:repeat(3,minmax(140px,1fr));}}
-    @media(max-width:620px){.kpis{grid-template-columns:1fr;}}
+    .charts{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      padding:12px;
+    }
+    @media (max-width: 1080px){
+      .charts{grid-template-columns:1fr}
+    }
+    .chartcard{padding:10px 12px}
+    .charttitle{font-weight:1000;margin:0 0 8px;font-size:14px}
+    .canvasWrap{height:280px}
+    .canvasWrap.tall{height:320px}
+    .canvasWrap.hbar{height:320px}
+    .footnote{color:var(--muted);font-size:12px;padding:0 12px 12px}
 
-    .kpi{background:var(--soft);border-radius:var(--radius);padding:10px 12px;}
-    .kpi .label{color:var(--muted);font-size:11px;margin-bottom:4px;}
-    .kpi .value{font-size:18px;font-weight:900;letter-spacing:-.4px;}
-
-    .slicer{margin-top:8px;}
-    .slicer-head{display:flex;justify-content:space-between;align-items:center;gap:8px;}
-    .slicer-head .title{font-weight:900;font-size:12px;}
-    .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
-    .chip{border:1px solid var(--border);background:#fff;border-radius:999px;padding:5px 8px;font-size:12px;cursor:pointer;user-select:none;}
-    .chip.on{border-color:#bfdbfe;background:#eff6ff;color:#1d4ed8;font-weight:800;}
-    .chip:active{transform:translateY(1px);}
-
-    .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    @media(max-width:1050px){.charts{grid-template-columns:1fr;}}
-    .section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px;}
-    .section h3{margin:0 0 8px 0;font-size:14px;}
-    .chartBox{height:240px;}
-    .chartBox.tall{height:270px;}
-    canvas{width:100%!important;height:100%!important;}
+    /* key modal */
+    .modalBack{
+      position:fixed;inset:0;background:rgba(15,23,42,.55);
+      display:flex;align-items:center;justify-content:center;padding:18px;
+      z-index:9999;
+    }
+    .modal{
+      width:min(520px, 95vw);
+      background:var(--card);border:1px solid var(--line);border-radius:16px;
+      box-shadow: 0 25px 80px rgba(0,0,0,.25);
+      padding:16px;
+    }
+    .modal h3{margin:0 0 6px;font-size:18px}
+    .modal p{margin:0 0 12px;color:var(--muted);font-size:13px}
+    .row{display:flex;gap:8px}
+    input{
+      flex:1;border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+      font-weight:800
+    }
+    .help{margin-top:10px;color:var(--muted);font-size:12px}
+    .errtxt{color:var(--danger);font-weight:900;margin-top:8px;display:none}
   </style>
 </head>
-
 <body>
-  <header><div style="font-size:26px">📊</div><h1>방송 매출 대시보드</h1></header>
-  <p class="sub">엑셀 슬라이서처럼 선택하면 KPI/차트가 즉시 변경됩니다.</p>
-
-  <div class="status">
-    <div>상태: <b id="statusText">로딩…</b> <span id="statusHint" style="color:var(--muted)"></span></div>
-    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-      <span id="lastUpdated" style="color:var(--muted); font-size:12px;"></span>
-      <button class="btn" id="resetBtn">전체 해제</button>
-      <button class="btn primary" id="refreshBtn">새로고침</button>
-    </div>
-  </div>
-
-  <div class="grid">
-    <div class="panel">
-      <h2>필터(슬라이서)</h2>
-      <div class="slicer" id="slicerYears"></div>
-      <div class="slicer" id="slicerMonths"></div>
-      <div class="slicer" id="slicerDays"></div>
-      <div class="slicer" id="slicerDows"></div>
-      <div class="slicer" id="slicerItems"></div>
-      <div class="slicer" id="slicerChannels"></div>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>📊 방송 매출 대시보드</h1>
+        <div class="sub">엑셀 슬라이서처럼 선택하면 KPI/차트가 즉시 변경됩니다.</div>
+      </div>
     </div>
 
-    <div>
-      <div class="kpis" id="kpis"></div>
+    <div class="statusbar card">
+      <div class="statusleft">
+        <span id="badge" class="badge">상태: 준비</span>
+        <span id="statusText" style="color:var(--muted);font-weight:800">키 인증 후 데이터를 불러옵니다.</span>
+      </div>
+      <div class="btns">
+        <span id="updatedAt" style="color:var(--muted);font-weight:800"></span>
+        <button id="btnClear" class="danger" disabled>전체 해제</button>
+        <button id="btnRefresh" class="primary" disabled>새로고침</button>
+      </div>
+    </div>
 
-      <div class="charts">
-        <div class="section">
-          <h3>방송채널별 (목표/실적/달성율)</h3>
-          <div class="chartBox"><canvas id="channelChart"></canvas></div>
+    <div class="grid">
+      <div class="card filters">
+        <h2>필터(슬라이서)</h2>
+
+        <div class="group" data-group="years">
+          <div class="ghead">
+            <div class="gtitle">연도</div>
+            <div class="gactions">
+              <button class="mini" data-act="all">전체</button>
+              <button class="mini" data-act="clear">해제</button>
+            </div>
+          </div>
+          <div class="pills" id="pills-years"></div>
         </div>
-        <div class="section">
-          <h3>월별 (목표/실적/달성율)</h3>
-          <div class="chartBox"><canvas id="monthChart"></canvas></div>
+
+        <div class="group" data-group="months">
+          <div class="ghead">
+            <div class="gtitle">월</div>
+            <div class="gactions">
+              <button class="mini" data-act="all">전체</button>
+              <button class="mini" data-act="clear">해제</button>
+            </div>
+          </div>
+          <div class="pills" id="pills-months"></div>
         </div>
-        <div class="section">
-          <h3>요일별 (목표/실적/달성율)</h3>
-          <div class="chartBox"><canvas id="dowChart"></canvas></div>
+
+        <div class="group" data-group="days">
+          <div class="ghead">
+            <div class="gtitle">일</div>
+            <div class="gactions">
+              <button class="mini" data-act="all">전체</button>
+              <button class="mini" data-act="clear">해제</button>
+            </div>
+          </div>
+          <div class="pills" id="pills-days"></div>
         </div>
-        <div class="section">
-          <h3>일자별 (목표/실적/달성율)</h3>
-          <div class="chartBox tall"><canvas id="dayChart"></canvas></div>
+
+        <div class="group" data-group="dows">
+          <div class="ghead">
+            <div class="gtitle">요일</div>
+            <div class="gactions">
+              <button class="mini" data-act="all">전체</button>
+              <button class="mini" data-act="clear">해제</button>
+            </div>
+          </div>
+          <div class="pills" id="pills-dows"></div>
         </div>
-        <div class="section" style="grid-column: 1 / -1;">
-          <h3>아이템별 (목표/실적/달성율)</h3>
-          <div class="chartBox tall"><canvas id="itemChart"></canvas></div>
+
+        <div class="group" data-group="items">
+          <div class="ghead">
+            <div class="gtitle">아이템</div>
+            <div class="gactions">
+              <button class="mini" data-act="all">전체</button>
+              <button class="mini" data-act="clear">해제</button>
+            </div>
+          </div>
+          <div class="pills" id="pills-items"></div>
         </div>
+
+        <div class="group" data-group="channels">
+          <div class="ghead">
+            <div class="gtitle">방송채널</div>
+            <div class="gactions">
+              <button class="mini" data-act="all">전체</button>
+              <button class="mini" data-act="clear">해제</button>
+            </div>
+          </div>
+          <div class="pills" id="pills-channels"></div>
+        </div>
+      </div>
+
+      <div class="main">
+        <div class="card kpis" id="kpis">
+          <div class="kpi"><div class="t">방송횟수</div><div class="v" id="kpi-bc">-</div></div>
+          <div class="kpi"><div class="t">특약횟수</div><div class="v" id="kpi-spc">-</div></div>
+          <div class="kpi"><div class="t">특약비용</div><div class="v" id="kpi-spv">-</div></div>
+          <div class="kpi"><div class="t">평균달성율</div><div class="v" id="kpi-ach">-</div></div>
+          <div class="kpi"><div class="t">방송시간(분)</div><div class="v" id="kpi-min">-</div></div>
+          <div class="kpi"><div class="t">시간당매출</div><div class="v" id="kpi-hr">-</div></div>
+        </div>
+
+        <div class="card charts">
+          <div class="card chartcard">
+            <div class="charttitle">방송채널별 (목표/실적/달성율)</div>
+            <div class="canvasWrap tall"><canvas id="chartChannel"></canvas></div>
+          </div>
+          <div class="card chartcard">
+            <div class="charttitle">월별 (목표/실적/달성율)</div>
+            <div class="canvasWrap"><canvas id="chartMonth"></canvas></div>
+          </div>
+          <div class="card chartcard">
+            <div class="charttitle">요일별 (목표/실적/달성율)</div>
+            <div class="canvasWrap"><canvas id="chartDow"></canvas></div>
+          </div>
+          <div class="card chartcard">
+            <div class="charttitle">일자별 (목표/실적/달성율) - TOP 30</div>
+            <div class="canvasWrap hbar"><canvas id="chartDay"></canvas></div>
+          </div>
+          <div class="card chartcard" style="grid-column:1/-1">
+            <div class="charttitle">아이템별 (목표/실적/달성율)</div>
+            <div class="canvasWrap tall"><canvas id="chartItem"></canvas></div>
+          </div>
+        </div>
+        <div class="footnote">※ 달성율(%) 점은 선을 잇지 않고 크게 표시합니다. (비어있음/aaa 등 불필요 값은 자동 제외)</div>
       </div>
     </div>
   </div>
 
-<script>
-/*** ✅ 1) 본인 Apps Script /exec URL ***/
-const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec";
-
-/*** ✅ 2) Apps Script의 ACCESS_KEY와 동일하게 ***/
-const ACCESS_KEY = "WHHS-ONLY-2026-SECRET";
-
-/*** JSONP ***/
-function jsonp(url){
-  return new Promise((resolve, reject) => {
-    const cb = "cb_" + Math.random().toString(36).slice(2);
-    const script = document.createElement("script");
-    window[cb] = (data) => { resolve(data); try{ delete window[cb]; }catch(e){ window[cb]=undefined; } script.remove(); };
-    const sep = url.includes("?") ? "&" : "?";
-    script.src = url + sep + "callback=" + cb;
-    script.onerror = () => { reject(new Error("JSONP load failed")); try{ delete window[cb]; }catch(e){ window[cb]=undefined; } script.remove(); };
-    document.body.appendChild(script);
-  });
-}
-
-function setStatus(ok, text, hint=""){
-  const el = document.getElementById("statusText");
-  const hintEl = document.getElementById("statusHint");
-  el.textContent = text;
-  hintEl.textContent = hint ? ` · ${hint}` : "";
-  el.style.color = ok ? "#059669" : "#dc2626";
-}
-function updateTimestamp(){
-  document.getElementById("lastUpdated").textContent = "업데이트: " + new Date().toLocaleString("ko-KR");
-}
-function fmtNumber(x){
-  const n = Number(x);
-  if(!isFinite(n)) return "-";
-  return Math.round(n).toLocaleString("ko-KR");
-}
-function fmtPercent01(x){
-  const n = Number(x);
-  if(!isFinite(n)) return "-";
-  return Math.round(n*100) + "%";
-}
-
-/*** 상태 ***/
-const state = { years:new Set(), months:new Set(), days:new Set(), dows:new Set(), items:new Set(), channels:new Set() };
-
-function readStateFromUrl(){
-  const sp = new URLSearchParams(location.search);
-  ["years","months","days","dows","items","channels"].forEach(k=>{
-    state[k].clear();
-    const v = sp.get(k);
-    if(v) v.split(",").map(s=>s.trim()).filter(Boolean).forEach(x=>state[k].add(x));
-  });
-}
-function writeStateToUrl(){
-  const sp = new URLSearchParams();
-  ["years","months","days","dows","items","channels"].forEach(k=>{
-    if(state[k].size) sp.set(k, [...state[k]].join(","));
-  });
-  history.replaceState(null, "", location.pathname + (sp.toString()?("?"+sp.toString()):""));
-}
-function buildQueryFromState(){
-  const sp = new URLSearchParams();
-  ["years","months","days","dows","items","channels"].forEach(k=>{
-    if(state[k].size) sp.set(k, [...state[k]].join(","));
-  });
-  return sp.toString();
-}
-
-/*** 슬라이서 렌더 ***/
-function renderSlicer(containerId, title, key, options){
-  const container = document.getElementById(containerId);
-  const selected = state[key];
-
-  const chipsHtml = (options || []).map(v=>{
-    const vv = String(v);
-    const on = selected.has(vv);
-    return `<div class="chip ${on?'on':''}" data-key="${key}" data-val="${vv}">${vv}</div>`;
-  }).join("");
-
-  container.innerHTML = `
-    <div class="slicer-head">
-      <div class="title">${title}</div>
-      <div style="display:flex; gap:6px;">
-        <button class="btn" data-action="all" data-key="${key}">전체</button>
-        <button class="btn" data-action="none" data-key="${key}">해제</button>
+  <!-- Key Modal -->
+  <div class="modalBack" id="keyModal" style="display:none">
+    <div class="modal">
+      <h3>키 인증</h3>
+      <p>이 대시보드는 비공개 키를 아는 사람만 볼 수 있습니다. 키를 입력해 주세요.</p>
+      <div class="row">
+        <input id="keyInput" placeholder="키 입력" />
+        <button class="primary" id="keyBtn">확인</button>
       </div>
+      <div class="errtxt" id="keyErr">키가 올바르지 않습니다.</div>
+      <div class="help">팁: 키는 브라우저에 저장할 수 있습니다(다음 접속 시 자동).</div>
     </div>
-    <div class="chips">${chipsHtml || '<span style="color:#6b7280;font-size:12px;">(옵션 없음)</span>'}</div>
-  `;
-}
+  </div>
 
-/*** KPI 6개 (요청 순서) ***/
-function renderKpis(d){
-  document.getElementById("kpis").innerHTML = `
-    <div class="kpi"><div class="label">방송횟수</div><div class="value">${fmtNumber(d["방송횟수"])}</div></div>
-    <div class="kpi"><div class="label">특약횟수</div><div class="value">${fmtNumber(d["특약횟수"])}</div></div>
-    <div class="kpi"><div class="label">특약비용</div><div class="value">${fmtNumber(d["특약비용"])}</div></div>
-    <div class="kpi"><div class="label">평균달성율</div><div class="value">${fmtPercent01(d["평균달성율"])}</div></div>
-    <div class="kpi"><div class="label">방송시간(분)</div><div class="value">${fmtNumber(d["방송시간_분"])}</div></div>
-    <div class="kpi"><div class="label">시간당매출</div><div class="value">${fmtNumber(d["시간당매출"])}</div></div>
-  `;
-}
+  <script>
+    /********************************************************
+     * 1) 여기만 설정하면 됩니다
+     ********************************************************/
+    const SCRIPT_EXEC_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec"; // ✅ 너의 /exec URL로 교체
 
-/*** 차트: 목표/실적 겹침 + 달성율 점만(점 크게) ***/
-let charts = {};
-function drawPivotChart(canvasId, labels, goals, actuals, achs, counts, opts={}){
-  const horizontal = !!opts.horizontal;
-  const pointSize = Number(opts.pointSize ?? 8);   // ✅ 점 더 크게
-  const ctx = document.getElementById(canvasId);
-  if(charts[canvasId]) charts[canvasId].destroy();
+    /********************************************************
+     * 내부 상태
+     ********************************************************/
+    let AUTH_KEY = "";
+    const filters = {
+      years: new Set(),
+      months: new Set(),
+      days: new Set(),
+      dows: new Set(),
+      items: new Set(),
+      channels: new Set()
+    };
+    let optionsCache = null;
 
-  charts[canvasId] = new Chart(ctx, {
-    data:{
-      labels: labels || [],
-      datasets:[
-        { type:'bar', label:'목표', data:(goals||[]).map(Number), barPercentage:0.9, categoryPercentage:0.8 },
-        { type:'bar', label:'실적', data:(actuals||[]).map(Number), barPercentage:0.55, categoryPercentage:0.8 },
-        {
-          type:'line',
-          label:'달성율(%)',
-          data:(achs||[]).map(v=>Number(v)*100),
-          yAxisID:'y1',
-          showLine:false,              // ✅ 선 연결 X
-          pointRadius:pointSize,
-          pointHoverRadius:pointSize+2,
-          borderWidth:0
-        }
-      ]
-    },
-    options:{
-      indexAxis: horizontal ? 'y' : 'x',
-      responsive:true,
-      maintainAspectRatio:false,
-      scales:{
-        y:{ beginAtZero:true },
-        y1:{
-          beginAtZero:true,
-          position:'right',
-          grid:{ drawOnChartArea:false },
-          ticks:{ callback:(v)=> v + '%' }
-        }
-      },
-      plugins:{
-        tooltip:{
-          callbacks:{
-            afterBody:(items)=>{
-              const i = items?.[0]?.dataIndex;
-              if(i==null) return '';
-              const cnt = counts?.[i];
-              return cnt!=null ? `방송횟수: ${cnt}` : '';
-            }
-          }
+    // charts
+    let chChannel, chMonth, chDow, chDay, chItem;
+
+    const badge = document.getElementById('badge');
+    const statusText = document.getElementById('statusText');
+    const updatedAt = document.getElementById('updatedAt');
+    const btnRefresh = document.getElementById('btnRefresh');
+    const btnClear = document.getElementById('btnClear');
+
+    function setStatus(ok, text){
+      badge.className = "badge" + (ok ? "" : " err");
+      badge.textContent = ok ? "상태: 정상" : "상태: 오류";
+      statusText.textContent = text || "";
+    }
+
+    function nowText(){
+      const d = new Date();
+      return `업데이트: ${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}. ${d.toLocaleTimeString('ko-KR')}`;
+    }
+
+    function fmtInt(n){
+      n = Number(n||0);
+      return n.toLocaleString('ko-KR');
+    }
+    function fmtMoney(n){
+      n = Number(n||0);
+      return n.toLocaleString('ko-KR');
+    }
+    function fmtPct(x){
+      x = Number(x||0);
+      return (x*100).toFixed(0) + "%";
+    }
+
+    /********************************************************
+     * JSONP 호출 (GitHub Pages에서 CORS 회피)
+     ********************************************************/
+    function jsonp(url){
+      return new Promise((resolve, reject)=>{
+        const cb = "CB_" + Math.random().toString(16).slice(2);
+        window[cb] = (data)=>{
+          delete window[cb];
+          script.remove();
+          resolve(data);
+        };
+        const script = document.createElement("script");
+        script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
+        script.onerror = ()=>{
+          delete window[cb];
+          script.remove();
+          reject(new Error("JSONP load failed"));
+        };
+        document.body.appendChild(script);
+      });
+    }
+
+    function buildUrl(action, extraParams={}){
+      const params = new URLSearchParams();
+      params.set("action", action);
+      params.set("key", AUTH_KEY);
+
+      // filters -> query
+      for (const k of Object.keys(filters)){
+        if (filters[k].size){
+          params.set(k, Array.from(filters[k]).join(","));
         }
       }
+      for (const [k,v] of Object.entries(extraParams)){
+        params.set(k, v);
+      }
+
+      return SCRIPT_EXEC_URL + "?" + params.toString();
     }
-  });
-}
 
-/*** 로드: key 포함해서 호출 ***/
-async function loadOptions(){
-  const d = await jsonp(API_URL + "?action=options&key=" + encodeURIComponent(ACCESS_KEY));
-  if(d && d.error) throw new Error(d.message || d.error);
+    /********************************************************
+     * 키 인증 모달
+     ********************************************************/
+    const keyModal = document.getElementById('keyModal');
+    const keyInput = document.getElementById('keyInput');
+    const keyBtn = document.getElementById('keyBtn');
+    const keyErr = document.getElementById('keyErr');
 
-  renderSlicer("slicerYears","연도","years", d.years || []);
-  renderSlicer("slicerMonths","월","months", d.months || []);
-  renderSlicer("slicerDays","일","days", d.days || []);
-  renderSlicer("slicerDows","요일","dows", d.dows || []);
-  renderSlicer("slicerItems","아이템","items", d.items || []);
-  renderSlicer("slicerChannels","방송채널","channels", d.channels || []);
-}
-
-async function refreshAll(){
-  try{
-    setStatus(true, "로딩 중…");
-    writeStateToUrl();
-
-    const q = buildQueryFromState();
-    const url = API_URL + "?action=dashboard&key=" + encodeURIComponent(ACCESS_KEY) + (q ? "&" + q : "");
-    const pack = await jsonp(url);
-    if(pack && pack.error) throw new Error(pack.message || pack.error);
-
-    renderKpis(pack.summary);
-
-    drawPivotChart("channelChart", pack.channel.labels, pack.channel.goals, pack.channel.actuals, pack.channel.achs, pack.channel.counts, { horizontal:false, pointSize:8 });
-    drawPivotChart("monthChart", pack.month.labels, pack.month.goals, pack.month.actuals, pack.month.achs, pack.month.counts, { horizontal:false, pointSize:8 });
-    drawPivotChart("dowChart", pack.dow.labels, pack.dow.goals, pack.dow.actuals, pack.dow.achs, pack.dow.counts, { horizontal:false, pointSize:8 });
-    drawPivotChart("dayChart", pack.day.labels, pack.day.goals, pack.day.actuals, pack.day.achs, pack.day.counts, { horizontal:true, pointSize:8 });
-    drawPivotChart("itemChart", pack.item.labels, pack.item.goals, pack.item.actuals, pack.item.achs, pack.item.counts, { horizontal:false, pointSize:8 });
-
-    updateTimestamp();
-    setStatus(true, "정상", "필터 적용 완료");
-  }catch(err){
-    console.error(err);
-    setStatus(false, "오류", err.message || String(err));
-  }
-}
-
-/*** 디바운스 ***/
-let t=null;
-function debounceRefresh(){ clearTimeout(t); t=setTimeout(()=>refreshAll(), 200); }
-
-/*** 클릭 처리 ***/
-document.addEventListener("click", (ev)=>{
-  const chip = ev.target.closest(".chip");
-  if(chip){
-    const key = chip.dataset.key;
-    const val = chip.dataset.val;
-    if(state[key].has(val)) state[key].delete(val);
-    else state[key].add(val);
-    chip.classList.toggle("on");
-    debounceRefresh();
-    return;
-  }
-  const actionBtn = ev.target.closest("button[data-action]");
-  if(actionBtn){
-    const key = actionBtn.dataset.key;
-    const action = actionBtn.dataset.action;
-    const parent = actionBtn.closest(".slicer");
-    const chipEls = parent ? parent.querySelectorAll(`.chip[data-key="${key}"]`) : [];
-    if(action==="none"){
-      state[key].clear();
-      chipEls.forEach(c=>c.classList.remove("on"));
-      debounceRefresh();
-    }else if(action==="all"){
-      chipEls.forEach(c=>state[key].add(c.dataset.val));
-      chipEls.forEach(c=>c.classList.add("on"));
-      debounceRefresh();
+    function openKeyModal(){
+      keyModal.style.display = "flex";
+      keyErr.style.display = "none";
+      keyInput.value = "";
+      keyInput.focus();
     }
-  }
-});
+    function closeKeyModal(){
+      keyModal.style.display = "none";
+    }
 
-document.getElementById("resetBtn").addEventListener("click", async ()=>{
-  ["years","months","days","dows","items","channels"].forEach(k=>state[k].clear());
-  await loadOptions();
-  await refreshAll();
-});
-document.getElementById("refreshBtn").addEventListener("click", async ()=>{ await refreshAll(); });
+    async function verifyKey(key){
+      AUTH_KEY = key.trim();
+      // options 호출로 검증 (키 틀리면 {error:'UNAUTHORIZED'} 응답)
+      const url = SCRIPT_EXEC_URL + `?action=options&key=${encodeURIComponent(AUTH_KEY)}`;
+      const data = await jsonp(url);
+      if (data && data.error === "UNAUTHORIZED") return null;
+      return data;
+    }
 
-(async function init(){
-  readStateFromUrl();
-  await loadOptions();
-  await refreshAll();
-})();
-</script>
+    async function onKeySubmit(){
+      try{
+        keyBtn.disabled = true;
+        const key = keyInput.value.trim();
+        const data = await verifyKey(key);
+        if(!data){
+          keyErr.style.display = "block";
+          setStatus(false, "키 인증 실패");
+          return;
+        }
+        // success
+        localStorage.setItem("WHHS_DASH_KEY", key);
+        optionsCache = data;
+        closeKeyModal();
+        btnRefresh.disabled = false;
+        btnClear.disabled = false;
+
+        setStatus(true, "필터 옵션 로드 완료");
+        renderOptions(optionsCache);
+        await loadDashboard();
+      }catch(err){
+        setStatus(false, err.message || String(err));
+      }finally{
+        keyBtn.disabled = false;
+      }
+    }
+
+    keyBtn.addEventListener("click", onKeySubmit);
+    keyInput.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter") onKeySubmit();
+    });
+
+    /********************************************************
+     * 옵션(슬라이서) 렌더링
+     ********************************************************/
+    function renderPills(containerId, arr, key){
+      const el = document.getElementById(containerId);
+      el.innerHTML = "";
+      arr.forEach(v=>{
+        const pill = document.createElement("div");
+        pill.className = "pill";
+        pill.textContent = v;
+        pill.onclick = ()=>{
+          if(filters[key].has(v)) filters[key].delete(v);
+          else filters[key].add(v);
+          pill.classList.toggle("on");
+          loadDashboard();
+        };
+        el.appendChild(pill);
+      });
+    }
+
+    function renderOptions(opt){
+      // 이미 Apps Script에서 정렬/필터(aaa 제거, 월/요일 순서) 처리됨
+      renderPills("pills-years", opt.years || [], "years");
+      renderPills("pills-months", opt.months || [], "months");
+      renderPills("pills-days", opt.days || [], "days");
+      renderPills("pills-dows", opt.dows || [], "dows");
+      renderPills("pills-items", opt.items || [], "items");
+      renderPills("pills-channels", opt.channels || [], "channels");
+    }
+
+    // 그룹 버튼 (전체/해제)
+    document.querySelectorAll(".group .mini").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const group = btn.closest(".group").dataset.group;
+        const act = btn.dataset.act;
+        const pillsEl = document.getElementById("pills-" + group);
+        if(!optionsCache) return;
+
+        const allArr = optionsCache[group] || [];
+
+        if(act === "all"){
+          filters[group] = new Set(allArr);
+          pillsEl.querySelectorAll(".pill").forEach(p=>p.classList.add("on"));
+        }else{
+          filters[group].clear();
+          pillsEl.querySelectorAll(".pill").forEach(p=>p.classList.remove("on"));
+        }
+        loadDashboard();
+      });
+    });
+
+    btnClear.addEventListener("click", ()=>{
+      for(const k of Object.keys(filters)) filters[k].clear();
+      document.querySelectorAll(".pill.on").forEach(p=>p.classList.remove("on"));
+      loadDashboard();
+    });
+
+    btnRefresh.addEventListener("click", ()=>{
+      loadDashboard(true);
+    });
+
+    /********************************************************
+     * 대시보드 로딩
+     ********************************************************/
+    async function loadDashboard(force){
+      try{
+        setStatus(true, "데이터 불러오는 중...");
+        updatedAt.textContent = "";
+        const url = buildUrl("dashboard");
+        const d = await jsonp(url);
+
+        if(d && d.error){
+          setStatus(false, d.message || d.error);
+          return;
+        }
+
+        renderKpis(d.summary || {});
+        renderCharts(d);
+
+        updatedAt.textContent = nowText();
+        setStatus(true, "필터 적용 완료");
+      }catch(err){
+        setStatus(false, err.message || "JSONP load failed");
+      }
+    }
+
+    function renderKpis(s){
+      document.getElementById("kpi-bc").textContent = fmtInt(s.방송횟수);
+      document.getElementById("kpi-spc").textContent = fmtInt(s.특약횟수);
+      document.getElementById("kpi-spv").textContent = fmtMoney(s.특약비용);
+      document.getElementById("kpi-ach").textContent = fmtPct(s.평균달성율);
+      document.getElementById("kpi-min").textContent = fmtInt(s.방송시간_분);
+      document.getElementById("kpi-hr").textContent = fmtMoney(s.시간당매출);
+    }
+
+    /********************************************************
+     * 차트 유틸
+     * - 목표/실적: 막대
+     * - 달성율: "점"만(선 연결 X) + 점 크게
+     ********************************************************/
+    function makeComboChart(ctx, labels, goals, actuals, achs, horizontal=false){
+      const achPct = (achs||[]).map(x=>Number(x||0)*100);
+
+      const data = {
+        labels,
+        datasets: [
+          {
+            label: "목표",
+            data: goals,
+            type: "bar",
+            yAxisID: horizontal ? "x" : "y",
+            borderWidth: 0
+          },
+          {
+            label: "실적",
+            data: actuals,
+            type: "bar",
+            yAxisID: horizontal ? "x" : "y",
+            borderWidth: 0
+          },
+          {
+            label: "달성율(%)",
+            data: achPct,
+            type: "scatter",        // ✅ 선 연결 없음
+            yAxisID: horizontal ? "y2" : "y2",
+            pointRadius: 6,         // ✅ 점 크게
+            pointHoverRadius: 7
+          }
+        ]
+      };
+
+      const options = {
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{ position:"top" },
+          tooltip:{
+            callbacks:{
+              label:(ctx)=>{
+                const label = ctx.dataset.label || "";
+                const v = ctx.parsed[horizontal ? "x" : "y"];
+                if(label.includes("달성율")) return `${label}: ${Number(v).toFixed(0)}%`;
+                return `${label}: ${fmtMoney(v)}`;
+              }
+            }
+          }
+        },
+        scales: horizontal ? {
+          x: { beginAtZero:true, grid:{color:"rgba(100,116,139,.15)"} },
+          y: { grid:{display:false} },
+          y2: { position:"right", beginAtZero:true, grid:{display:false}, ticks:{ callback:(v)=>v+"%" } }
+        } : {
+          y: { beginAtZero:true, grid:{color:"rgba(100,116,139,.15)"} },
+          x: { grid:{display:false} },
+          y2: { position:"right", beginAtZero:true, grid:{display:false}, ticks:{ callback:(v)=>v+"%" } }
+        }
+      };
+
+      if(horizontal){
+        // 가로 막대형: Chart.js는 indexAxis로 처리
+        options.indexAxis = "y";
+      }
+
+      return { data, options };
+    }
+
+    function buildOrUpdate(chartRef, canvasId, cfg){
+      const ctx = document.getElementById(canvasId);
+      if(chartRef) chartRef.destroy();
+      return new Chart(ctx, cfg);
+    }
+
+    function renderCharts(d){
+      // 방송채널: 문자열 내림차순 + (비어있음 제거)는 서버에서 처리됨
+      const c = d.channel || {labels:[],goals:[],actuals:[],achs:[]};
+      const m = d.month || {labels:[],goals:[],actuals:[],achs:[]};
+      const w = d.dow || {labels:[],goals:[],actuals:[],achs:[]};
+      const day = d.day || {labels:[],goals:[],actuals:[],achs:[]};
+      const it = d.item || {labels:[],goals:[],actuals:[],achs:[]};
+
+      // 1) 방송채널: 세로막대 + 달성율 점(선 없음)
+      {
+        const {data, options} = makeComboChart(null, c.labels, c.goals, c.actuals, c.achs, false);
+        chChannel = buildOrUpdate(chChannel, "chartChannel", { type:"bar", data, options });
+      }
+
+      // 2) 월별: 세로막대 + 달성율 점
+      {
+        const {data, options} = makeComboChart(null, m.labels, m.goals, m.actuals, m.achs, false);
+        chMonth = buildOrUpdate(chMonth, "chartMonth", { type:"bar", data, options });
+      }
+
+      // 3) 요일별: 세로막대 + 달성율 점
+      {
+        const {data, options} = makeComboChart(null, w.labels, w.goals, w.actuals, w.achs, false);
+        chDow = buildOrUpdate(chDow, "chartDow", { type:"bar", data, options });
+      }
+
+      // 4) 일자별: 가로막대 + 달성율 점
+      {
+        const {data, options} = makeComboChart(null, day.labels, day.goals, day.actuals, day.achs, true);
+        chDay = buildOrUpdate(chDay, "chartDay", { type:"bar", data, options });
+      }
+
+      // 5) 아이템별: ✅ 세로막대 + 달성율 점(선 없음)
+      {
+        const {data, options} = makeComboChart(null, it.labels, it.goals, it.actuals, it.achs, false);
+        chItem = buildOrUpdate(chItem, "chartItem", { type:"bar", data, options });
+      }
+    }
+
+    /********************************************************
+     * 시작
+     ********************************************************/
+    (async function init(){
+      // 1) localStorage에 키가 있으면 바로 시도
+      const saved = localStorage.getItem("WHHS_DASH_KEY");
+      if(saved){
+        try{
+          setStatus(true, "저장된 키로 인증 중...");
+          const data = await verifyKey(saved);
+          if(!data) throw new Error("saved key invalid");
+          optionsCache = data;
+          btnRefresh.disabled = false;
+          btnClear.disabled = false;
+          setStatus(true, "필터 옵션 로드 완료");
+          renderOptions(optionsCache);
+          await loadDashboard();
+          return;
+        }catch(e){
+          localStorage.removeItem("WHHS_DASH_KEY");
+        }
+      }
+      // 2) 없거나 실패하면 팝업
+      openKeyModal();
+      setStatus(false, "키 인증 필요");
+    })();
+  </script>
 </body>
 </html>
