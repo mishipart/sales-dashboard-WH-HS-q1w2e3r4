@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sales Dashboard</title>
+
+  <!-- 검색 노출 최소화 -->
+  <meta name="robots" content="noindex,nofollow">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: system-ui; background:#f5f7fb; margin:0; padding:20px; }
+    h1 { margin-bottom:20px; }
+    h2 { margin-top:40px; }
+    .kpis { display:flex; gap:12px; flex-wrap:wrap; }
+    .kpi { background:#eaf2ff; padding:14px 18px; border-radius:12px; min-width:140px; }
+    canvas { max-width:100%; background:#fff; border-radius:12px; padding:12px; margin-top:10px; }
+  </style>
+</head>
+<body>
+
+<h1>📊 방송 매출 대시보드</h1>
+
+<div class="kpis" id="kpis"></div>
+
+<h2>방송채널별 달성율</h2>
+<canvas id="channelChart"></canvas>
+
+<script>
+/* 🔽 여기에 본인 Apps Script 웹앱 URL 넣기 */
+const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec";
+
+async function loadSummary() {
+  const res = await fetch(API_URL + "?action=summary");
+  const d = await res.json();
+
+  document.getElementById("kpis").innerHTML = `
+    <div class="kpi">방송횟수<br><b>${d.방송횟수}</b></div>
+    <div class="kpi">특약횟수<br><b>${d.특약횟수}</b></div>
+    <div class="kpi">평균달성율<br><b>${Math.round(d.평균달성율 * 100)}%</b></div>
+    <div class="kpi">시간당매출<br><b>${Math.round(d.시간당매출)}</b></div>
+  `;
+}
+
+async function loadChannelChart() {
+  const res = await fetch(API_URL + "?action=bar&by=방송채널&metric=달성율&agg=mean");
+  const d = await res.json();
+
+  new Chart(document.getElementById("channelChart"), {
+    ty
