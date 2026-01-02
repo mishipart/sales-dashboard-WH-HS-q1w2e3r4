@@ -10,655 +10,919 @@
 
   <style>
     :root{
-      --bg:#f5f7fb;
+      --bg:#f6f8fb;
       --card:#ffffff;
-      --line:#e7edf5;
-      --text:#0f172a;
-      --muted:#64748b;
-      --primary:#2563eb;
-      --danger:#dc2626;
-      --pill:#eef2ff;
-      --shadow: 0 6px 20px rgba(15,23,42,.06);
-      --radius:14px;
+      --text:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --accent:#60a5fa;
+      --accent2:#fb7185;
+      --accent3:#f59e0b;
+      --shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.06);
+      --radius: 16px;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
-    .wrap{max-width:1400px;margin:18px auto;padding:0 14px}
-    .top{
-      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", "Apple SD Gothic Neo", Arial;
+      background:var(--bg);
+      color:var(--text);
     }
-    h1{margin:0;font-size:26px;display:flex;gap:10px;align-items:center}
-    .sub{margin-top:4px;color:var(--muted);font-size:12px}
-    .statusbar{
-      background:var(--card);border:1px solid var(--line);border-radius:12px;
-      padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;
-      box-shadow:var(--shadow);margin:10px 0 12px
+    header{
+      padding:18px 18px 10px;
+      max-width:1280px;
+      margin:0 auto;
     }
-    .statusleft{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .badge{padding:4px 8px;border-radius:999px;background:#ecfeff;color:#155e75;font-weight:700;font-size:12px}
-    .badge.err{background:#fef2f2;color:#991b1b}
-    .btns{display:flex;gap:8px;align-items:center}
-    button{
-      border:1px solid var(--line);background:var(--card);padding:7px 10px;border-radius:10px;
-      cursor:pointer;font-weight:700
+    .title{
+      display:flex; align-items:center; gap:10px;
+      font-size:28px; font-weight:900;
     }
-    button.primary{background:var(--primary);border-color:var(--primary);color:white}
-    button.danger{background:#fff;border-color:#fecaca;color:var(--danger)}
-    button:disabled{opacity:.55;cursor:not-allowed}
+    .subtitle{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:13px;
+    }
 
-    .grid{
-      display:grid;
-      grid-template-columns: 300px 1fr;
+    .topbar{
+      margin-top:12px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:10px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
       gap:12px;
+    }
+    .status{
+      font-size:13px;
+      color:var(--muted);
+    }
+    .status b{color:#065f46}
+    .status .err b{color:#b91c1c}
+    .actions{
+      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .btn{
+      border:1px solid var(--line);
+      background:#fff;
+      padding:7px 10px;
+      border-radius: 10px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:12px;
+    }
+    .btn.primary{
+      background:#eef2ff;
+      border-color:#c7d2fe;
+      color:#1d4ed8;
+    }
+
+    main{
+      max-width:1280px;
+      margin: 14px auto 36px;
+      padding:0 18px;
+      display:grid;
+      grid-template-columns: 320px 1fr;
+      gap:14px;
       align-items:start;
     }
-    @media (max-width: 1080px){
-      .grid{grid-template-columns:1fr}
+
+    /* Filters */
+    .panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:12px;
+    }
+    .panel h3{
+      margin:0 0 10px;
+      font-size:14px;
+      font-weight:900;
+    }
+    .filterBlock{
+      margin-top:10px;
+      border-top:1px dashed #eef0f4;
+      padding-top:10px;
+    }
+    .filterHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .filterHeader .label{
+      font-size:13px;
+      font-weight:900;
+    }
+    .filterHeader .miniBtns{
+      display:flex; gap:6px;
+    }
+    .mini{
+      border:1px solid var(--line);
+      background:#fff;
+      padding:5px 8px;
+      border-radius: 10px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:11px;
+      color:#111827;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+    .chip{
+      border:1px solid var(--line);
+      background:#fff;
+      padding:6px 10px;
+      border-radius: 999px;
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip.on{
+      border-color:#93c5fd;
+      background:#eff6ff;
+      color:#1d4ed8;
+      font-weight:900;
+    }
+
+    /* Content */
+    .content{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap:10px;
+    }
+    .kpi{
+      background:#eaf2ff;
+      border-radius: 14px;
+      padding:12px 14px;
+      min-height:74px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:4px;
+    }
+    .kpi .k{
+      color:#375a8c;
+      font-size:12px;
+      font-weight:800;
+    }
+    .kpi .v{
+      font-size:20px;
+      font-weight:1000;
+      color:#0f172a;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
     }
 
     .card{
-      background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-      box-shadow:var(--shadow);
-    }
-    .filters{padding:12px}
-    .filters h2{margin:0 0 8px;font-size:15px}
-    .group{margin:10px 0 14px}
-    .ghead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
-    .gtitle{font-weight:900}
-    .gactions{display:flex;gap:6px}
-    .mini{padding:5px 8px;font-size:12px;border-radius:9px}
-    .pills{display:flex;flex-wrap:wrap;gap:6px}
-    .pill{
-      padding:7px 9px;border-radius:999px;border:1px solid var(--line);
-      background:#fff;cursor:pointer;user-select:none;
-      font-weight:700;font-size:12px
-    }
-    .pill.on{
-      background:var(--pill);
-      border-color:#c7d2fe;
-      outline: 2px solid #dbeafe;
-    }
-
-    .main{display:grid;gap:12px}
-    .kpis{display:grid;grid-template-columns: repeat(6, 1fr);gap:10px;padding:12px}
-    @media (max-width: 1080px){
-      .kpis{grid-template-columns: repeat(2, 1fr)}
-    }
-    .kpi{background:#eaf2ff;border:1px solid #dbeafe;border-radius:14px;padding:12px}
-    .kpi .t{color:var(--muted);font-weight:900;font-size:12px}
-    .kpi .v{font-size:20px;font-weight:1000;margin-top:3px}
-
-    .charts{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       padding:12px;
     }
-    @media (max-width: 1080px){
-      .charts{grid-template-columns:1fr}
+    .card h4{
+      margin:0 0 10px;
+      font-size:13px;
+      font-weight:1000;
     }
-    .chartcard{padding:10px 12px}
-    .charttitle{font-weight:1000;margin:0 0 8px;font-size:14px}
-    .canvasWrap{height:280px}
-    .canvasWrap.tall{height:320px}
-    .canvasWrap.hbar{height:320px}
-    .footnote{color:var(--muted);font-size:12px;padding:0 12px 12px}
+    .chartWrap{
+      height:260px; /* 그래프 크기 줄임 */
+    }
+    .chartWrap.tall{
+      height:320px;
+    }
 
-    /* key modal */
-    .modalBack{
-      position:fixed;inset:0;background:rgba(15,23,42,.55);
-      display:flex;align-items:center;justify-content:center;padding:18px;
-      z-index:9999;
+    .footnote{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    /* Modal */
+    .modalOverlay{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:1000;
     }
     .modal{
-      width:min(520px, 95vw);
-      background:var(--card);border:1px solid var(--line);border-radius:16px;
-      box-shadow: 0 25px 80px rgba(0,0,0,.25);
+      width:min(520px, 100%);
+      background:#fff;
+      border-radius: 18px;
       padding:16px;
+      box-shadow: 0 12px 48px rgba(0,0,0,.25);
+      border:1px solid rgba(0,0,0,.08);
     }
-    .modal h3{margin:0 0 6px;font-size:18px}
-    .modal p{margin:0 0 12px;color:var(--muted);font-size:13px}
-    .row{display:flex;gap:8px}
-    input{
-      flex:1;border:1px solid var(--line);border-radius:12px;padding:10px 12px;
-      font-weight:800
+    .modal h3{margin:0 0 8px; font-size:16px; font-weight:1000}
+    .modal p{margin:0 0 12px; color:var(--muted); font-size:13px; line-height:1.4}
+    .row{
+      display:flex; gap:8px; align-items:center;
     }
-    .help{margin-top:10px;color:var(--muted);font-size:12px}
-    .errtxt{color:var(--danger);font-weight:900;margin-top:8px;display:none}
+    input[type="password"], input[type="text"]{
+      width:100%;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius: 12px;
+      outline:none;
+      font-size:14px;
+    }
+    .msg{
+      margin-top:10px;
+      font-size:12px;
+      color:#b91c1c;
+      display:none;
+      font-weight:800;
+    }
+
+    @media (max-width: 1100px){
+      main{grid-template-columns: 1fr;}
+      .kpis{grid-template-columns: repeat(3, minmax(0, 1fr));}
+      .grid2{grid-template-columns: 1fr;}
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top">
-      <div>
-        <h1>📊 방송 매출 대시보드</h1>
-        <div class="sub">엑셀 슬라이서처럼 선택하면 KPI/차트가 즉시 변경됩니다.</div>
-      </div>
-    </div>
+<header>
+  <div class="title">📊 방송 매출 대시보드</div>
+  <div class="subtitle">엑셀 슬라이서처럼 선택하면 KPI/차트가 즉시 변경됩니다.</div>
 
-    <div class="statusbar card">
-      <div class="statusleft">
-        <span id="badge" class="badge">상태: 준비</span>
-        <span id="statusText" style="color:var(--muted);font-weight:800">키 인증 후 데이터를 불러옵니다.</span>
-      </div>
-      <div class="btns">
-        <span id="updatedAt" style="color:var(--muted);font-weight:800"></span>
-        <button id="btnClear" class="danger" disabled>전체 해제</button>
-        <button id="btnRefresh" class="primary" disabled>새로고침</button>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div class="card filters">
-        <h2>필터(슬라이서)</h2>
-
-        <div class="group" data-group="years">
-          <div class="ghead">
-            <div class="gtitle">연도</div>
-            <div class="gactions">
-              <button class="mini" data-act="all">전체</button>
-              <button class="mini" data-act="clear">해제</button>
-            </div>
-          </div>
-          <div class="pills" id="pills-years"></div>
-        </div>
-
-        <div class="group" data-group="months">
-          <div class="ghead">
-            <div class="gtitle">월</div>
-            <div class="gactions">
-              <button class="mini" data-act="all">전체</button>
-              <button class="mini" data-act="clear">해제</button>
-            </div>
-          </div>
-          <div class="pills" id="pills-months"></div>
-        </div>
-
-        <div class="group" data-group="days">
-          <div class="ghead">
-            <div class="gtitle">일</div>
-            <div class="gactions">
-              <button class="mini" data-act="all">전체</button>
-              <button class="mini" data-act="clear">해제</button>
-            </div>
-          </div>
-          <div class="pills" id="pills-days"></div>
-        </div>
-
-        <div class="group" data-group="dows">
-          <div class="ghead">
-            <div class="gtitle">요일</div>
-            <div class="gactions">
-              <button class="mini" data-act="all">전체</button>
-              <button class="mini" data-act="clear">해제</button>
-            </div>
-          </div>
-          <div class="pills" id="pills-dows"></div>
-        </div>
-
-        <div class="group" data-group="items">
-          <div class="ghead">
-            <div class="gtitle">아이템</div>
-            <div class="gactions">
-              <button class="mini" data-act="all">전체</button>
-              <button class="mini" data-act="clear">해제</button>
-            </div>
-          </div>
-          <div class="pills" id="pills-items"></div>
-        </div>
-
-        <div class="group" data-group="channels">
-          <div class="ghead">
-            <div class="gtitle">방송채널</div>
-            <div class="gactions">
-              <button class="mini" data-act="all">전체</button>
-              <button class="mini" data-act="clear">해제</button>
-            </div>
-          </div>
-          <div class="pills" id="pills-channels"></div>
-        </div>
-      </div>
-
-      <div class="main">
-        <div class="card kpis" id="kpis">
-          <div class="kpi"><div class="t">방송횟수</div><div class="v" id="kpi-bc">-</div></div>
-          <div class="kpi"><div class="t">특약횟수</div><div class="v" id="kpi-spc">-</div></div>
-          <div class="kpi"><div class="t">특약비용</div><div class="v" id="kpi-spv">-</div></div>
-          <div class="kpi"><div class="t">평균달성율</div><div class="v" id="kpi-ach">-</div></div>
-          <div class="kpi"><div class="t">방송시간(분)</div><div class="v" id="kpi-min">-</div></div>
-          <div class="kpi"><div class="t">시간당매출</div><div class="v" id="kpi-hr">-</div></div>
-        </div>
-
-        <div class="card charts">
-          <div class="card chartcard">
-            <div class="charttitle">방송채널별 (목표/실적/달성율)</div>
-            <div class="canvasWrap tall"><canvas id="chartChannel"></canvas></div>
-          </div>
-          <div class="card chartcard">
-            <div class="charttitle">월별 (목표/실적/달성율)</div>
-            <div class="canvasWrap"><canvas id="chartMonth"></canvas></div>
-          </div>
-          <div class="card chartcard">
-            <div class="charttitle">요일별 (목표/실적/달성율)</div>
-            <div class="canvasWrap"><canvas id="chartDow"></canvas></div>
-          </div>
-          <div class="card chartcard">
-            <div class="charttitle">일자별 (목표/실적/달성율) - TOP 30</div>
-            <div class="canvasWrap hbar"><canvas id="chartDay"></canvas></div>
-          </div>
-          <div class="card chartcard" style="grid-column:1/-1">
-            <div class="charttitle">아이템별 (목표/실적/달성율)</div>
-            <div class="canvasWrap tall"><canvas id="chartItem"></canvas></div>
-          </div>
-        </div>
-        <div class="footnote">※ 달성율(%) 점은 선을 잇지 않고 크게 표시합니다. (비어있음/aaa 등 불필요 값은 자동 제외)</div>
-      </div>
+  <div class="topbar">
+    <div class="status" id="statusText">상태: <b>대기</b> · 키 인증 필요</div>
+    <div class="actions">
+      <span id="updatedAt">업데이트: -</span>
+      <button class="btn" id="btnReset">전체 해제</button>
+      <button class="btn primary" id="btnReload">새로고침</button>
     </div>
   </div>
+</header>
 
-  <!-- Key Modal -->
-  <div class="modalBack" id="keyModal" style="display:none">
-    <div class="modal">
-      <h3>키 인증</h3>
-      <p>이 대시보드는 비공개 키를 아는 사람만 볼 수 있습니다. 키를 입력해 주세요.</p>
-      <div class="row">
-        <input id="keyInput" placeholder="키 입력" />
-        <button class="primary" id="keyBtn">확인</button>
+<main>
+  <!-- Filters -->
+  <section class="panel">
+    <h3>필터(슬라이서)</h3>
+
+    <div class="filterBlock" id="blkYears">
+      <div class="filterHeader">
+        <div class="label">연도</div>
+        <div class="miniBtns">
+          <button class="mini" data-act="all" data-k="years">전체</button>
+          <button class="mini" data-act="clear" data-k="years">해제</button>
+        </div>
       </div>
-      <div class="errtxt" id="keyErr">키가 올바르지 않습니다.</div>
-      <div class="help">팁: 키는 브라우저에 저장할 수 있습니다(다음 접속 시 자동).</div>
+      <div class="chips" id="chipsYears"></div>
+    </div>
+
+    <div class="filterBlock" id="blkMonths">
+      <div class="filterHeader">
+        <div class="label">월</div>
+        <div class="miniBtns">
+          <button class="mini" data-act="all" data-k="months">전체</button>
+          <button class="mini" data-act="clear" data-k="months">해제</button>
+        </div>
+      </div>
+      <div class="chips" id="chipsMonths"></div>
+    </div>
+
+    <div class="filterBlock" id="blkDays">
+      <div class="filterHeader">
+        <div class="label">일</div>
+        <div class="miniBtns">
+          <button class="mini" data-act="all" data-k="days">전체</button>
+          <button class="mini" data-act="clear" data-k="days">해제</button>
+        </div>
+      </div>
+      <div class="chips" id="chipsDays"></div>
+    </div>
+
+    <div class="filterBlock" id="blkDows">
+      <div class="filterHeader">
+        <div class="label">요일</div>
+        <div class="miniBtns">
+          <button class="mini" data-act="all" data-k="dows">전체</button>
+          <button class="mini" data-act="clear" data-k="dows">해제</button>
+        </div>
+      </div>
+      <div class="chips" id="chipsDows"></div>
+    </div>
+
+    <div class="filterBlock" id="blkItems">
+      <div class="filterHeader">
+        <div class="label">아이템</div>
+        <div class="miniBtns">
+          <button class="mini" data-act="all" data-k="items">전체</button>
+          <button class="mini" data-act="clear" data-k="items">해제</button>
+        </div>
+      </div>
+      <div class="chips" id="chipsItems"></div>
+    </div>
+
+    <div class="filterBlock" id="blkChannels">
+      <div class="filterHeader">
+        <div class="label">방송채널</div>
+        <div class="miniBtns">
+          <button class="mini" data-act="all" data-k="channels">전체</button>
+          <button class="mini" data-act="clear" data-k="channels">해제</button>
+        </div>
+      </div>
+      <div class="chips" id="chipsChannels"></div>
+    </div>
+
+    <div class="footnote">※ 키를 모르면 데이터를 불러올 수 없습니다.</div>
+  </section>
+
+  <!-- Content -->
+  <section class="content">
+    <div class="kpis">
+      <div class="kpi"><div class="k">방송횟수</div><div class="v" id="kpiCnt">-</div></div>
+      <div class="kpi"><div class="k">특약횟수</div><div class="v" id="kpiSpCnt">-</div></div>
+      <div class="kpi"><div class="k">특약비용</div><div class="v" id="kpiSpCost">-</div></div>
+      <div class="kpi"><div class="k">평균달성율</div><div class="v" id="kpiAch">-</div></div>
+      <div class="kpi"><div class="k">방송시간(분)</div><div class="v" id="kpiMin">-</div></div>
+      <div class="kpi"><div class="k">시간당매출</div><div class="v" id="kpiHr">-</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h4>방송채널별 (목표/실적/달성율)</h4>
+        <div class="chartWrap"><canvas id="chChannel"></canvas></div>
+      </div>
+      <div class="card">
+        <h4>월별 (목표/실적/달성율)</h4>
+        <div class="chartWrap"><canvas id="chMonth"></canvas></div>
+      </div>
+      <div class="card">
+        <h4>요일별 (목표/실적/달성율)</h4>
+        <div class="chartWrap"><canvas id="chDow"></canvas></div>
+      </div>
+      <div class="card">
+        <h4>일자별 (목표/실적/달성율) - TOP 30</h4>
+        <div class="chartWrap tall"><canvas id="chDay"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4>아이템별 (목표/실적/달성율)</h4>
+      <div class="chartWrap tall"><canvas id="chItem"></canvas></div>
+    </div>
+  </section>
+</main>
+
+<!-- Key modal -->
+<div class="modalOverlay" id="keyModal">
+  <div class="modal">
+    <h3>키 인증</h3>
+    <p>이 페이지는 비공개 데이터입니다. 접근 키를 입력하세요.</p>
+    <div class="row">
+      <input id="keyInput" type="password" placeholder="키를 입력하세요" autocomplete="current-password" />
+      <button class="btn primary" id="keyOk">확인</button>
+    </div>
+    <div class="msg" id="keyMsg">키가 올바르지 않습니다.</div>
+    <div style="margin-top:10px; color:var(--muted); font-size:12px;">
+      · 키는 브라우저에만 저장됩니다(서버 저장 없음).<br/>
+      · 키를 변경했다면 저장된 키를 지우고 다시 입력하세요.
     </div>
   </div>
+</div>
 
-  <script>
-    /********************************************************
-     * 1) 여기만 설정하면 됩니다
-     ********************************************************/
-    const SCRIPT_EXEC_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec"; // ✅ 너의 /exec URL로 교체
+<script>
+/** ===========================
+ *  0) 반드시 여기만 수정하세요
+ * =========================== */
 
-    /********************************************************
-     * 내부 상태
-     ********************************************************/
-    let AUTH_KEY = "";
-    const filters = {
-      years: new Set(),
-      months: new Set(),
-      days: new Set(),
-      dows: new Set(),
-      items: new Set(),
-      channels: new Set()
+// ✅ 1) Apps Script 웹앱 실행 URL (끝이 /exec 로 끝나는 주소)
+const API_EXEC_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec";
+
+// ✅ 2) 기본 키(원하면 비워두고, 팝업에서만 입력하게 해도 됨)
+//    - 사용자가 바꿔둔 키로 수정 가능하도록 표기만 해둠
+const DEFAULT_KEY = "WHHS-PSM-221035"; // 예: "WHHS-ONLY-2026-SECRET"
+
+
+/** ===========================
+ *  1) 유틸
+ * =========================== */
+const $ = (id)=>document.getElementById(id);
+
+function setStatus(ok, msg){
+  const el = $("statusText");
+  if(ok){
+    el.innerHTML = `상태: <b>정상</b> · ${msg || "로드 완료"}`;
+  }else{
+    el.innerHTML = `상태: <span class="err"><b>오류</b></span> · ${msg || "문제 발생"}`;
+  }
+}
+
+function fmtInt(n){
+  n = Number(n||0);
+  return n.toLocaleString("ko-KR");
+}
+function fmtMoney(n){
+  n = Number(n||0);
+  return n.toLocaleString("ko-KR");
+}
+function fmtPctFromRatio(ratio){
+  // ratio: 0~1
+  const v = Number(ratio||0) * 100;
+  return `${v.toFixed(0)}%`;
+}
+function toPctValue(v){
+  // 어떤 입력이 와도 최종적으로 "퍼센트 숫자(예: 82)"로 변환
+  if (v === null || v === undefined) return 0;
+  if (typeof v === "string"){
+    const s = v.trim().replace(/,/g,'');
+    if (!s) return 0;
+    if (s.endsWith("%")){
+      const n = parseFloat(s.slice(0,-1));
+      return isFinite(n) ? n : 0;
+    }
+    const n = parseFloat(s);
+    if (!isFinite(n)) return 0;
+    // 0~1이면 비율로 보고 %로 환산
+    if (n <= 1.5) return n * 100;
+    // 82 같은 값이면 이미 %로 간주
+    return n;
+  }
+  const n = Number(v);
+  if (!isFinite(n)) return 0;
+  if (n <= 1.5) return n * 100;
+  return n;
+}
+
+function loadFromStorageKey(){
+  return localStorage.getItem("dash_key") || "";
+}
+function saveToStorageKey(k){
+  localStorage.setItem("dash_key", k);
+}
+
+/** JSONP 호출 */
+function jsonp(url, timeoutMs=15000){
+  return new Promise((resolve, reject)=>{
+    const cb = "cb_" + Math.random().toString(16).slice(2);
+    const script = document.createElement("script");
+    let timer = null;
+
+    window[cb] = (data)=>{
+      cleanup();
+      resolve(data);
     };
-    let optionsCache = null;
 
-    // charts
-    let chChannel, chMonth, chDow, chDay, chItem;
-
-    const badge = document.getElementById('badge');
-    const statusText = document.getElementById('statusText');
-    const updatedAt = document.getElementById('updatedAt');
-    const btnRefresh = document.getElementById('btnRefresh');
-    const btnClear = document.getElementById('btnClear');
-
-    function setStatus(ok, text){
-      badge.className = "badge" + (ok ? "" : " err");
-      badge.textContent = ok ? "상태: 정상" : "상태: 오류";
-      statusText.textContent = text || "";
+    function cleanup(){
+      if(timer) clearTimeout(timer);
+      delete window[cb];
+      if(script && script.parentNode) script.parentNode.removeChild(script);
     }
 
-    function nowText(){
-      const d = new Date();
-      return `업데이트: ${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}. ${d.toLocaleTimeString('ko-KR')}`;
-    }
+    timer = setTimeout(()=>{
+      cleanup();
+      reject(new Error("JSONP timeout"));
+    }, timeoutMs);
 
-    function fmtInt(n){
-      n = Number(n||0);
-      return n.toLocaleString('ko-KR');
-    }
-    function fmtMoney(n){
-      n = Number(n||0);
-      return n.toLocaleString('ko-KR');
-    }
-    function fmtPct(x){
-      x = Number(x||0);
-      return (x*100).toFixed(0) + "%";
-    }
+    script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb + "&_ts=" + Date.now();
+    script.onerror = ()=>{
+      cleanup();
+      reject(new Error("JSONP load failed"));
+    };
+    document.head.appendChild(script);
+  });
+}
 
-    /********************************************************
-     * JSONP 호출 (GitHub Pages에서 CORS 회피)
-     ********************************************************/
-    function jsonp(url){
-      return new Promise((resolve, reject)=>{
-        const cb = "CB_" + Math.random().toString(16).slice(2);
-        window[cb] = (data)=>{
-          delete window[cb];
-          script.remove();
-          resolve(data);
-        };
-        const script = document.createElement("script");
-        script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
-        script.onerror = ()=>{
-          delete window[cb];
-          script.remove();
-          reject(new Error("JSONP load failed"));
-        };
-        document.body.appendChild(script);
-      });
+/** 쿼리 만들기 */
+function qs(params){
+  const sp = new URLSearchParams();
+  Object.entries(params).forEach(([k,v])=>{
+    if(v === undefined || v === null) return;
+    if(Array.isArray(v)){
+      v.forEach(x=> sp.append(k, x));
+    }else{
+      sp.set(k, v);
     }
+  });
+  return sp.toString();
+}
 
-    function buildUrl(action, extraParams={}){
-      const params = new URLSearchParams();
-      params.set("action", action);
-      params.set("key", AUTH_KEY);
+/** ===========================
+ *  2) 상태/필터
+ * =========================== */
+const state = {
+  key: "",
+  filters: {
+    years: [],
+    months: [],
+    days: [],
+    dows: [],
+    items: [],
+    channels: []
+  },
+  options: null,
+  charts: {}
+};
 
-      // filters -> query
-      for (const k of Object.keys(filters)){
-        if (filters[k].size){
-          params.set(k, Array.from(filters[k]).join(","));
+function clearFilters(){
+  state.filters = { years:[], months:[], days:[], dows:[], items:[], channels:[] };
+  renderAllChips();
+}
+
+function setAll(k){
+  if(!state.options) return;
+  state.filters[k] = (state.options[k] || []).slice();
+  renderChips(k);
+}
+
+function toggleFilter(k, val){
+  const arr = state.filters[k];
+  const idx = arr.indexOf(val);
+  if(idx >= 0) arr.splice(idx,1);
+  else arr.push(val);
+  renderChips(k);
+}
+
+/** ===========================
+ *  3) 렌더(칩)
+ * =========================== */
+function makeChip(containerId, k, val){
+  const el = document.createElement("div");
+  el.className = "chip";
+  el.textContent = val;
+  el.onclick = ()=>{
+    toggleFilter(k, val);
+    fetchDashboard();
+  };
+  return el;
+}
+
+function renderChips(k){
+  const map = {
+    years: "chipsYears",
+    months: "chipsMonths",
+    days: "chipsDays",
+    dows: "chipsDows",
+    items: "chipsItems",
+    channels: "chipsChannels"
+  };
+  const wrap = $(map[k]);
+  wrap.innerHTML = "";
+  const all = (state.options && state.options[k]) ? state.options[k] : [];
+  all.forEach(val=>{
+    const chip = makeChip(map[k], k, val);
+    if(state.filters[k].includes(val)) chip.classList.add("on");
+    wrap.appendChild(chip);
+  });
+}
+
+function renderAllChips(){
+  ["years","months","days","dows","items","channels"].forEach(renderChips);
+}
+
+/** mini buttons */
+document.addEventListener("click", (e)=>{
+  const t = e.target;
+  if(t && t.classList.contains("mini")){
+    const act = t.dataset.act;
+    const k = t.dataset.k;
+    if(act === "all") setAll(k);
+    if(act === "clear") state.filters[k] = [];
+    renderChips(k);
+    fetchDashboard();
+  }
+});
+
+/** ===========================
+ *  4) 차트 생성/업데이트
+ * =========================== */
+function destroyChart(id){
+  if(state.charts[id]){
+    state.charts[id].destroy();
+    delete state.charts[id];
+  }
+}
+
+function makeComboChart(canvasId, payload, opts={}){
+  // payload: { labels, goals, actuals, achs } where achs is ratio (0~1) recommended
+  const ctx = $(canvasId);
+  if(!ctx) return;
+
+  const labels = payload.labels || [];
+  const goals = (payload.goals || []).map(Number);
+  const actuals = (payload.actuals || []).map(Number);
+
+  // ✅ 달성율은 화면에서는 %로!
+  const achPct = (payload.achs || []).map(toPctValue);
+
+  destroyChart(canvasId);
+
+  state.charts[canvasId] = new Chart(ctx, {
+    type: opts.type || "bar",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "목표",
+          data: goals,
+          backgroundColor: "rgba(96,165,250,.55)",
+          borderColor: "rgba(96,165,250,1)",
+          borderWidth: 1,
+          order: 2
+        },
+        {
+          label: "실적",
+          data: actuals,
+          backgroundColor: "rgba(251,113,133,.45)",
+          borderColor: "rgba(251,113,133,1)",
+          borderWidth: 1,
+          order: 2
+        },
+        {
+          // ✅ 달성율: 선을 잇지 않고 점만 크게 표시
+          type: "scatter",
+          label: "달성율(%)",
+          data: achPct.map((v,i)=>({ x: i, y: v })),
+          yAxisID: "y1",
+          showLine: false,
+          pointRadius: 6,           // ← 요청: 점 크게
+          pointHoverRadius: 8,
+          borderColor: "rgba(245,158,11,1)",
+          backgroundColor: "rgba(245,158,11,.55)",
+          order: 1
         }
-      }
-      for (const [k,v] of Object.entries(extraParams)){
-        params.set(k, v);
-      }
-
-      return SCRIPT_EXEC_URL + "?" + params.toString();
-    }
-
-    /********************************************************
-     * 키 인증 모달
-     ********************************************************/
-    const keyModal = document.getElementById('keyModal');
-    const keyInput = document.getElementById('keyInput');
-    const keyBtn = document.getElementById('keyBtn');
-    const keyErr = document.getElementById('keyErr');
-
-    function openKeyModal(){
-      keyModal.style.display = "flex";
-      keyErr.style.display = "none";
-      keyInput.value = "";
-      keyInput.focus();
-    }
-    function closeKeyModal(){
-      keyModal.style.display = "none";
-    }
-
-    async function verifyKey(key){
-      AUTH_KEY = key.trim();
-      // options 호출로 검증 (키 틀리면 {error:'UNAUTHORIZED'} 응답)
-      const url = SCRIPT_EXEC_URL + `?action=options&key=${encodeURIComponent(AUTH_KEY)}`;
-      const data = await jsonp(url);
-      if (data && data.error === "UNAUTHORIZED") return null;
-      return data;
-    }
-
-    async function onKeySubmit(){
-      try{
-        keyBtn.disabled = true;
-        const key = keyInput.value.trim();
-        const data = await verifyKey(key);
-        if(!data){
-          keyErr.style.display = "block";
-          setStatus(false, "키 인증 실패");
-          return;
-        }
-        // success
-        localStorage.setItem("WHHS_DASH_KEY", key);
-        optionsCache = data;
-        closeKeyModal();
-        btnRefresh.disabled = false;
-        btnClear.disabled = false;
-
-        setStatus(true, "필터 옵션 로드 완료");
-        renderOptions(optionsCache);
-        await loadDashboard();
-      }catch(err){
-        setStatus(false, err.message || String(err));
-      }finally{
-        keyBtn.disabled = false;
-      }
-    }
-
-    keyBtn.addEventListener("click", onKeySubmit);
-    keyInput.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter") onKeySubmit();
-    });
-
-    /********************************************************
-     * 옵션(슬라이서) 렌더링
-     ********************************************************/
-    function renderPills(containerId, arr, key){
-      const el = document.getElementById(containerId);
-      el.innerHTML = "";
-      arr.forEach(v=>{
-        const pill = document.createElement("div");
-        pill.className = "pill";
-        pill.textContent = v;
-        pill.onclick = ()=>{
-          if(filters[key].has(v)) filters[key].delete(v);
-          else filters[key].add(v);
-          pill.classList.toggle("on");
-          loadDashboard();
-        };
-        el.appendChild(pill);
-      });
-    }
-
-    function renderOptions(opt){
-      // 이미 Apps Script에서 정렬/필터(aaa 제거, 월/요일 순서) 처리됨
-      renderPills("pills-years", opt.years || [], "years");
-      renderPills("pills-months", opt.months || [], "months");
-      renderPills("pills-days", opt.days || [], "days");
-      renderPills("pills-dows", opt.dows || [], "dows");
-      renderPills("pills-items", opt.items || [], "items");
-      renderPills("pills-channels", opt.channels || [], "channels");
-    }
-
-    // 그룹 버튼 (전체/해제)
-    document.querySelectorAll(".group .mini").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const group = btn.closest(".group").dataset.group;
-        const act = btn.dataset.act;
-        const pillsEl = document.getElementById("pills-" + group);
-        if(!optionsCache) return;
-
-        const allArr = optionsCache[group] || [];
-
-        if(act === "all"){
-          filters[group] = new Set(allArr);
-          pillsEl.querySelectorAll(".pill").forEach(p=>p.classList.add("on"));
-        }else{
-          filters[group].clear();
-          pillsEl.querySelectorAll(".pill").forEach(p=>p.classList.remove("on"));
-        }
-        loadDashboard();
-      });
-    });
-
-    btnClear.addEventListener("click", ()=>{
-      for(const k of Object.keys(filters)) filters[k].clear();
-      document.querySelectorAll(".pill.on").forEach(p=>p.classList.remove("on"));
-      loadDashboard();
-    });
-
-    btnRefresh.addEventListener("click", ()=>{
-      loadDashboard(true);
-    });
-
-    /********************************************************
-     * 대시보드 로딩
-     ********************************************************/
-    async function loadDashboard(force){
-      try{
-        setStatus(true, "데이터 불러오는 중...");
-        updatedAt.textContent = "";
-        const url = buildUrl("dashboard");
-        const d = await jsonp(url);
-
-        if(d && d.error){
-          setStatus(false, d.message || d.error);
-          return;
-        }
-
-        renderKpis(d.summary || {});
-        renderCharts(d);
-
-        updatedAt.textContent = nowText();
-        setStatus(true, "필터 적용 완료");
-      }catch(err){
-        setStatus(false, err.message || "JSONP load failed");
-      }
-    }
-
-    function renderKpis(s){
-      document.getElementById("kpi-bc").textContent = fmtInt(s.방송횟수);
-      document.getElementById("kpi-spc").textContent = fmtInt(s.특약횟수);
-      document.getElementById("kpi-spv").textContent = fmtMoney(s.특약비용);
-      document.getElementById("kpi-ach").textContent = fmtPct(s.평균달성율);
-      document.getElementById("kpi-min").textContent = fmtInt(s.방송시간_분);
-      document.getElementById("kpi-hr").textContent = fmtMoney(s.시간당매출);
-    }
-
-    /********************************************************
-     * 차트 유틸
-     * - 목표/실적: 막대
-     * - 달성율: "점"만(선 연결 X) + 점 크게
-     ********************************************************/
-    function makeComboChart(ctx, labels, goals, actuals, achs, horizontal=false){
-      const achPct = (achs||[]).map(x=>Number(x||0)*100);
-
-      const data = {
-        labels,
-        datasets: [
-          {
-            label: "목표",
-            data: goals,
-            type: "bar",
-            yAxisID: horizontal ? "x" : "y",
-            borderWidth: 0
-          },
-          {
-            label: "실적",
-            data: actuals,
-            type: "bar",
-            yAxisID: horizontal ? "x" : "y",
-            borderWidth: 0
-          },
-          {
-            label: "달성율(%)",
-            data: achPct,
-            type: "scatter",        // ✅ 선 연결 없음
-            yAxisID: horizontal ? "y2" : "y2",
-            pointRadius: 6,         // ✅ 점 크게
-            pointHoverRadius: 7
-          }
-        ]
-      };
-
-      const options = {
-        responsive:true,
-        maintainAspectRatio:false,
-        plugins:{
-          legend:{ position:"top" },
-          tooltip:{
-            callbacks:{
-              label:(ctx)=>{
-                const label = ctx.dataset.label || "";
-                const v = ctx.parsed[horizontal ? "x" : "y"];
-                if(label.includes("달성율")) return `${label}: ${Number(v).toFixed(0)}%`;
-                return `${label}: ${fmtMoney(v)}`;
+      ]
+    },
+    options: {
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{ position:"top" },
+        tooltip:{
+          callbacks:{
+            label:(ctx)=>{
+              const ds = ctx.dataset;
+              const label = ds.label || "";
+              if(label.includes("달성율")){
+                const v = ctx.parsed.y;
+                return `달성율: ${Number(v||0).toFixed(0)}%`;
               }
+              const v = ctx.parsed.y ?? ctx.parsed;
+              return `${label}: ${Number(v||0).toLocaleString("ko-KR")}`;
             }
           }
+        }
+      },
+      scales:{
+        x: {
+          grid:{ color:"rgba(229,231,235,.7)" }
         },
-        scales: horizontal ? {
-          x: { beginAtZero:true, grid:{color:"rgba(100,116,139,.15)"} },
-          y: { grid:{display:false} },
-          y2: { position:"right", beginAtZero:true, grid:{display:false}, ticks:{ callback:(v)=>v+"%" } }
-        } : {
-          y: { beginAtZero:true, grid:{color:"rgba(100,116,139,.15)"} },
-          x: { grid:{display:false} },
-          y2: { position:"right", beginAtZero:true, grid:{display:false}, ticks:{ callback:(v)=>v+"%" } }
-        }
-      };
-
-      if(horizontal){
-        // 가로 막대형: Chart.js는 indexAxis로 처리
-        options.indexAxis = "y";
-      }
-
-      return { data, options };
-    }
-
-    function buildOrUpdate(chartRef, canvasId, cfg){
-      const ctx = document.getElementById(canvasId);
-      if(chartRef) chartRef.destroy();
-      return new Chart(ctx, cfg);
-    }
-
-    function renderCharts(d){
-      // 방송채널: 문자열 내림차순 + (비어있음 제거)는 서버에서 처리됨
-      const c = d.channel || {labels:[],goals:[],actuals:[],achs:[]};
-      const m = d.month || {labels:[],goals:[],actuals:[],achs:[]};
-      const w = d.dow || {labels:[],goals:[],actuals:[],achs:[]};
-      const day = d.day || {labels:[],goals:[],actuals:[],achs:[]};
-      const it = d.item || {labels:[],goals:[],actuals:[],achs:[]};
-
-      // 1) 방송채널: 세로막대 + 달성율 점(선 없음)
-      {
-        const {data, options} = makeComboChart(null, c.labels, c.goals, c.actuals, c.achs, false);
-        chChannel = buildOrUpdate(chChannel, "chartChannel", { type:"bar", data, options });
-      }
-
-      // 2) 월별: 세로막대 + 달성율 점
-      {
-        const {data, options} = makeComboChart(null, m.labels, m.goals, m.actuals, m.achs, false);
-        chMonth = buildOrUpdate(chMonth, "chartMonth", { type:"bar", data, options });
-      }
-
-      // 3) 요일별: 세로막대 + 달성율 점
-      {
-        const {data, options} = makeComboChart(null, w.labels, w.goals, w.actuals, w.achs, false);
-        chDow = buildOrUpdate(chDow, "chartDow", { type:"bar", data, options });
-      }
-
-      // 4) 일자별: 가로막대 + 달성율 점
-      {
-        const {data, options} = makeComboChart(null, day.labels, day.goals, day.actuals, day.achs, true);
-        chDay = buildOrUpdate(chDay, "chartDay", { type:"bar", data, options });
-      }
-
-      // 5) 아이템별: ✅ 세로막대 + 달성율 점(선 없음)
-      {
-        const {data, options} = makeComboChart(null, it.labels, it.goals, it.actuals, it.achs, false);
-        chItem = buildOrUpdate(chItem, "chartItem", { type:"bar", data, options });
-      }
-    }
-
-    /********************************************************
-     * 시작
-     ********************************************************/
-    (async function init(){
-      // 1) localStorage에 키가 있으면 바로 시도
-      const saved = localStorage.getItem("WHHS_DASH_KEY");
-      if(saved){
-        try{
-          setStatus(true, "저장된 키로 인증 중...");
-          const data = await verifyKey(saved);
-          if(!data) throw new Error("saved key invalid");
-          optionsCache = data;
-          btnRefresh.disabled = false;
-          btnClear.disabled = false;
-          setStatus(true, "필터 옵션 로드 완료");
-          renderOptions(optionsCache);
-          await loadDashboard();
-          return;
-        }catch(e){
-          localStorage.removeItem("WHHS_DASH_KEY");
+        y: {
+          beginAtZero:true,
+          grid:{ color:"rgba(229,231,235,.7)" },
+          ticks:{
+            callback:(v)=>Number(v).toLocaleString("ko-KR")
+          }
+        },
+        y1: {
+          position:"right",
+          beginAtZero:true,
+          grid:{ drawOnChartArea:false },
+          ticks:{
+            callback:(v)=> `${v}%`
+          }
         }
       }
-      // 2) 없거나 실패하면 팝업
-      openKeyModal();
-      setStatus(false, "키 인증 필요");
-    })();
-  </script>
+    }
+  });
+}
+
+function makeHComboChart(canvasId, payload){
+  // 가로막대형(일자 TOP30 등)
+  const labels = payload.labels || [];
+  const goals = (payload.goals || []).map(Number);
+  const actuals = (payload.actuals || []).map(Number);
+  const achPct = (payload.achs || []).map(toPctValue);
+
+  destroyChart(canvasId);
+
+  state.charts[canvasId] = new Chart($(canvasId), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        {
+          label:"목표",
+          data: goals,
+          backgroundColor: "rgba(96,165,250,.55)",
+          borderWidth:1
+        },
+        {
+          label:"실적",
+          data: actuals,
+          backgroundColor: "rgba(251,113,133,.45)",
+          borderWidth:1
+        },
+        {
+          type:"scatter",
+          label:"달성율(%)",
+          data: achPct.map((v,i)=>({ x: v, y: i })),
+          xAxisID:"x1",
+          showLine:false,
+          pointRadius:6,
+          pointHoverRadius:8,
+          borderColor:"rgba(245,158,11,1)",
+          backgroundColor:"rgba(245,158,11,.55)"
+        }
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      indexAxis:"y",
+      plugins:{
+        legend:{ position:"top" },
+        tooltip:{
+          callbacks:{
+            label:(ctx)=>{
+              const label = ctx.dataset.label || "";
+              if(label.includes("달성율")){
+                return `달성율: ${Number(ctx.parsed.x||0).toFixed(0)}%`;
+              }
+              return `${label}: ${Number(ctx.parsed.x||0).toLocaleString("ko-KR")}`;
+            }
+          }
+        }
+      },
+      scales:{
+        x:{
+          beginAtZero:true,
+          grid:{ color:"rgba(229,231,235,.7)" },
+          ticks:{ callback:(v)=>Number(v).toLocaleString("ko-KR") }
+        },
+        x1:{
+          position:"top",
+          beginAtZero:true,
+          grid:{ drawOnChartArea:false },
+          ticks:{ callback:(v)=>`${v}%` }
+        },
+        y:{
+          grid:{ color:"rgba(229,231,235,.7)" }
+        }
+      }
+    }
+  });
+}
+
+/** ===========================
+ *  5) API 호출
+ * =========================== */
+async function fetchOptions(){
+  const url = API_EXEC_URL + "?" + qs({
+    action:"options",
+    key: state.key
+  });
+  const data = await jsonp(url, 20000);
+  if(data && data.error) throw new Error(data.message || data.error);
+  return data;
+}
+
+async function fetchDashboard(){
+  try{
+    setStatus(true, "불러오는 중...");
+    const p = state.filters;
+
+    const url = API_EXEC_URL + "?" + qs({
+      action:"dashboard",
+      key: state.key,
+      years: p.years,
+      months: p.months,
+      days: p.days,
+      dows: p.dows,
+      items: p.items,
+      channels: p.channels
+    });
+
+    const data = await jsonp(url, 25000);
+    if(data && data.error) throw new Error(data.message || data.error);
+
+    renderDashboard(data);
+    $("updatedAt").textContent = "업데이트: " + new Date().toLocaleString("ko-KR");
+    setStatus(true, "필터 적용 완료");
+  }catch(err){
+    console.error(err);
+    setStatus(false, err.message || "JSONP load failed");
+  }
+}
+
+/** ===========================
+ *  6) 렌더(대시보드)
+ * =========================== */
+function renderDashboard(d){
+  const s = d.summary || {};
+  $("kpiCnt").textContent = fmtInt(s.방송횟수);
+  $("kpiSpCnt").textContent = fmtInt(s.특약횟수);
+  $("kpiSpCost").textContent = fmtMoney(s.특약비용);
+  $("kpiAch").textContent = fmtPctFromRatio(s.평균달성율); // ✅ 0~1 → 80%
+  $("kpiMin").textContent = fmtInt(s.방송시간_분);
+  $("kpiHr").textContent = fmtMoney(s.시간당매출);
+
+  // 차트
+  // 1) 채널: 문자열 내림차순 / (비어있음 제거는 백엔드에서 처리)
+  makeComboChart("chChannel", d.channel, { type:"bar" });
+
+  // 2) 월
+  makeComboChart("chMonth", d.month, { type:"bar" });
+
+  // 3) 요일
+  makeComboChart("chDow", d.dow, { type:"bar" });
+
+  // 4) 일자: 가로 막대
+  makeHComboChart("chDay", d.day);
+
+  // 5) 아이템: 세로 막대(요청) + 달성율 점만
+  makeComboChart("chItem", d.item, { type:"bar" });
+}
+
+/** ===========================
+ *  7) 키 인증 흐름
+ * =========================== */
+function openKeyModal(){
+  $("keyModal").style.display = "flex";
+  $("keyInput").value = state.key || "";
+  $("keyMsg").style.display = "none";
+  $("keyInput").focus();
+}
+function closeKeyModal(){
+  $("keyModal").style.display = "none";
+}
+
+async function verifyKeyAndInit(){
+  try{
+    setStatus(true, "키 확인 중...");
+    // options 호출로 키 검증 + 필터 목록 가져오기
+    const opt = await fetchOptions();
+    state.options = opt;
+    renderAllChips();
+    closeKeyModal();
+    setStatus(true, "키 인증 완료");
+    await fetchDashboard();
+  }catch(err){
+    console.error(err);
+    $("keyMsg").style.display = "block";
+    setStatus(false, "키 인증 실패");
+  }
+}
+
+/** ===========================
+ *  8) 이벤트
+ * =========================== */
+$("btnReload").onclick = ()=> fetchDashboard();
+$("btnReset").onclick = ()=>{
+  clearFilters();
+  fetchDashboard();
+};
+
+$("keyOk").onclick = ()=>{
+  const k = $("keyInput").value.trim();
+  state.key = k;
+  saveToStorageKey(k);
+  verifyKeyAndInit();
+};
+$("keyInput").addEventListener("keydown", (e)=>{
+  if(e.key === "Enter") $("keyOk").click();
+});
+
+/** ===========================
+ *  9) 시작
+ * =========================== */
+(function init(){
+  // 키 불러오기: localStorage → DEFAULT_KEY
+  state.key = loadFromStorageKey() || (DEFAULT_KEY || "");
+  if(!state.key){
+    openKeyModal();
+    return;
+  }
+  // 키가 있으면 바로 검증/로드
+  verifyKeyAndInit();
+})();
+</script>
 </body>
 </html>
