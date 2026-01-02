@@ -13,133 +13,154 @@
       --border:#e5e7eb; --soft:#eaf2ff; --accent:#2563eb;
       --radius:14px;
     }
-    body{ font-family: system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo","Noto Sans KR",sans-serif;
-      background:var(--bg); margin:0; padding:18px; color:var(--text); }
-    header{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
-    header h1{ margin:0; font-size:28px; letter-spacing:-.4px; }
-    .sub{ margin:0 0 14px 0; color:var(--muted); font-size:13px; }
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+      background:var(--bg); margin:0; padding:14px; color:var(--text);
+    }
+    header{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+    header h1{ margin:0; font-size:24px; letter-spacing:-.4px; }
+    .sub{ margin:0 0 10px 0; color:var(--muted); font-size:12px; }
 
-    .grid{ display:grid; grid-template-columns: 360px 1fr; gap:14px; align-items:start; }
-    @media(max-width:1050px){ .grid{ grid-template-columns:1fr; } }
-
-    .panel{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:12px; }
-    .panel h2{ margin:0 0 8px 0; font-size:16px; }
-    .hint{ color:var(--muted); font-size:12px; margin-top:6px; }
-
-    .status{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
-      border:1px solid var(--border); border-radius:var(--radius); background:var(--card); padding:10px 12px; }
-    .status b{ font-weight:800; }
-    .btn{ border:1px solid var(--border); background:#fff; border-radius:10px; padding:8px 10px; cursor:pointer; font-size:13px; }
+    .status{
+      display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+      border:1px solid var(--border); border-radius:var(--radius); background:var(--card);
+      padding:8px 10px;
+    }
+    .status b{ font-weight:900; }
+    .btn{
+      border:1px solid var(--border); background:#fff; border-radius:10px;
+      padding:7px 9px; cursor:pointer; font-size:12px;
+    }
     .btn:hover{ background:#f9fafb; }
     .btn.primary{ border-color:#c7d2fe; background:#eef2ff; }
 
-    .kpis{ display:grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap:12px; margin-top:12px; }
-    @media(max-width:920px){ .kpis{ grid-template-columns: repeat(2, minmax(150px, 1fr)); } }
-    @media(max-width:520px){ .kpis{ grid-template-columns:1fr; } }
-    .kpi{ background:var(--soft); border-radius:var(--radius); padding:14px 16px; }
-    .kpi .label{ color:var(--muted); font-size:12px; margin-bottom:6px; }
-    .kpi .value{ font-size:22px; font-weight:900; letter-spacing:-.4px; }
+    .grid{ display:grid; grid-template-columns: 300px 1fr; gap:12px; align-items:start; margin-top:12px; }
+    @media(max-width:1050px){ .grid{ grid-template-columns:1fr; } }
 
-    .slicer{ margin-top:10px; }
-    .slicer-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
-    .slicer-head .title{ font-weight:800; }
-    .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .panel{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:10px; }
+    .panel h2{ margin:0 0 8px 0; font-size:14px; }
+
+    .kpis{ display:grid; grid-template-columns: repeat(6, minmax(140px, 1fr)); gap:10px; margin-bottom:10px; }
+    @media(max-width:1180px){ .kpis{ grid-template-columns: repeat(3, minmax(140px, 1fr)); } }
+    @media(max-width:620px){ .kpis{ grid-template-columns:1fr; } }
+
+    .kpi{ background:var(--soft); border-radius:var(--radius); padding:10px 12px; }
+    .kpi .label{ color:var(--muted); font-size:11px; margin-bottom:4px; }
+    .kpi .value{ font-size:18px; font-weight:900; letter-spacing:-.4px; }
+
+    /* 슬라이서(작게) */
+    .slicer{ margin-top:8px; }
+    .slicer-head{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    .slicer-head .title{ font-weight:900; font-size:12px; }
+    .chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
     .chip{
       border:1px solid var(--border); background:#fff; border-radius:999px;
-      padding:7px 10px; font-size:13px; cursor:pointer; user-select:none;
+      padding:5px 8px; font-size:12px; cursor:pointer; user-select:none;
     }
-    .chip.on{ border-color:#bfdbfe; background:#eff6ff; color:#1d4ed8; font-weight:700; }
+    .chip.on{ border-color:#bfdbfe; background:#eff6ff; color:#1d4ed8; font-weight:800; }
     .chip:active{ transform: translateY(1px); }
 
-    .section{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
-      padding:12px; margin-top:12px; }
-    .section h3{ margin:0 0 10px 0; font-size:16px; }
-    canvas{ width:100% !important; max-height:380px; }
+    /* 차트 레이아웃(한 눈에) */
+    .charts{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media(max-width:1050px){ .charts{ grid-template-columns:1fr; } }
+
+    .section{
+      background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+      padding:10px;
+    }
+    .section h3{ margin:0 0 8px 0; font-size:14px; }
+
+    /* 그래프 높이 줄이기 */
+    .chartBox{ height:240px; }
+    .chartBox.tall{ height:270px; }
+    canvas{ width:100% !important; height:100% !important; }
   </style>
 </head>
 
 <body>
   <header>
-    <div style="font-size:30px">📊</div>
+    <div style="font-size:26px">📊</div>
     <h1>방송 매출 대시보드</h1>
   </header>
-  <p class="sub">엑셀 슬라이서처럼 버튼을 눌러 필터링하면 KPI/차트가 즉시 변경됩니다.</p>
+  <p class="sub">엑셀 슬라이서처럼 선택하면 KPI/차트가 즉시 변경됩니다.</p>
 
   <div class="status">
     <div>상태: <b id="statusText">로딩…</b> <span id="statusHint" style="color:var(--muted)"></span></div>
     <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-      <span id="lastUpdated" style="color:var(--muted); font-size:13px;"></span>
+      <span id="lastUpdated" style="color:var(--muted); font-size:12px;"></span>
       <button class="btn" id="resetBtn">전체 해제</button>
       <button class="btn primary" id="refreshBtn">새로고침</button>
     </div>
   </div>
 
-  <div class="grid" style="margin-top:14px;">
+  <div class="grid">
     <!-- LEFT: slicers -->
     <div class="panel">
       <h2>필터(슬라이서)</h2>
 
+      <!-- 요청한 순서: 연도, 월, 일, 요일, 아이템, 방송채널 -->
       <div class="slicer" id="slicerYears"></div>
       <div class="slicer" id="slicerMonths"></div>
+      <div class="slicer" id="slicerDays"></div>
       <div class="slicer" id="slicerDows"></div>
       <div class="slicer" id="slicerItems"></div>
       <div class="slicer" id="slicerChannels"></div>
-
-      <div class="hint">팁: 여러 개를 동시에 선택할 수 있어요(엑셀 슬라이서와 동일).</div>
     </div>
 
-    <!-- RIGHT: KPIs + Charts -->
+    <!-- RIGHT -->
     <div>
       <div class="kpis" id="kpis"></div>
 
-      <div class="section">
-        <h3>방송채널별 달성율</h3>
-        <canvas id="channelChart"></canvas>
-      </div>
+      <div class="charts">
+        <div class="section">
+          <h3>방송채널별 (목표/실적/달성율)</h3>
+          <div class="chartBox"><canvas id="channelChart"></canvas></div>
+        </div>
 
-      <div class="section">
-        <h3>아이템별 달성율</h3>
-        <canvas id="itemChart"></canvas>
-      </div>
+        <div class="section">
+          <h3>월별 (목표/실적/달성율)</h3>
+          <div class="chartBox"><canvas id="monthChart"></canvas></div>
+        </div>
 
-      <div class="section">
-        <h3>월별 달성율</h3>
-        <canvas id="monthChart"></canvas>
-      </div>
+        <div class="section">
+          <h3>요일별 (목표/실적/달성율)</h3>
+          <div class="chartBox"><canvas id="dowChart"></canvas></div>
+        </div>
 
-      <div class="section">
-        <h3>요일별 달성율</h3>
-        <canvas id="dowChart"></canvas>
+        <div class="section">
+          <h3>일자별 (목표/실적/달성율)</h3>
+          <div class="chartBox tall"><canvas id="dayChart"></canvas></div>
+        </div>
+
+        <div class="section" style="grid-column: 1 / -1;">
+          <h3>아이템별 (목표/실적/달성율)</h3>
+          <div class="chartBox tall"><canvas id="itemChart"></canvas></div>
+        </div>
       </div>
     </div>
   </div>
 
 <script>
 /*** ✅ 본인 Apps Script exec URL 입력 ***/
-const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec"; // ← 이것만 바꾸세요
+const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec"; // ← 여기만 바꾸세요
 
 /*** JSONP 유틸 ***/
 function jsonp(url){
   return new Promise((resolve, reject) => {
     const cb = "cb_" + Math.random().toString(36).slice(2);
     const script = document.createElement("script");
-    window[cb] = (data) => {
-      resolve(data);
-      try{ delete window[cb]; }catch(e){ window[cb]=undefined; }
-      script.remove();
-    };
+    window[cb] = (data) => { resolve(data); try{ delete window[cb]; }catch(e){ window[cb]=undefined; } script.remove(); };
     const sep = url.includes("?") ? "&" : "?";
     script.src = url + sep + "callback=" + cb;
-    script.onerror = () => {
-      reject(new Error("JSONP load failed"));
-      try{ delete window[cb]; }catch(e){ window[cb]=undefined; }
-      script.remove();
-    };
+    script.onerror = () => { reject(new Error("JSONP load failed")); try{ delete window[cb]; }catch(e){ window[cb]=undefined; } script.remove(); };
     document.body.appendChild(script);
   });
 }
 
-/*** 상태/UI ***/
 function setStatus(ok, text, hint=""){
   const el = document.getElementById("statusText");
   const hintEl = document.getElementById("statusHint");
@@ -156,114 +177,165 @@ function fmtNumber(x){
   if(!isFinite(n)) return "-";
   return Math.round(n).toLocaleString("ko-KR");
 }
+function fmtMoney(x){ return fmtNumber(x); }
 function fmtPercent01(x){
   const n = Number(x);
   if(!isFinite(n)) return "-";
   return Math.round(n*100) + "%";
 }
 
-/*** 선택 상태(엑셀 슬라이서처럼 멀티) ***/
+/*** 선택 상태 ***/
 const state = {
   years: new Set(),
   months: new Set(),
+  days: new Set(),
   dows: new Set(),
   items: new Set(),
   channels: new Set(),
 };
 
-// URL 쿼리에 선택상태 저장/복원 (공유 링크에도 유지)
 function readStateFromUrl(){
   const sp = new URLSearchParams(location.search);
-  ["years","months","dows","items","channels"].forEach(k=>{
+  ["years","months","days","dows","items","channels"].forEach(k=>{
     state[k].clear();
     const v = sp.get(k);
-    if(v){
-      v.split(",").map(s=>s.trim()).filter(Boolean).forEach(x=>state[k].add(x));
-    }
+    if(v) v.split(",").map(s=>s.trim()).filter(Boolean).forEach(x=>state[k].add(x));
   });
 }
 function writeStateToUrl(){
   const sp = new URLSearchParams();
-  ["years","months","dows","items","channels"].forEach(k=>{
+  ["years","months","days","dows","items","channels"].forEach(k=>{
     if(state[k].size) sp.set(k, [...state[k]].join(","));
   });
-  const newUrl = location.pathname + (sp.toString()?("?"+sp.toString()):"");
-  history.replaceState(null, "", newUrl);
+  history.replaceState(null, "", location.pathname + (sp.toString()?("?"+sp.toString()):""));
 }
-
 function buildQueryFromState(){
   const sp = new URLSearchParams();
-  ["years","months","dows","items","channels"].forEach(k=>{
+  ["years","months","days","dows","items","channels"].forEach(k=>{
     if(state[k].size) sp.set(k, [...state[k]].join(","));
   });
   return sp.toString();
 }
 
-/*** 슬라이서 렌더(칩 버튼) ***/
+/*** 슬라이서 렌더 ***/
 function renderSlicer(containerId, title, key, options){
   const container = document.getElementById(containerId);
   const selected = state[key];
 
   const chipsHtml = (options || []).map(v=>{
-    const on = selected.has(String(v));
-    return `<div class="chip ${on?'on':''}" data-key="${key}" data-val="${String(v)}">${String(v)}</div>`;
+    const vv = String(v);
+    const on = selected.has(vv);
+    return `<div class="chip ${on?'on':''}" data-key="${key}" data-val="${vv}">${vv}</div>`;
   }).join("");
 
   container.innerHTML = `
     <div class="slicer-head">
       <div class="title">${title}</div>
       <div style="display:flex; gap:6px;">
-        <button class="btn" data-action="all" data-key="${key}">전체선택</button>
+        <button class="btn" data-action="all" data-key="${key}">전체</button>
         <button class="btn" data-action="none" data-key="${key}">해제</button>
       </div>
     </div>
-    <div class="chips">${chipsHtml || '<span style="color:var(--muted);font-size:13px;">(옵션 없음)</span>'}</div>
+    <div class="chips">${chipsHtml || '<span style="color:var(--muted);font-size:12px;">(옵션 없음)</span>'}</div>
   `;
 }
 
-/*** KPI ***/
+/*** KPI 6개 (요청한 순서) ***/
 function renderKpis(d){
   document.getElementById("kpis").innerHTML = `
     <div class="kpi"><div class="label">방송횟수</div><div class="value">${fmtNumber(d["방송횟수"])}</div></div>
     <div class="kpi"><div class="label">특약횟수</div><div class="value">${fmtNumber(d["특약횟수"])}</div></div>
+    <div class="kpi"><div class="label">특약비용</div><div class="value">${fmtMoney(d["특약비용"])}</div></div>
     <div class="kpi"><div class="label">평균달성율</div><div class="value">${fmtPercent01(d["평균달성율"])}</div></div>
-    <div class="kpi"><div class="label">시간당매출</div><div class="value">${fmtNumber(d["시간당매출"])}</div></div>
+    <div class="kpi"><div class="label">방송시간(분)</div><div class="value">${fmtNumber(d["방송시간_분"])}</div></div>
+    <div class="kpi"><div class="label">시간당매출</div><div class="value">${fmtMoney(d["시간당매출"])}</div></div>
   `;
 }
 
-/*** Charts ***/
+/*** Chart: 목표/실적 bar 겹침 + 달성율 line + tooltip에 방송횟수 표시 ***/
 let charts = {};
-function drawBarChart(canvasId, labels, values01, labelText){
+function drawPivotChart(canvasId, labels, goals, actuals, achs, counts, horizontal=false){
   const ctx = document.getElementById(canvasId);
   if(charts[canvasId]) charts[canvasId].destroy();
 
   charts[canvasId] = new Chart(ctx, {
-    type:"bar",
-    data:{
+    data: {
       labels: labels || [],
-      datasets:[{
-        label: labelText,
-        data: (values01 || []).map(v => Number(v) * 100)
-      }]
+      datasets: [
+        {
+          type: 'bar',
+          label: '목표',
+          data: (goals || []).map(Number),
+          // 겹쳐보이게(큰 바)
+          barPercentage: 0.9,
+          categoryPercentage: 0.8,
+        },
+        {
+          type: 'bar',
+          label: '실적',
+          data: (actuals || []).map(Number),
+          // 겹쳐보이게(작은 바)
+          barPercentage: 0.55,
+          categoryPercentage: 0.8,
+        },
+        {
+          type: 'line',
+          label: '달성율(%)',
+          data: (achs || []).map(v=>Number(v)*100),
+          yAxisID: 'y1',
+          tension: 0.25,
+          pointRadius: 2
+        }
+      ]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      scales:{ y:{ beginAtZero:true } }
+    options: {
+      indexAxis: horizontal ? 'y' : 'x',
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: { display: false }
+        },
+        y1: {
+          beginAtZero: true,
+          position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: { callback: (v)=> v + '%' }
+        }
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            afterBody: (items) => {
+              const i = items?.[0]?.dataIndex;
+              if (i == null) return '';
+              const cnt = counts?.[i];
+              return cnt != null ? `방송횟수: ${cnt}` : '';
+            }
+          }
+        },
+        legend: { display: true }
+      }
     }
   });
 }
 
-/*** 데이터 로드 (필터 반영) ***/
+/*** 데이터 로더 ***/
 async function loadOptions(){
-  // options는 필터 없이도 되지만, “필터된 옵션”을 원하면 query 붙여도 됨
   const d = await jsonp(API_URL + "?action=options");
   if(d && d.error) throw new Error(d.error);
 
-  // 옵션이 없을 때도 안전하게
+  // months/days/dows는 백엔드에서 정렬됨. 안전하게 프론트에서도 정렬 보정.
+  const months = (d.months || []).slice().sort((a,b)=>Number(a)-Number(b));
+  const days = (d.days || []).slice().sort((a,b)=>Number(a)-Number(b));
+  const dowOrder = ['일','월','화','수','목','금','토'];
+  const dows = (d.dows || []).filter(x=>dowOrder.includes(x)).sort((a,b)=>dowOrder.indexOf(a)-dowOrder.indexOf(b));
+
   renderSlicer("slicerYears", "연도", "years", d.years || []);
-  renderSlicer("slicerMonths", "월", "months", d.months || []);
-  renderSlicer("slicerDows", "요일", "dows", d.dows || []);
+  renderSlicer("slicerMonths", "월", "months", months);
+  renderSlicer("slicerDays", "일", "days", days);
+  renderSlicer("slicerDows", "요일", "dows", dows);
   renderSlicer("slicerItems", "아이템", "items", d.items || []);
   renderSlicer("slicerChannels", "방송채널", "channels", d.channels || []);
 }
@@ -279,21 +351,27 @@ async function loadCharts(){
   const q = buildQueryFromState();
   const suffix = q ? "&" + q : "";
 
-  const ch = await jsonp(API_URL + "?action=bar&by=방송채널&metric=달성율&agg=mean&top=30" + suffix);
+  const ch = await jsonp(API_URL + "?action=statsbar&by=방송채널&top=30" + suffix);
   if(ch && ch.error) throw new Error(ch.error);
-  drawBarChart("channelChart", ch.labels, ch.values, "달성율(%)");
+  drawPivotChart("channelChart", ch.labels, ch.goals, ch.actuals, ch.achs, ch.counts, false);
 
-  const it = await jsonp(API_URL + "?action=bar&by=아이템&metric=달성율&agg=mean&top=30" + suffix);
-  if(it && it.error) throw new Error(it.error);
-  drawBarChart("itemChart", it.labels, it.values, "달성율(%)");
-
-  const mo = await jsonp(API_URL + "?action=bar&by=월&metric=달성율&agg=mean&top=12" + suffix);
+  const mo = await jsonp(API_URL + "?action=statsbar&by=월&top=12" + suffix);
   if(mo && mo.error) throw new Error(mo.error);
-  drawBarChart("monthChart", mo.labels, mo.values, "달성율(%)");
+  drawPivotChart("monthChart", mo.labels, mo.goals, mo.actuals, mo.achs, mo.counts, false);
 
-  const dw = await jsonp(API_URL + "?action=bar&by=요일&metric=달성율&agg=mean&top=7" + suffix);
+  const dw = await jsonp(API_URL + "?action=statsbar&by=요일&top=7" + suffix);
   if(dw && dw.error) throw new Error(dw.error);
-  drawBarChart("dowChart", dw.labels, dw.values, "달성율(%)");
+  drawPivotChart("dowChart", dw.labels, dw.goals, dw.actuals, dw.achs, dw.counts, false);
+
+  // 일자별 (가로막대 가능)
+  const dy = await jsonp(API_URL + "?action=statsbar&by=일자&top=31" + suffix);
+  if(dy && dy.error) throw new Error(dy.error);
+  drawPivotChart("dayChart", dy.labels, dy.goals, dy.actuals, dy.achs, dy.counts, true);
+
+  // 아이템별 (가로막대)
+  const it = await jsonp(API_URL + "?action=statsbar&by=아이템&top=30" + suffix);
+  if(it && it.error) throw new Error(it.error);
+  drawPivotChart("itemChart", it.labels, it.goals, it.actuals, it.achs, it.counts, true);
 }
 
 async function refreshAll(){
@@ -310,7 +388,7 @@ async function refreshAll(){
   }
 }
 
-/*** 이벤트: 칩 클릭/전체선택/해제 ***/
+/*** 이벤트: 칩/전체/해제 ***/
 document.addEventListener("click", async (ev) => {
   const chip = ev.target.closest(".chip");
   if(chip){
@@ -318,11 +396,7 @@ document.addEventListener("click", async (ev) => {
     const val = chip.dataset.val;
     if(state[key].has(val)) state[key].delete(val);
     else state[key].add(val);
-
-    // UI 즉시 반영
     chip.classList.toggle("on");
-
-    // KPI/차트 즉시 갱신 (엑셀 슬라이서 느낌)
     await refreshAll();
     return;
   }
@@ -348,8 +422,8 @@ document.addEventListener("click", async (ev) => {
 });
 
 document.getElementById("resetBtn").addEventListener("click", async ()=>{
-  ["years","months","dows","items","channels"].forEach(k=>state[k].clear());
-  await loadOptions(); // UI 다시 그림
+  ["years","months","days","dows","items","channels"].forEach(k=>state[k].clear());
+  await loadOptions();
   await refreshAll();
 });
 
@@ -360,8 +434,8 @@ document.getElementById("refreshBtn").addEventListener("click", async ()=>{
 /*** 초기 실행 ***/
 (async function init(){
   readStateFromUrl();
-  await loadOptions();   // 슬라이서 옵션 생성
-  await refreshAll();    // 현재 선택값으로 KPI/차트 로드
+  await loadOptions();
+  await refreshAll();
 })();
 </script>
 </body>
