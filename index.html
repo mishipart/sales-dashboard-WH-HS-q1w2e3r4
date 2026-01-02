@@ -30,21 +30,59 @@
 /* 🔽 여기에 본인 Apps Script 웹앱 URL 넣기 */
 const API_URL = "https://script.google.com/macros/s/AKfycbzpLQ2wcNZIuisAjsaDTxA_Lj1E5X6CWEeZffW0_PPdjHTAo7peoHig1UmzyvXbkLHUuw/exec";
 
-async function loadSummary() {
-  const res = await fetch(API_URL + "?action=summary");
-  const d = await res.json();
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb = "cb_" + Math.random().toString(36).slice(2);
+    window[cb] = (data) => {
+      resolve(data);
+      delete window[cb];
+      script.remove();
+    };
+    const script = document.createElement("script");
+    script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
+    script.onerror = () => {
+      reject(new Error("JSONP load failed"));
+      delete window[cb];
+      script.remove();
+    };
+    document.body.appendChild(script);
+  });
+}
 
+async function loadSummary() {
+  const d = await jsonp(API_URL + "?action=summary");
   document.getElementById("kpis").innerHTML = `
-    <div class="kpi">방송횟수<br><b>${d.방송횟수}</b></div>
-    <div class="kpi">특약횟수<br><b>${d.특약횟수}</b></div>
-    <div class="kpi">평균달성율<br><b>${Math.round(d.평균달성율 * 100)}%</b></div>
-    <div class="kpi">시간당매출<br><b>${Math.round(d.시간당매출)}</b></div>
+    <div class="kpi">방송횟수<br><b>${d["방송횟수"] ?? "-"}</b></div>
+    <div class="kpi">특약횟수<br><b>${d["특약횟수"] ?? "-"}</b></div>
+    <div class="kpi">평균달성율<br><b>${d["평균달성율"] != null ? Math.round(d["평균달성율"]*100)+"%" : "-"}</b></div>
+    <div class="kpi">시간당매출<br><b>${d["시간당매출"] != null ? Math.round(d["시간당매출"]) : "-"}</b></div>
   `;
 }
 
+let channelChart;
 async function loadChannelChart() {
-  const res = await fetch(API_URL + "?action=bar&by=방송채널&metric=달성율&agg=mean");
-  const d = await res.json();
+  const d = await jsonp(API_URL + "?action=bar&by=방송채널&metric=달성율&agg=mean&top=30");
 
-  new Chart(document.getElementById("channelChart"), {
-    ty
+  const ctx = document.getElementById("channelChart");
+  if (channelChart) channelChart.destroy();
+
+  channelChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: d.labels || [],
+      datasets: [{
+        label: "달성율(%)",
+        data: (d.values || []).map(v => Number(v) * 100)
+      }]
+    },
+    options: { scales: { y: { beginAtZero: true } } }
+  });
+}
+
+(async function init(){
+  await loadSummary();
+  await loadChannelChart();
+  setInterval(loadSummary, 10000);
+  setInterval(loadChannelChart, 30000);
+})();
+</script>
