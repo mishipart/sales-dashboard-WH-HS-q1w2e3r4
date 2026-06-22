@@ -34,50 +34,25 @@
     .filters .sec{margin-bottom:16px}
     .filters .sec h3{margin:0 0 8px;font-size:14px}
     .chips{display:flex;flex-wrap:wrap;gap:8px}
-
-    /* ✅ 원형 → 둥근사각형 + 비활성화 */
     .chip{
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:12px;
-      padding:8px 11px;
-      min-width:46px;
-      text-align:center;
-      font-size:12px;
-      cursor:pointer;
-      user-select:none;
-      transition:.12s ease;
+      border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 11px;min-width:46px;
+      text-align:center;font-size:12px;cursor:pointer;user-select:none;transition:.12s ease;
     }
     .chip:hover{border-color:#9bb8ff;background:#f7faff}
     .chip.on{border-color:#7aa3ff;background:#eaf1ff;color:#1746a2;font-weight:700}
-    .chip.disabled{
-      opacity:.32;
-      background:#f3f4f6;
-      color:#9ca3af;
-      cursor:not-allowed;
-      text-decoration:line-through;
-    }
+    .chip.disabled{opacity:.32;background:#f3f4f6;color:#9ca3af;cursor:not-allowed;text-decoration:line-through}
     .chip.disabled:hover{border-color:var(--line);background:#f3f4f6}
 
     .filters .sec .tools{display:flex;gap:8px;margin-left:auto}
     .filters .sec .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 
     .kpis{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}
-    .kpi{
-      background:#eaf1ff;
-      border-radius:14px;
-      padding:12px 10px;
-      min-height:118px;
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-start;
-    }
+    .kpi{background:#eaf1ff;border-radius:14px;padding:12px 10px;min-height:118px;display:flex;flex-direction:column;justify-content:flex-start}
     .kpi .k{font-size:11px;color:#475569;line-height:1.35;word-break:keep-all}
     .kpi .v{font-size:16px;font-weight:800;margin-top:8px;line-height:1.35;word-break:keep-all}
 
     .charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
     .charts .span2{grid-column:1 / -1}
-
     .chartBox{position:relative;height:320px;min-height:320px;overflow:hidden}
     .chartBox.tall{height:360px;min-height:360px}
     .chartBox.short{height:280px;min-height:280px}
@@ -85,15 +60,13 @@
 
     .status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
     .status .left{display:flex;gap:10px;align-items:center}
-
-    .grid.filters-collapsed .filtersWrap{display:none;}
-
+    .grid.filters-collapsed .filtersWrap{display:none}
     .btn.toggle{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 14px}
     .btn.toggle .arrow{display:inline-block;width:18px;text-align:center;font-weight:700;color:#64748b}
 
     @media (max-width: 1100px){
       .grid{grid-template-columns:1fr}
-      .grid.filters-collapsed{grid-template-columns:1fr;}
+      .grid.filters-collapsed{grid-template-columns:1fr}
       .kpis{grid-template-columns:repeat(2,1fr)}
       .charts{grid-template-columns:1fr}
       .charts .span2{grid-column:auto}
@@ -168,13 +141,22 @@
             <div class="hd"><h3 style="margin:0">아이템별 (목표/실적/달성율)</h3></div>
             <div class="bd"><div class="chartBox tall"><canvas id="chItem"></canvas></div></div>
           </div>
-          <div class="card span2">
-            <div class="hd"><h3 style="margin:0">방송채널별 평균 수수료율 / 이익합계</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chFeeProfitChannel"></canvas></div></div>
+
+          <div class="card">
+            <div class="hd"><h3 style="margin:0">방송채널별 이익</h3></div>
+            <div class="bd"><div class="chartBox tall"><canvas id="chProfitChannel"></canvas></div></div>
           </div>
-          <div class="card span2">
-            <div class="hd"><h3 style="margin:0">아이템별 평균 수수료율 / 이익합계</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chFeeProfitItem"></canvas></div></div>
+          <div class="card">
+            <div class="hd"><h3 style="margin:0">아이템별 이익</h3></div>
+            <div class="bd"><div class="chartBox tall"><canvas id="chProfitItem"></canvas></div></div>
+          </div>
+          <div class="card">
+            <div class="hd"><h3 style="margin:0">방송채널별 수수료율</h3></div>
+            <div class="bd"><div class="chartBox tall"><canvas id="chFeeChannel"></canvas></div></div>
+          </div>
+          <div class="card">
+            <div class="hd"><h3 style="margin:0">아이템별 수수료율</h3></div>
+            <div class="bd"><div class="chartBox tall"><canvas id="chFeeItem"></canvas></div></div>
           </div>
         </div>
       </div>
@@ -182,7 +164,7 @@
   </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzM2EF4VXF_NMpxftflHUSZ0I_QAB5e-g5aKX9npX5SuZYwH1EikQagMNlhwQAy13xm9A/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyFHntbLbgIIikumPnCryAw9ZRJgzdoW8p_uzjf7NGW_2wq-BXZrOHT0X3lxaNLQdR7BA/exec";
 const DEFAULT_KEY = "WHHS-PSM-221035";
 const FILTER_UI_KEY = "dash_filters_collapsed";
 const DOW_ORDER = ['일','월','화','수','목','금','토'];
@@ -192,7 +174,10 @@ const store = {
   filters: { years:[], months:[], days:[], dows:[], items:[], channels:[] },
   options: null,
   availableOptions: null,
-  charts: { channel:null, month:null, dow:null, day:null, item:null, feeProfitChannel:null, feeProfitItem:null },
+  charts: {
+    channel:null, month:null, dow:null, day:null, item:null,
+    profitChannel:null, profitItem:null, feeChannel:null, feeItem:null
+  },
   renderQueued: false,
   lastData: null,
 };
@@ -242,7 +227,6 @@ function setStatus(ok, msg){
   elStatusPill.style.color = ok ? '#166534' : '#b91c1c';
   elStatusText.style.color = ok ? '#166534' : '#b91c1c';
 }
-
 function toNumberSafe(v){
   if (v === null || v === undefined) return 0;
   if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
@@ -280,7 +264,6 @@ function normalizeRateArray(arr){
     return n <= 1.5 ? n * 100 : n;
   });
 }
-
 function jsonp(url){
   return new Promise((resolve,reject)=>{
     const cb = "CB_" + Math.random().toString(36).slice(2);
@@ -299,7 +282,6 @@ function jsonp(url){
     setTimeout(()=>{ cleanup(); reject(new Error("JSONP timeout")); }, 20000);
   });
 }
-
 async function apiFetch(action){
   if (!API_URL) throw new Error("API_URL을 설정해야 합니다.");
   if (!store.key) throw new Error("키가 없습니다. 우측 상단 '키 변경'에서 입력하세요.");
@@ -414,8 +396,15 @@ function renderFilters(){
 function destroyChart(ch){ if (ch && typeof ch.destroy === 'function') ch.destroy(); }
 function canvasIdMap(id){
   return {
-    chChannel:'channel', chMonth:'month', chDow:'dow', chDay:'day', chItem:'item',
-    chFeeProfitChannel:'feeProfitChannel', chFeeProfitItem:'feeProfitItem'
+    chChannel:'channel',
+    chMonth:'month',
+    chDow:'dow',
+    chDay:'day',
+    chItem:'item',
+    chProfitChannel:'profitChannel',
+    chProfitItem:'profitItem',
+    chFeeChannel:'feeChannel',
+    chFeeItem:'feeItem'
   }[id];
 }
 function prepareCanvas(canvasId){
@@ -467,19 +456,17 @@ function makeComboChart(canvasId, labels, goal, actual, ratePct, count){
   });
 }
 
-function makeFeeProfitChart(canvasId, labels, avgFeeRate, profitSum, count){
+function makeProfitChart(canvasId, labels, profitSum, count){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
   const canvas = prepareCanvas(canvasId);
-  const fee100 = normalizeRateArray(avgFeeRate);
   const profitArr = safeArr(profitSum).map(toNumberSafe);
 
   store.charts[key] = new Chart(canvas, {
     data: {
       labels: safeArr(labels),
       datasets: [
-        { type:'bar', label:'이익합계', data: profitArr, yAxisID:'y', borderWidth:0, barPercentage:.8, categoryPercentage:.7 },
-        { type:'line', label:'평균 수수료율(%)', data: fee100, yAxisID:'y1', tension:0.25, pointRadius:3, pointHoverRadius:6 }
+        { type:'bar', label:'이익합계', data: profitArr, yAxisID:'y', borderWidth:0, barPercentage:.75, categoryPercentage:.7 }
       ]
     },
     options: {
@@ -487,22 +474,58 @@ function makeFeeProfitChart(canvasId, labels, avgFeeRate, profitSum, count){
       plugins:{
         legend:{ position:'top' },
         tooltip:{
-          intersect:false, mode:'index',
+          intersect:false,
+          mode:'index',
+          callbacks:{ afterBody:(items)=>{
+            const i = items?.[0]?.dataIndex ?? -1;
+            if (i<0) return '';
+            return [`방송횟수: ${fmt(count?.[i] ?? 0)}`, `이익합계: ${fmt(profitArr?.[i] ?? 0, 0)}`];
+          }}
+        }
+      },
+      scales:{ y:{ beginAtZero:false, ticks:{ callback:(v)=> fmt(v) } } }
+    }
+  });
+}
+
+function makeFeeStatsChart(canvasId, labels, avgFeeRate, minFeeRate, maxFeeRate, count){
+  const key = canvasIdMap(canvasId);
+  destroyChart(store.charts[key]);
+  const canvas = prepareCanvas(canvasId);
+
+  const avg100 = normalizeRateArray(avgFeeRate);
+  const min100 = normalizeRateArray(minFeeRate);
+  const max100 = normalizeRateArray(maxFeeRate);
+
+  store.charts[key] = new Chart(canvas, {
+    data: {
+      labels: safeArr(labels),
+      datasets: [
+        { type:'line', label:'최고 수수료율(%)', data:max100, yAxisID:'y', tension:.25, pointRadius:3, pointHoverRadius:6 },
+        { type:'line', label:'평균 수수료율(%)', data:avg100, yAxisID:'y', tension:.25, pointRadius:3, pointHoverRadius:6 },
+        { type:'line', label:'최저 수수료율(%)', data:min100, yAxisID:'y', tension:.25, pointRadius:3, pointHoverRadius:6 }
+      ]
+    },
+    options: {
+      responsive:false, maintainAspectRatio:false, animation:false,
+      plugins:{
+        legend:{ position:'top' },
+        tooltip:{
+          intersect:false,
+          mode:'index',
           callbacks:{ afterBody:(items)=>{
             const i = items?.[0]?.dataIndex ?? -1;
             if (i<0) return '';
             return [
               `방송횟수: ${fmt(count?.[i] ?? 0)}`,
-              `평균 수수료율: ${fmtPct(fee100?.[i] ?? 0, 1)}`,
-              `이익합계: ${fmt(profitArr?.[i] ?? 0, 0)}`
+              `최고: ${fmtPct(max100?.[i] ?? 0, 1)}`,
+              `평균: ${fmtPct(avg100?.[i] ?? 0, 1)}`,
+              `최저: ${fmtPct(min100?.[i] ?? 0, 1)}`
             ];
           }}
         }
       },
-      scales:{
-        y:{ beginAtZero:true, ticks:{ callback:(v)=> fmt(v) } },
-        y1:{ beginAtZero:true, position:'right', grid:{ drawOnChartArea:false }, ticks:{ callback:(v)=> v + '%' } }
-      }
+      scales:{ y:{ beginAtZero:true, ticks:{ callback:(v)=> v + '%' } } }
     }
   });
 }
@@ -547,21 +570,37 @@ function renderFromData(data){
     const item = charts.item || {};
     makeComboChart('chItem', item.labels, item.goal, item.actual, item.ratePct, item.count);
 
-    const fpCh = charts.feeProfitChannel || charts.channel || {};
-    const fpChIdx = safeArr(fpCh.labels).map((v,i)=>[String(v), i])
+    const profitCh = charts.profitChannel || charts.channel || {};
+    const profitChIdx = safeArr(profitCh.labels).map((v,i)=>[String(v), i])
       .filter(([v])=>v && v!=='(비어있음)')
       .sort((a,b)=>a[0].localeCompare(b[0], 'en'));
-    const fpChPick = (arr)=> fpChIdx.map(([_,i])=> arr?.[i] ?? 0);
+    const profitChPick = (arr)=> profitChIdx.map(([_,i])=> arr?.[i] ?? 0);
 
-    makeFeeProfitChart('chFeeProfitChannel',
-      fpChIdx.map(x=>x[0]),
-      fpChPick(fpCh.avgFeeRate),
-      fpChPick(fpCh.profitSum),
-      fpChPick(fpCh.count)
+    makeProfitChart('chProfitChannel',
+      profitChIdx.map(x=>x[0]),
+      profitChPick(profitCh.profitSum),
+      profitChPick(profitCh.count)
     );
 
-    const fpItem = charts.feeProfitItem || charts.item || {};
-    makeFeeProfitChart('chFeeProfitItem', fpItem.labels, fpItem.avgFeeRate, fpItem.profitSum, fpItem.count);
+    const profitItem = charts.profitItem || charts.item || {};
+    makeProfitChart('chProfitItem', profitItem.labels, profitItem.profitSum, profitItem.count);
+
+    const feeCh = charts.feeChannel || charts.channel || {};
+    const feeChIdx = safeArr(feeCh.labels).map((v,i)=>[String(v), i])
+      .filter(([v])=>v && v!=='(비어있음)')
+      .sort((a,b)=>a[0].localeCompare(b[0], 'en'));
+    const feeChPick = (arr)=> feeChIdx.map(([_,i])=> arr?.[i] ?? 0);
+
+    makeFeeStatsChart('chFeeChannel',
+      feeChIdx.map(x=>x[0]),
+      feeChPick(feeCh.avgFeeRate),
+      feeChPick(feeCh.minFeeRate),
+      feeChPick(feeCh.maxFeeRate),
+      feeChPick(feeCh.count)
+    );
+
+    const feeItem = charts.feeItem || charts.item || {};
+    makeFeeStatsChart('chFeeItem', feeItem.labels, feeItem.avgFeeRate, feeItem.minFeeRate, feeItem.maxFeeRate, feeItem.count);
   });
 }
 
