@@ -9,154 +9,60 @@
 
   <style>
     :root{
-      --bg:#f5f7fb;
-      --card:#fff;
-      --line:#e6ebf4;
-      --text:#111827;
-      --muted:#6b7280;
+      --bg:#f5f7fb; --card:#fff; --line:#e6ebf4; --text:#111827; --muted:#6b7280;
       --radius:14px;
     }
-
     *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--text)}
+    .wrap{max-width:1280px;margin:18px auto;padding:0 14px}
+    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+    .title{display:flex;gap:10px;align-items:center}
+    .title h1{font-size:28px;margin:0}
+    .title p{margin:6px 0 0;color:var(--muted);font-size:13px}
 
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans KR",sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
+    .btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;cursor:pointer}
+    .btn.primary{border-color:#b8ccff;background:#eaf1ff}
+    .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;color:var(--muted);font-size:13px}
 
-    .wrap{
-      max-width:1280px;
-      margin:18px auto;
-      padding:0 14px;
-    }
+    .grid{display:grid;grid-template-columns:320px 1fr;gap:14px}
+    .grid.filters-collapsed{grid-template-columns:1fr;}
 
-    .topbar{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:12px;
-    }
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 8px 24px rgba(17,24,39,.04)}
+    .card .hd{padding:14px 14px 0}
+    .card .bd{padding:14px}
 
-    .title{
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
+    .filters .sec{margin-bottom:16px}
+    .filters .sec h3{margin:0 0 8px;font-size:14px}
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
 
-    .title h1{
-      font-size:28px;
-      margin:0;
-    }
-
-    .title p{
-      margin:6px 0 0;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .btn{
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:10px;
-      padding:9px 12px;
-      cursor:pointer;
-    }
-
-    .btn.primary{
-      border-color:#b8ccff;
-      background:#eaf1ff;
-    }
-
-    .pill{
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:999px;
-      padding:7px 10px;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:320px 1fr;
-      gap:14px;
-    }
-
-    .grid.filters-collapsed{
-      grid-template-columns:1fr;
-    }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:0 8px 24px rgba(17,24,39,.04);
-    }
-
-    .card .hd{
-      padding:14px 14px 0;
-    }
-
-    .card .bd{
-      padding:14px;
-    }
-
-    .filters .sec{
-      margin-bottom:14px;
-    }
-
-    .filters .sec h3{
-      margin:0 0 8px;
-      font-size:14px;
-    }
-
-    .chips{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
+    /* ✅ 원형 → 둥근사각형 + 비활성화 */
     .chip{
       border:1px solid var(--line);
       background:#fff;
-      border-radius:999px;
-      padding:8px 10px;
+      border-radius:12px;
+      padding:8px 11px;
+      min-width:46px;
+      text-align:center;
       font-size:12px;
       cursor:pointer;
       user-select:none;
+      transition:.12s ease;
     }
-
-    .chip.on{
-      border-color:#7aa3ff;
-      background:#eaf1ff;
+    .chip:hover{border-color:#9bb8ff;background:#f7faff}
+    .chip.on{border-color:#7aa3ff;background:#eaf1ff;color:#1746a2;font-weight:700}
+    .chip.disabled{
+      opacity:.32;
+      background:#f3f4f6;
+      color:#9ca3af;
+      cursor:not-allowed;
+      text-decoration:line-through;
     }
+    .chip.disabled:hover{border-color:var(--line);background:#f3f4f6}
 
-    .filters .sec .tools{
-      display:flex;
-      gap:8px;
-      margin-left:auto;
-    }
+    .filters .sec .tools{display:flex;gap:8px;margin-left:auto}
+    .filters .sec .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 
-    .filters .sec .row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-
-    /* ✅ KPI 카드 폰트 축소 */
-    .kpis{
-      display:grid;
-      grid-template-columns:repeat(8,1fr);
-      gap:10px;
-    }
-
+    .kpis{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}
     .kpi{
       background:#eaf1ff;
       border-radius:14px;
@@ -166,130 +72,34 @@
       flex-direction:column;
       justify-content:flex-start;
     }
+    .kpi .k{font-size:11px;color:#475569;line-height:1.35;word-break:keep-all}
+    .kpi .v{font-size:16px;font-weight:800;margin-top:8px;line-height:1.35;word-break:keep-all}
 
-    .kpi .k{
-      font-size:11px;
-      color:#475569;
-      line-height:1.35;
-      word-break:keep-all;
-    }
+    .charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
+    .charts .span2{grid-column:1 / -1}
 
-    .kpi .v{
-      font-size:16px;
-      font-weight:800;
-      margin-top:8px;
-      line-height:1.35;
-      word-break:keep-all;
-    }
+    .chartBox{position:relative;height:320px;min-height:320px;overflow:hidden}
+    .chartBox.tall{height:360px;min-height:360px}
+    .chartBox.short{height:280px;min-height:280px}
+    .chartBox canvas{position:absolute;inset:0;display:block}
 
-    .charts{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      align-items:stretch;
-    }
+    .status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .status .left{display:flex;gap:10px;align-items:center}
 
-    .charts .span2{
-      grid-column:1 / -1;
-    }
+    .grid.filters-collapsed .filtersWrap{display:none;}
 
-    .chartBox{
-      position:relative;
-      height:320px;
-      min-height:320px;
-      overflow:hidden;
-    }
-
-    .chartBox.tall{
-      height:360px;
-      min-height:360px;
-    }
-
-    .chartBox.short{
-      height:280px;
-      min-height:280px;
-    }
-
-    .chartBox canvas{
-      position:absolute;
-      inset:0;
-      display:block;
-    }
-
-    .status{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:10px;
-    }
-
-    .status .left{
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-
-    .grid.filters-collapsed .filtersWrap{
-      display:none;
-    }
-
-    .btn.toggle{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      border-radius:999px;
-      padding:9px 14px;
-    }
-
-    .btn.toggle .arrow{
-      display:inline-block;
-      width:18px;
-      text-align:center;
-      font-weight:700;
-      color:#64748b;
-    }
+    .btn.toggle{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 14px}
+    .btn.toggle .arrow{display:inline-block;width:18px;text-align:center;font-weight:700;color:#64748b}
 
     @media (max-width: 1100px){
-      .grid{
-        grid-template-columns:1fr;
-      }
-
-      .grid.filters-collapsed{
-        grid-template-columns:1fr;
-      }
-
-      .kpis{
-        grid-template-columns:repeat(2,1fr);
-      }
-
-      .charts{
-        grid-template-columns:1fr;
-      }
-
-      .charts .span2{
-        grid-column:auto;
-      }
-
-      .chartBox,
-      .chartBox.tall,
-      .chartBox.short{
-        height:320px;
-        min-height:320px;
-      }
-
-      .kpi{
-        min-height:100px;
-        padding:12px 10px;
-      }
-
-      .kpi .k{
-        font-size:11px;
-      }
-
-      .kpi .v{
-        font-size:17px;
-      }
+      .grid{grid-template-columns:1fr}
+      .grid.filters-collapsed{grid-template-columns:1fr;}
+      .kpis{grid-template-columns:repeat(2,1fr)}
+      .charts{grid-template-columns:1fr}
+      .charts .span2{grid-column:auto}
+      .chartBox,.chartBox.tall,.chartBox.short{height:320px;min-height:320px}
+      .kpi{min-height:100px}
+      .kpi .v{font-size:17px}
     }
   </style>
 </head>
@@ -307,12 +117,10 @@
 
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
         <span class="pill" id="statusPill">상태: -</span>
-
         <button class="btn toggle" id="btnToggleFilters" title="필터를 접거나 펼칩니다">
           <span class="arrow" id="toggleArrow">▾</span>
           <span id="toggleLabel">필터 접기</span>
         </button>
-
         <button class="btn" id="btnReset">전체 해제</button>
         <button class="btn primary" id="btnRefresh">새로고침</button>
         <button class="btn" id="btnKey">키 변경</button>
@@ -324,7 +132,7 @@
         <div class="hd"><h3 style="margin:0;font-size:16px">필터(슬라이서)</h3></div>
         <div class="bd" id="filters"></div>
         <div class="bd" style="padding-top:0;color:var(--muted);font-size:12px">
-          ※ 키를 모르면 데이터를 불러올 수 없습니다.
+          ※ 선택 조건에 데이터가 없는 값은 자동으로 비활성화됩니다.
         </div>
       </div>
 
@@ -332,12 +140,9 @@
         <div class="card" style="margin-bottom:14px">
           <div class="bd">
             <div class="status">
-              <div class="left">
-                <span class="pill" id="statusText">상태: -</span>
-              </div>
+              <div class="left"><span class="pill" id="statusText">상태: -</span></div>
               <div style="color:var(--muted);font-size:13px" id="updatedText">업데이트: -</div>
             </div>
-
             <div class="kpis" id="kpis"></div>
           </div>
         </div>
@@ -345,37 +150,31 @@
         <div class="charts">
           <div class="card">
             <div class="hd"><h3 style="margin:0">방송채널별 (목표/실적/달성율)</h3></div>
-            <div class="bd"><div class="chartBox" id="boxChannel"><canvas id="chChannel"></canvas></div></div>
+            <div class="bd"><div class="chartBox"><canvas id="chChannel"></canvas></div></div>
           </div>
-
           <div class="card">
             <div class="hd"><h3 style="margin:0">월별 (목표/실적/달성율)</h3></div>
-            <div class="bd"><div class="chartBox" id="boxMonth"><canvas id="chMonth"></canvas></div></div>
+            <div class="bd"><div class="chartBox"><canvas id="chMonth"></canvas></div></div>
           </div>
-
           <div class="card">
             <div class="hd"><h3 style="margin:0">요일별 (목표/실적/달성율)</h3></div>
-            <div class="bd"><div class="chartBox short" id="boxDow"><canvas id="chDow"></canvas></div></div>
+            <div class="bd"><div class="chartBox short"><canvas id="chDow"></canvas></div></div>
           </div>
-
           <div class="card">
             <div class="hd"><h3 style="margin:0">일자별 (목표/실적/달성율) - TOP 30</h3></div>
-            <div class="bd"><div class="chartBox tall" id="boxDay"><canvas id="chDay"></canvas></div></div>
+            <div class="bd"><div class="chartBox tall"><canvas id="chDay"></canvas></div></div>
           </div>
-
           <div class="card span2">
             <div class="hd"><h3 style="margin:0">아이템별 (목표/실적/달성율)</h3></div>
-            <div class="bd"><div class="chartBox tall" id="boxItem"><canvas id="chItem"></canvas></div></div>
+            <div class="bd"><div class="chartBox tall"><canvas id="chItem"></canvas></div></div>
           </div>
-
           <div class="card span2">
             <div class="hd"><h3 style="margin:0">방송채널별 평균 수수료율 / 이익합계</h3></div>
-            <div class="bd"><div class="chartBox tall" id="boxFeeProfitChannel"><canvas id="chFeeProfitChannel"></canvas></div></div>
+            <div class="bd"><div class="chartBox tall"><canvas id="chFeeProfitChannel"></canvas></div></div>
           </div>
-
           <div class="card span2">
             <div class="hd"><h3 style="margin:0">아이템별 평균 수수료율 / 이익합계</h3></div>
-            <div class="bd"><div class="chartBox tall" id="boxFeeProfitItem"><canvas id="chFeeProfitItem"></canvas></div></div>
+            <div class="bd"><div class="chartBox tall"><canvas id="chFeeProfitItem"></canvas></div></div>
           </div>
         </div>
       </div>
@@ -383,31 +182,17 @@
   </div>
 
 <script>
-/** =========================
- *  설정값
- *  ========================= */
-const API_URL = "https://script.google.com/macros/s/AKfycbzIJQH0DC0bMKmaiBTityyQZxwqxUkJpcAIFLR8TPqHTuohBErhDkAzrg1vHI6vhHlKMg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzM2EF4VXF_NMpxftflHUSZ0I_QAB5e-g5aKX9npX5SuZYwH1EikQagMNlhwQAy13xm9A/exec";
 const DEFAULT_KEY = "WHHS-PSM-221035";
 const FILTER_UI_KEY = "dash_filters_collapsed";
-
-/** =========================
- *  State
- *  ========================= */
 const DOW_ORDER = ['일','월','화','수','목','금','토'];
 
 const store = {
   key: localStorage.getItem('dash_key') || DEFAULT_KEY,
   filters: { years:[], months:[], days:[], dows:[], items:[], channels:[] },
   options: null,
-  charts: { 
-    channel:null,
-    month:null,
-    dow:null,
-    day:null,
-    item:null,
-    feeProfitChannel:null,
-    feeProfitItem:null
-  },
+  availableOptions: null,
+  charts: { channel:null, month:null, dow:null, day:null, item:null, feeProfitChannel:null, feeProfitItem:null },
   renderQueued: false,
   lastData: null,
 };
@@ -418,9 +203,6 @@ const elUpdated = document.getElementById('updatedText');
 const elFilters = document.getElementById('filters');
 const elKpis = document.getElementById('kpis');
 
-/** =========================
- *  필터 여닫기 UI
- *  ========================= */
 const gridRoot = document.getElementById("gridRoot");
 const btnToggleFilters = document.getElementById("btnToggleFilters");
 const toggleLabel = document.getElementById("toggleLabel");
@@ -432,29 +214,13 @@ function setFiltersCollapsed(collapsed){
 
   toggleLabel.textContent = collapsed ? "필터 펼치기" : "필터 접기";
   toggleArrow.textContent = collapsed ? "▸" : "▾";
-
   localStorage.setItem(FILTER_UI_KEY, collapsed ? "1" : "0");
 
-  requestAnimationFrame(()=> {
-    requestAnimationFrame(()=> {
-      if (store.lastData) renderFromData(store.lastData);
-    });
-  });
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ if (store.lastData) renderFromData(store.lastData); }));
 }
+btnToggleFilters.addEventListener("click", ()=>setFiltersCollapsed(!gridRoot.classList.contains("filters-collapsed")));
+(function initFiltersCollapsed(){ setFiltersCollapsed(localStorage.getItem(FILTER_UI_KEY) === "1"); })();
 
-btnToggleFilters.addEventListener("click", ()=>{
-  const collapsed = gridRoot.classList.contains("filters-collapsed");
-  setFiltersCollapsed(!collapsed);
-});
-
-(function initFiltersCollapsed(){
-  const saved = localStorage.getItem(FILTER_UI_KEY);
-  setFiltersCollapsed(saved === "1");
-})();
-
-/** =========================
- *  Buttons
- *  ========================= */
 document.getElementById('btnKey').addEventListener('click', () => {
   const k = prompt("접속 키를 입력하세요", store.key || "");
   if (k == null) return;
@@ -462,18 +228,13 @@ document.getElementById('btnKey').addEventListener('click', () => {
   localStorage.setItem('dash_key', store.key);
   loadAll(true);
 });
-
 document.getElementById('btnRefresh').addEventListener('click', ()=> loadAll(true));
-
 document.getElementById('btnReset').addEventListener('click', ()=>{
   store.filters = { years:[], months:[], days:[], dows:[], items:[], channels:[] };
   renderFilters();
   loadAll(true);
 });
 
-/** =========================
- *  Helpers
- *  ========================= */
 function setStatus(ok, msg){
   const t = ok ? `상태: 정상 · ${msg}` : `상태: 오류 · ${msg}`;
   elStatusPill.textContent = t;
@@ -485,55 +246,34 @@ function setStatus(ok, msg){
 function toNumberSafe(v){
   if (v === null || v === undefined) return 0;
   if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
-
   let s = String(v).trim();
   if (!s || s === '-') return 0;
-
   s = s.replace(/\s/g,'').replace(/,/g,'').replace(/[^0-9.\-]/g,'');
-
   const m = s.match(/^(-?\d+)\.(\d{3})$/);
   if (m) s = m[1] + m[2];
-
   const n = Number(s);
   return Number.isFinite(n) ? n : 0;
 }
-
-function fmt(n, d=0){
-  const x = toNumberSafe(n);
-  return x.toLocaleString(undefined,{maximumFractionDigits:d});
-}
-
+function fmt(n, d=0){ return toNumberSafe(n).toLocaleString(undefined,{maximumFractionDigits:d}); }
 function fmtPct(p, d=1){
   let v = toNumberSafe(p);
   if (v <= 1.5) v = v * 100;
   return `${v.toFixed(d)}%`;
 }
-
 function qs(obj){
   const u = new URLSearchParams();
   Object.entries(obj).forEach(([k,v])=>{
-    if (Array.isArray(v) && v.length){
-      u.set(k, v.join(','));
-    } else if (v !== undefined && v !== null && v !== '' && !(Array.isArray(v) && !v.length)) {
-      u.set(k, v);
-    }
+    if (Array.isArray(v) && v.length) u.set(k, v.join(','));
+    else if (v !== undefined && v !== null && v !== '' && !(Array.isArray(v) && !v.length)) u.set(k, v);
   });
   return u.toString();
 }
-
 function debounceRender(fn){
   if (store.renderQueued) return;
   store.renderQueued = true;
-  requestAnimationFrame(()=>{
-    store.renderQueued = false;
-    fn();
-  });
+  requestAnimationFrame(()=>{ store.renderQueued = false; fn(); });
 }
-
-function safeArr(a){
-  return Array.isArray(a) ? a : [];
-}
-
+function safeArr(a){ return Array.isArray(a) ? a : []; }
 function normalizeRateArray(arr){
   return safeArr(arr).map(v=>{
     const n = toNumberSafe(v);
@@ -541,28 +281,21 @@ function normalizeRateArray(arr){
   });
 }
 
-/** =========================
- *  API
- *  ========================= */
 function jsonp(url){
   return new Promise((resolve,reject)=>{
     const cb = "CB_" + Math.random().toString(36).slice(2);
     const s = document.createElement('script');
     let done = false;
-
     const cleanup = () => {
       if (done) return;
       done = true;
       try { delete window[cb]; } catch(e){}
       s.remove();
     };
-
     window[cb] = (data) => { cleanup(); resolve(data); };
     s.onerror = () => { cleanup(); reject(new Error("JSONP load failed")); };
-
     s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
     document.body.appendChild(s);
-
     setTimeout(()=>{ cleanup(); reject(new Error("JSONP timeout")); }, 20000);
   });
 }
@@ -581,34 +314,27 @@ async function apiFetch(action){
     items: store.filters.items,
     channels: store.filters.channels,
   };
-
-  const url = `${API_URL}?${qs(payload)}`;
-  const res = await jsonp(url);
-
+  const res = await jsonp(`${API_URL}?${qs(payload)}`);
   if (!res || res.ok === false) throw new Error(res?.message || "API error");
   return res;
 }
 
-/** =========================
- *  UI: Filters
- *  ========================= */
 function toggleInList(list, v){
   const i = list.indexOf(v);
   if (i>=0) list.splice(i,1);
   else list.push(v);
 }
-
-function sortMonth(arr){ 
-  return [...arr].map(Number).sort((a,b)=>a-b).map(String); 
-}
-
-function sortDay(arr){ 
-  return [...arr].map(Number).sort((a,b)=>a-b).map(String); 
-}
-
+function sortMonth(arr){ return [...arr].map(Number).sort((a,b)=>a-b).map(String); }
+function sortDay(arr){ return [...arr].map(Number).sort((a,b)=>a-b).map(String); }
 function sortDow(arr){
   const set = new Set(arr);
   return DOW_ORDER.filter(x=>set.has(x));
+}
+function sortedValues(key, values){
+  if (key === 'months') return sortMonth(values||[]);
+  if (key === 'days') return sortDay(values||[]);
+  if (key === 'dows') return sortDow(values||[]);
+  return (values||[]).filter(v=>v && v!=='(비어있음)').sort((a,b)=>String(a).localeCompare(String(b),'ko'));
 }
 
 function renderFilters(){
@@ -618,18 +344,21 @@ function renderFilters(){
   }
 
   const opts = store.options;
+  const available = store.availableOptions || opts;
 
   const sections = [
-    { key:'years', label:'연도', values: opts.years || [] },
-    { key:'months', label:'월', values: sortMonth(opts.months||[]) },
-    { key:'days', label:'일', values: sortDay(opts.days||[]) },
-    { key:'dows', label:'요일', values: sortDow(opts.dows||[]) },
-    { key:'items', label:'아이템', values: (opts.items||[]).filter(v=>v && v!=='(비어있음)') },
-    { key:'channels', label:'방송채널', values: (opts.channels||[]).filter(v=>v && v!=='(비어있음)').sort((a,b)=>String(a).localeCompare(String(b))) },
+    { key:'years', label:'연도', values: sortedValues('years', opts.years) },
+    { key:'months', label:'월', values: sortedValues('months', opts.months) },
+    { key:'days', label:'일', values: sortedValues('days', opts.days) },
+    { key:'dows', label:'요일', values: sortedValues('dows', opts.dows) },
+    { key:'items', label:'아이템', values: sortedValues('items', opts.items) },
+    { key:'channels', label:'방송채널', values: sortedValues('channels', opts.channels) },
   ];
 
   elFilters.innerHTML = sections.map(sec=>{
     const sel = store.filters[sec.key] || [];
+    const availSet = new Set((available[sec.key] || []).map(String));
+
     return `
       <div class="sec">
         <div class="row">
@@ -641,8 +370,10 @@ function renderFilters(){
         </div>
         <div class="chips">
           ${sec.values.map(v=>{
-            const on = sel.includes(String(v));
-            return `<div class="chip ${on?'on':''}" data-key="${sec.key}" data-val="${String(v)}">${String(v)}</div>`;
+            const sv = String(v);
+            const on = sel.includes(sv);
+            const disabled = !on && !availSet.has(sv);
+            return `<div class="chip ${on?'on':''} ${disabled?'disabled':''}" data-key="${sec.key}" data-val="${sv}" data-disabled="${disabled ? '1':'0'}">${sv}</div>`;
           }).join('')}
         </div>
       </div>
@@ -651,6 +382,7 @@ function renderFilters(){
 
   elFilters.querySelectorAll('.chip').forEach(ch=>{
     ch.addEventListener('click', ()=>{
+      if (ch.dataset.disabled === '1') return;
       const k = ch.dataset.key;
       const v = ch.dataset.val;
       toggleInList(store.filters[k], v);
@@ -666,8 +398,12 @@ function renderFilters(){
       const sec = sections.find(s=>s.key===k);
       if (!sec) return;
 
-      if (act==='all') store.filters[k] = sec.values.map(String);
-      else store.filters[k] = [];
+      if (act==='all') {
+        const availSet = new Set((available[k] || []).map(String));
+        store.filters[k] = sec.values.map(String).filter(v=>availSet.has(v));
+      } else {
+        store.filters[k] = [];
+      }
 
       renderFilters();
       loadAll(false);
@@ -675,216 +411,114 @@ function renderFilters(){
   });
 }
 
-/** =========================
- *  Charts
- *  ========================= */
-function destroyChart(ch){
-  if (ch && typeof ch.destroy === 'function') ch.destroy();
-}
-
+function destroyChart(ch){ if (ch && typeof ch.destroy === 'function') ch.destroy(); }
 function canvasIdMap(id){
   return {
-    chChannel:'channel',
-    chMonth:'month',
-    chDow:'dow',
-    chDay:'day',
-    chItem:'item',
-    chFeeProfitChannel:'feeProfitChannel',
-    chFeeProfitItem:'feeProfitItem'
+    chChannel:'channel', chMonth:'month', chDow:'dow', chDay:'day', chItem:'item',
+    chFeeProfitChannel:'feeProfitChannel', chFeeProfitItem:'feeProfitItem'
   }[id];
 }
-
 function prepareCanvas(canvasId){
   const canvas = document.getElementById(canvasId);
   const box = canvas.parentElement;
   const rect = box.getBoundingClientRect();
   const w = Math.max(10, Math.floor(rect.width));
   const h = Math.max(10, Math.floor(rect.height));
-
   canvas.style.width = w + "px";
   canvas.style.height = h + "px";
   canvas.width = w;
   canvas.height = h;
-
   return canvas;
 }
 
 function makeComboChart(canvasId, labels, goal, actual, ratePct, count){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
-
   const canvas = prepareCanvas(canvasId);
-
   const rate100 = normalizeRateArray(ratePct);
 
-  const c = new Chart(canvas, {
+  store.charts[key] = new Chart(canvas, {
     data: {
       labels: safeArr(labels),
       datasets: [
-        { 
-          type:'bar', 
-          label:'목표(합계)', 
-          data: safeArr(goal), 
-          yAxisID:'y', 
-          borderWidth:0, 
-          barPercentage:.8, 
-          categoryPercentage:.7 
-        },
-        { 
-          type:'bar', 
-          label:'실적(합계)', 
-          data: safeArr(actual), 
-          yAxisID:'y', 
-          borderWidth:0, 
-          barPercentage:.8, 
-          categoryPercentage:.7 
-        },
-        { 
-          type:'line', 
-          label:'달성율(%)', 
-          data: rate100, 
-          yAxisID:'y1', 
-          tension:0.25, 
-          pointRadius:3, 
-          pointHoverRadius:6 
-        }
+        { type:'bar', label:'목표(합계)', data: safeArr(goal), yAxisID:'y', borderWidth:0, barPercentage:.8, categoryPercentage:.7 },
+        { type:'bar', label:'실적(합계)', data: safeArr(actual), yAxisID:'y', borderWidth:0, barPercentage:.8, categoryPercentage:.7 },
+        { type:'line', label:'달성율(%)', data: rate100, yAxisID:'y1', tension:0.25, pointRadius:3, pointHoverRadius:6 }
       ]
     },
     options: {
-      responsive:false,
-      maintainAspectRatio:false,
-      animation:false,
+      responsive:false, maintainAspectRatio:false, animation:false,
       plugins:{
         legend:{ position:'top' },
         tooltip:{
-          intersect:false,
-          mode:'index',
-          callbacks:{
-            afterBody:(items)=>{
-              const i = items?.[0]?.dataIndex ?? -1;
-              if (i<0) return '';
-              return [
-                `방송횟수: ${fmt(count?.[i] ?? 0)}`,
-                `달성율: ${fmtPct(rate100?.[i] ?? 0, 1)}`
-              ];
-            }
-          }
+          intersect:false, mode:'index',
+          callbacks:{ afterBody:(items)=>{
+            const i = items?.[0]?.dataIndex ?? -1;
+            if (i<0) return '';
+            return [`방송횟수: ${fmt(count?.[i] ?? 0)}`, `달성율: ${fmtPct(rate100?.[i] ?? 0, 1)}`];
+          }}
         }
       },
       scales:{
-        y:{ 
-          beginAtZero:true,
-          ticks:{ callback:(v)=> fmt(v) }
-        },
-        y1:{
-          beginAtZero:true,
-          position:'right',
-          grid:{ drawOnChartArea:false },
-          ticks:{ callback:(v)=> v + '%' }
-        }
+        y:{ beginAtZero:true, ticks:{ callback:(v)=> fmt(v) } },
+        y1:{ beginAtZero:true, position:'right', grid:{ drawOnChartArea:false }, ticks:{ callback:(v)=> v + '%' } }
       }
     }
   });
-
-  store.charts[key] = c;
 }
 
 function makeFeeProfitChart(canvasId, labels, avgFeeRate, profitSum, count){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
-
   const canvas = prepareCanvas(canvasId);
-
   const fee100 = normalizeRateArray(avgFeeRate);
   const profitArr = safeArr(profitSum).map(toNumberSafe);
 
-  const c = new Chart(canvas, {
+  store.charts[key] = new Chart(canvas, {
     data: {
       labels: safeArr(labels),
       datasets: [
-        { 
-          type:'bar', 
-          label:'이익합계', 
-          data: profitArr, 
-          yAxisID:'y', 
-          borderWidth:0, 
-          barPercentage:.8, 
-          categoryPercentage:.7 
-        },
-        { 
-          type:'line', 
-          label:'평균 수수료율(%)', 
-          data: fee100, 
-          yAxisID:'y1', 
-          tension:0.25, 
-          pointRadius:3, 
-          pointHoverRadius:6 
-        }
+        { type:'bar', label:'이익합계', data: profitArr, yAxisID:'y', borderWidth:0, barPercentage:.8, categoryPercentage:.7 },
+        { type:'line', label:'평균 수수료율(%)', data: fee100, yAxisID:'y1', tension:0.25, pointRadius:3, pointHoverRadius:6 }
       ]
     },
     options: {
-      responsive:false,
-      maintainAspectRatio:false,
-      animation:false,
+      responsive:false, maintainAspectRatio:false, animation:false,
       plugins:{
         legend:{ position:'top' },
         tooltip:{
-          intersect:false,
-          mode:'index',
-          callbacks:{
-            afterBody:(items)=>{
-              const i = items?.[0]?.dataIndex ?? -1;
-              if (i<0) return '';
-              return [
-                `방송횟수: ${fmt(count?.[i] ?? 0)}`,
-                `평균 수수료율: ${fmtPct(fee100?.[i] ?? 0, 1)}`,
-                `이익합계: ${fmt(profitArr?.[i] ?? 0, 0)}`
-              ];
-            }
-          }
+          intersect:false, mode:'index',
+          callbacks:{ afterBody:(items)=>{
+            const i = items?.[0]?.dataIndex ?? -1;
+            if (i<0) return '';
+            return [
+              `방송횟수: ${fmt(count?.[i] ?? 0)}`,
+              `평균 수수료율: ${fmtPct(fee100?.[i] ?? 0, 1)}`,
+              `이익합계: ${fmt(profitArr?.[i] ?? 0, 0)}`
+            ];
+          }}
         }
       },
       scales:{
-        y:{ 
-          beginAtZero:true,
-          ticks:{ callback:(v)=> fmt(v) }
-        },
-        y1:{
-          beginAtZero:true,
-          position:'right',
-          grid:{ drawOnChartArea:false },
-          ticks:{ callback:(v)=> v + '%' }
-        }
+        y:{ beginAtZero:true, ticks:{ callback:(v)=> fmt(v) } },
+        y1:{ beginAtZero:true, position:'right', grid:{ drawOnChartArea:false }, ticks:{ callback:(v)=> v + '%' } }
       }
     }
   });
-
-  store.charts[key] = c;
 }
 
-/** =========================
- *  Render
- *  ========================= */
 function renderKpis(k){
-  const specialCostNum = toNumberSafe(k?.specialCost);
-  const avgFeeRateNum = toNumberSafe(k?.avgFeeRate);
-  const profitSumNum = toNumberSafe(k?.profitSum);
-  const profitAvgNum = toNumberSafe(k?.profitAvg);
-
   const items = [
     ['방송횟수', fmt(k?.broadcastCount)],
     ['특약횟수', fmt(k?.specialCount)],
-    ['특약비용', fmt(specialCostNum, 0)],
+    ['특약비용', fmt(k?.specialCost, 0)],
     ['평균달성율', fmtPct(k?.achievementRate, 1)],
     ['방송시간(분)', fmt(k?.totalMinutes)],
     ['시간당매출', fmt(k?.salesPerHour, 2)],
-    ['평균 수수료율', fmtPct(avgFeeRateNum, 1)],
-    ['이익합계(평균)', `${fmt(profitSumNum, 0)} (${fmt(profitAvgNum, 0)})`],
+    ['평균 수수료율', fmtPct(k?.avgFeeRate, 1)],
+    ['이익합계(평균)', `${fmt(k?.profitSum, 0)} (${fmt(k?.profitAvg, 0)})`],
   ];
-
-  elKpis.innerHTML = items.map(([kk,v])=>`
-    <div class="kpi"><div class="k">${kk}</div><div class="v">${v}</div></div>
-  `).join('');
+  elKpis.innerHTML = items.map(([kk,v])=>`<div class="kpi"><div class="k">${kk}</div><div class="v">${v}</div></div>`).join('');
 }
 
 function renderFromData(data){
@@ -897,58 +531,26 @@ function renderFromData(data){
     const idx = safeArr(ch.labels).map((v,i)=>[String(v), i])
       .filter(([v])=>v && v!=='(비어있음)')
       .sort((a,b)=>a[0].localeCompare(b[0], 'en'));
-
     const pick = (arr)=> idx.map(([_,i])=> arr?.[i] ?? 0);
 
-    makeComboChart('chChannel',
-      idx.map(x=>x[0]),
-      pick(ch.goal),
-      pick(ch.actual),
-      pick(ch.ratePct),
-      pick(ch.count)
-    );
+    makeComboChart('chChannel', idx.map(x=>x[0]), pick(ch.goal), pick(ch.actual), pick(ch.ratePct), pick(ch.count));
 
     const month = charts.month || {};
-    makeComboChart('chMonth',
-      month.labels,
-      month.goal,
-      month.actual,
-      month.ratePct,
-      month.count
-    );
+    makeComboChart('chMonth', month.labels, month.goal, month.actual, month.ratePct, month.count);
 
     const dow = charts.dow || {};
-    makeComboChart('chDow',
-      dow.labels,
-      dow.goal,
-      dow.actual,
-      dow.ratePct,
-      dow.count
-    );
+    makeComboChart('chDow', dow.labels, dow.goal, dow.actual, dow.ratePct, dow.count);
 
     const day = charts.day || {};
-    makeComboChart('chDay',
-      day.labels,
-      day.goal,
-      day.actual,
-      day.ratePct,
-      day.count
-    );
+    makeComboChart('chDay', day.labels, day.goal, day.actual, day.ratePct, day.count);
 
     const item = charts.item || {};
-    makeComboChart('chItem',
-      item.labels,
-      item.goal,
-      item.actual,
-      item.ratePct,
-      item.count
-    );
+    makeComboChart('chItem', item.labels, item.goal, item.actual, item.ratePct, item.count);
 
     const fpCh = charts.feeProfitChannel || charts.channel || {};
     const fpChIdx = safeArr(fpCh.labels).map((v,i)=>[String(v), i])
       .filter(([v])=>v && v!=='(비어있음)')
       .sort((a,b)=>a[0].localeCompare(b[0], 'en'));
-
     const fpChPick = (arr)=> fpChIdx.map(([_,i])=> arr?.[i] ?? 0);
 
     makeFeeProfitChart('chFeeProfitChannel',
@@ -959,19 +561,10 @@ function renderFromData(data){
     );
 
     const fpItem = charts.feeProfitItem || charts.item || {};
-
-    makeFeeProfitChart('chFeeProfitItem',
-      fpItem.labels,
-      fpItem.avgFeeRate,
-      fpItem.profitSum,
-      fpItem.count
-    );
+    makeFeeProfitChart('chFeeProfitItem', fpItem.labels, fpItem.avgFeeRate, fpItem.profitSum, fpItem.count);
   });
 }
 
-/** =========================
- *  Main load
- *  ========================= */
 async function loadAll(force){
   try{
     setStatus(true, '로딩 중...');
@@ -984,12 +577,13 @@ async function loadAll(force){
 
     const data = await apiFetch('dashboard');
     store.lastData = data;
+    store.availableOptions = data.availableOptions || store.options;
 
     elUpdated.textContent = `업데이트: ${data.updated || '-'}`;
     setStatus(true, '필터 적용 완료');
 
+    renderFilters();
     renderFromData(data);
-
   } catch(err){
     console.error(err);
     setStatus(false, err.message || String(err));
@@ -1002,7 +596,6 @@ async function loadAll(force){
     store.key = (k || "").trim();
     localStorage.setItem('dash_key', store.key);
   }
-
   await loadAll(true);
 })();
 </script>
