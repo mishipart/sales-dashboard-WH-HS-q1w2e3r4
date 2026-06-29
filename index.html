@@ -174,17 +174,14 @@
             <div class="hd"><h3 style="margin:0">아이템별 수수료율</h3></div>
             <div class="bd"><div class="chartBox tall"><canvas id="chFeeItem"></canvas></div></div>
           </div>
-          <div class="card span2">
-            <div class="hd"><h3 style="margin:0">게스트별 수수료율</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chFeeGuest"></canvas></div></div>
-          </div>
+
         </div>
       </div>
     </div>
   </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyHS97velyCu_XVWvDhOgsJ0Tl5bdkflIK9eapmi4vxxm0DIRThVP0A_acVmYAuCSPWJw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyUweZAgDJYsMYnxiBLhY4ktAWxxL9EeUerzwpmg5q6r25zsd0IhBoJJQvevAtRaMGVtQ/exec";
 const DEFAULT_KEY = "WHHS-PSM-221035";
 const FILTER_UI_KEY = "dash_filters_collapsed";
 const DOW_ORDER = ['일','월','화','수','목','금','토'];
@@ -197,7 +194,7 @@ const store = {
   charts: {
     channel:null, month:null, dow:null, day:null, item:null, guest:null,
     profitChannel:null, profitItem:null, profitGuest:null,
-    feeChannel:null, feeItem:null, feeGuest:null
+    feeChannel:null, feeItem:null
   },
   renderQueued: false,
   lastData: null,
@@ -429,8 +426,7 @@ function canvasIdMap(id){
     chProfitItem:'profitItem',
     chProfitGuest:'profitGuest',
     chFeeChannel:'feeChannel',
-    chFeeItem:'feeItem',
-    chFeeGuest:'feeGuest'
+    chFeeItem:'feeItem'
   }[id];
 }
 function prepareCanvas(canvasId){
@@ -514,7 +510,7 @@ function makeProfitChart(canvasId, labels, profitSum, count){
   });
 }
 
-function makeFeeStatsChart(canvasId, labels, avgFeeRate, minFeeRate, maxFeeRate, count){
+function makeFeeStatsChart(canvasId, labels, avgFeeRate, minFeeRate, maxFeeRate, count, minFeeDate, maxFeeDate){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
   const canvas = prepareCanvas(canvasId);
@@ -527,9 +523,9 @@ function makeFeeStatsChart(canvasId, labels, avgFeeRate, minFeeRate, maxFeeRate,
     data: {
       labels: safeArr(labels),
       datasets: [
-        { type:'line', label:'최고 수수료율(%)', data:max100, yAxisID:'y', tension:.25, pointRadius:3, pointHoverRadius:6 },
+        { type:'line', label:'최고 수수료율(%)', data:max100, yAxisID:'y', tension:.25, pointRadius:3, pointHoverRadius:6, highestDate:safeArr(maxFeeDate) },
         { type:'line', label:'평균 수수료율(%)', data:avg100, yAxisID:'y', tension:.25, pointRadius:3, pointHoverRadius:6 },
-        { type:'line', label:'최저 수수료율(%)', data:min100, yAxisID:'y', tension:.25, pointRadius:3, pointHoverRadius:6 }
+        { type:'line', label:'최저 수수료율(%)', data:min100, yAxisID:'y', tension:.25, pointRadius:3, pointHoverRadius:6, lowestDate:safeArr(minFeeDate) }
       ]
     },
     options: {
@@ -542,11 +538,13 @@ function makeFeeStatsChart(canvasId, labels, avgFeeRate, minFeeRate, maxFeeRate,
           callbacks:{ afterBody:(items)=>{
             const i = items?.[0]?.dataIndex ?? -1;
             if (i<0) return '';
+            const highestDate = items?.[0]?.chart?.data?.datasets?.[0]?.highestDate?.[i] || '';
+            const lowestDate = items?.[0]?.chart?.data?.datasets?.[2]?.lowestDate?.[i] || '';
             return [
               `방송횟수: ${fmt(count?.[i] ?? 0)}`,
-              `최고: ${fmtPct(max100?.[i] ?? 0, 1)}`,
+              `최고: ${fmtPct(max100?.[i] ?? 0, 1)}${highestDate ? ' · ' + highestDate : ''}`,
               `평균: ${fmtPct(avg100?.[i] ?? 0, 1)}`,
-              `최저: ${fmtPct(min100?.[i] ?? 0, 1)}`
+              `최저: ${fmtPct(min100?.[i] ?? 0, 1)}${lowestDate ? ' · ' + lowestDate : ''}`
             ];
           }}
         }
@@ -628,14 +626,13 @@ function renderFromData(data){
       feeChPick(feeCh.avgFeeRate),
       feeChPick(feeCh.minFeeRate),
       feeChPick(feeCh.maxFeeRate),
-      feeChPick(feeCh.count)
+      feeChPick(feeCh.count),
+      feeChPick(feeCh.minFeeDate),
+      feeChPick(feeCh.maxFeeDate)
     );
 
     const feeItem = charts.feeItem || charts.item || {};
-    makeFeeStatsChart('chFeeItem', feeItem.labels, feeItem.avgFeeRate, feeItem.minFeeRate, feeItem.maxFeeRate, feeItem.count);
-
-    const feeGuest = charts.feeGuest || charts.guest || {};
-    makeFeeStatsChart('chFeeGuest', feeGuest.labels, feeGuest.avgFeeRate, feeGuest.minFeeRate, feeGuest.maxFeeRate, feeGuest.count);
+    makeFeeStatsChart('chFeeItem', feeItem.labels, feeItem.avgFeeRate, feeItem.minFeeRate, feeItem.maxFeeRate, feeItem.count, feeItem.minFeeDate, feeItem.maxFeeDate);
   });
 }
 
