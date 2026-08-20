@@ -685,20 +685,33 @@ document.querySelectorAll('.tabBtn').forEach(btn=>{
   btn.addEventListener('click', ()=>setActiveTab(btn.dataset.tab));
 });
 
+/** =========================
+ *  Sidebar filter UI
+ *  ========================= */
 const btnToggleFilters = document.getElementById("btnToggleFilters");
+const btnCloseSidebar = document.getElementById("btnCloseSidebar");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
 
 function setFiltersCollapsed(collapsed){
-  if (collapsed) gridRoot.classList.add("filters-collapsed");
-  else gridRoot.classList.remove("filters-collapsed");
-
-  toggleLabel.textContent = collapsed ? "필터 펼치기" : "필터 접기";
-  toggleArrow.textContent = collapsed ? "▸" : "▾";
+  document.body.classList.toggle("sidebar-collapsed", collapsed);
   localStorage.setItem(FILTER_UI_KEY, collapsed ? "1" : "0");
 
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{ if (store.lastData) renderFromData(store.lastData); }));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if (store.lastData) renderFromData(store.lastData);
+  }));
 }
-btnToggleFilters.addEventListener("click", ()=>setFiltersCollapsed(!gridRoot.classList.contains("filters-collapsed")));
-(function initFiltersCollapsed(){ setFiltersCollapsed(localStorage.getItem(FILTER_UI_KEY) === "1"); })();
+
+btnToggleFilters?.addEventListener("click", ()=>{
+  setFiltersCollapsed(!document.body.classList.contains("sidebar-collapsed"));
+});
+btnCloseSidebar?.addEventListener("click", ()=>setFiltersCollapsed(true));
+sidebarOverlay?.addEventListener("click", ()=>setFiltersCollapsed(true));
+
+(function initFiltersCollapsed(){
+  const saved = localStorage.getItem(FILTER_UI_KEY);
+  const mobile = window.matchMedia("(max-width: 900px)").matches;
+  setFiltersCollapsed(saved === "1" || mobile);
+})();
 
 document.getElementById('btnKey').addEventListener('click', () => {
   const k = prompt("접속 키를 입력하세요", store.key || "");
