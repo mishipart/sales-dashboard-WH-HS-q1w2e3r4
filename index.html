@@ -541,6 +541,39 @@
 
     .kpi .v{font-size:17px}
     }
+  
+    /* ✅ 필터 그룹 접기/펼치기 표시 강화 */
+    .filterGroupBtn{
+      position:relative;
+      border:1px solid #dbeafe !important;
+      box-shadow:0 2px 8px rgba(15,23,42,.04);
+    }
+    .filterGroupBtn::after{
+      content:"접기";
+      font-size:10px;
+      font-weight:800;
+      color:#64748b;
+      background:#fff;
+      border:1px solid #dbe3ef;
+      border-radius:999px;
+      padding:3px 7px;
+      margin-left:auto;
+    }
+    .filterGroup.collapsed .filterGroupBtn::after{
+      content:"펼치기";
+    }
+    .filterGroupArrow{
+      font-size:13px !important;
+      font-weight:900 !important;
+      border:1px solid #cbd5e1;
+    }
+    .filterGroup.collapsed .filterGroupArrow{
+      transform:rotate(-90deg);
+      background:#eaf1ff;
+      color:#1746a2;
+      border-color:#9bb8ff;
+    }
+
   </style>
 </head>
 
@@ -995,11 +1028,11 @@ function renderFilters(){
 
     return `
       <div class="filterGroup ${groupCollapsed ? 'collapsed' : ''}" data-group="${group.key}">
-        <button class="filterGroupBtn" type="button" data-group-toggle="${group.key}">
+        <button class="filterGroupBtn" type="button" data-group-toggle="${group.key}" title="클릭하면 이 필터 구간을 접거나 펼칩니다">
           <span class="filterGroupTitle">${group.title}</span>
           <span class="filterGroupMeta">
             ${selectedCount ? `<span>선택 ${selectedCount}</span>` : ''}
-            <span class="filterGroupArrow">▾</span>
+            <span class="filterGroupArrow">⌄</span>
           </span>
         </button>
         <div class="filterGroupBody">
