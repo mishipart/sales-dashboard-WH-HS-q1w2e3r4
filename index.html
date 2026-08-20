@@ -9,114 +9,490 @@
 
   <style>
     :root{
-      --bg:#f5f7fb; --card:#fff; --line:#e6ebf4; --text:#111827; --muted:#6b7280;
-      --radius:14px;
+      --bg:#f3f6fb;
+      --surface:#ffffff;
+      --surface2:#f8fafc;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#e2e8f0;
+      --line2:#d9e2ef;
+      --brand:#155e75;
+      --brand2:#0f4f67;
+      --brandSoft:#e6f4f8;
+      --blueSoft:#eaf1ff;
+      --danger:#b91c1c;
+      --success:#166534;
+      --shadow:0 12px 30px rgba(15,23,42,.06);
+      --shadow2:0 8px 22px rgba(15,23,42,.08);
+      --radius:18px;
+      --sidebar:304px;
     }
+
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--text)}
-    .wrap{max-width:1280px;margin:18px auto;padding:0 14px}
-    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
-    .title{display:flex;gap:10px;align-items:center}
-    .title h1{font-size:28px;margin:0}
-    .title p{margin:6px 0 0;color:var(--muted);font-size:13px}
-
-    .btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;cursor:pointer}
-    .btn.primary{border-color:#b8ccff;background:#eaf1ff}
-    .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;color:var(--muted);font-size:13px}
-
-    .grid{display:grid;grid-template-columns:320px 1fr;gap:14px}
-    .grid.filters-collapsed{grid-template-columns:1fr;}
-
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 8px 24px rgba(17,24,39,.04)}
-    .card .hd{padding:14px 14px 0}
-    .card .bd{padding:14px}
-
-    .filters .sec{margin-bottom:16px}
-    .filters .sec h3{margin:0 0 8px;font-size:14px}
-    .chips{display:flex;flex-wrap:wrap;gap:8px}
-    .chip{
-      border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 11px;min-width:46px;
-      text-align:center;font-size:12px;cursor:pointer;user-select:none;transition:.12s ease;
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(21,94,117,.08), transparent 32%),
+        linear-gradient(180deg,#f8fbff 0%, var(--bg) 48%, #eef3f9 100%);
+      color:var(--text);
+      letter-spacing:-.02em;
     }
-    .chip:hover{border-color:#9bb8ff;background:#f7faff}
-    .chip.on{border-color:#7aa3ff;background:#eaf1ff;color:#1746a2;font-weight:700}
-    .chip.disabled{opacity:.32;background:#f3f4f6;color:#9ca3af;cursor:not-allowed;text-decoration:line-through}
-    .chip.disabled:hover{border-color:var(--line);background:#f3f4f6}
 
-    .filters .sec .tools{display:flex;gap:6px;margin-left:auto}
-    .filters .sec .tools .btn{
-      padding:6px 9px;
+    .appShell{
+      min-height:100vh;
+      display:grid;
+      grid-template-columns:var(--sidebar) 1fr;
+      transition:grid-template-columns .18s ease;
+    }
+    body.sidebar-collapsed .appShell{grid-template-columns:0 1fr}
+
+    .sidebar{
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow:auto;
+      padding:16px 12px;
+      background:rgba(255,255,255,.86);
+      backdrop-filter:blur(14px);
+      border-right:1px solid var(--line);
+      box-shadow:8px 0 26px rgba(15,23,42,.04);
+      z-index:20;
+      transition:transform .18s ease, opacity .18s ease;
+    }
+    body.sidebar-collapsed .sidebar{
+      transform:translateX(-100%);
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .sidebarHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:4px 6px 12px;
+      margin-bottom:8px;
+      border-bottom:1px solid var(--line);
+    }
+    .sidebarTitle{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:15px;
+      font-weight:800;
+    }
+    .iconBtn{
+      width:36px;
+      height:36px;
+      border:1px solid var(--line);
+      background:var(--surface);
+      border-radius:12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      color:#334155;
+      box-shadow:0 2px 8px rgba(15,23,42,.04);
+    }
+    .iconBtn:hover{background:#f8fafc;border-color:#cbd5e1}
+    .filterNote{
+      color:var(--muted);
       font-size:12px;
-      line-height:1.2;
-      border-radius:10px;
-      min-width:42px;
+      line-height:1.45;
+      padding:8px 6px 12px;
     }
-    .filters .sec .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 
-    .kpis{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}
-    .kpi{background:#eaf1ff;border-radius:14px;padding:12px 10px;min-height:118px;display:flex;flex-direction:column;justify-content:flex-start}
-    .kpi .k{font-size:11px;color:#475569;line-height:1.35;word-break:keep-all}
-    .kpi .v{font-size:16px;font-weight:800;margin-top:8px;line-height:1.35;word-break:keep-all}
+    .main{
+      min-width:0;
+      padding:18px 22px 28px;
+    }
 
-    .charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
-    .charts .span2{grid-column:1 / -1}
-    .chartBox{position:relative;height:320px;min-height:320px;overflow:hidden}
-    .chartBox.tall{height:360px;min-height:360px}
-    .chartBox.short{height:280px;min-height:280px}
-    .chartBox canvas{position:absolute;inset:0;display:block}
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:14px;
+    }
+    .title{
+      min-width:0;
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logoBadge{
+      width:44px;
+      height:44px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:15px;
+      background:linear-gradient(135deg,#e0f2fe,#f0fdf4);
+      box-shadow:var(--shadow2);
+      font-size:25px;
+      flex:0 0 auto;
+    }
+    .title h1{
+      font-size:26px;
+      line-height:1.1;
+      margin:0;
+      font-weight:900;
+      letter-spacing:-.045em;
+    }
+    .title p{
+      margin:5px 0 0;
+      color:var(--muted);
+      font-size:13px;
+    }
 
-    .status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .topActions{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.9);
+      border-radius:13px;
+      padding:9px 12px;
+      cursor:pointer;
+      color:#0f172a;
+      font-size:13px;
+      line-height:1;
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      box-shadow:0 2px 10px rgba(15,23,42,.04);
+    }
+    .btn:hover{background:#f8fafc;border-color:#cbd5e1}
+    .btn.primary{
+      border-color:#b8ccff;
+      background:#eef4ff;
+      color:#1746a2;
+      font-weight:700;
+    }
+    .btn.toggle{border-radius:999px}
+    .btn .arrow{font-weight:900;color:#64748b}
+
+    .pill{
+      display:inline-flex;
+      gap:7px;
+      align-items:center;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.9);
+      border-radius:999px;
+      padding:8px 11px;
+      color:var(--muted);
+      font-size:12.5px;
+      box-shadow:0 2px 10px rgba(15,23,42,.04);
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      justify-content:center;
+      margin:2px 0 14px;
+      flex-wrap:wrap;
+    }
+    .tabBtn{
+      min-width:136px;
+      border:1px solid #c8d7e4;
+      background:rgba(255,255,255,.82);
+      color:#334155;
+      border-radius:999px;
+      font-size:15px;
+      font-weight:800;
+      line-height:1;
+      padding:11px 18px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      box-shadow:0 5px 14px rgba(15,23,42,.05);
+      transition:.15s ease;
+    }
+    .tabBtn:hover{transform:translateY(-1px);border-color:#8eb4c2}
+    .tabBtn.on{
+      background:linear-gradient(135deg,var(--brand),var(--brand2));
+      color:#fff;
+      border-color:rgba(15,79,103,.9);
+      box-shadow:0 10px 22px rgba(21,94,117,.22);
+    }
+    .tabPanel{display:none}
+    .tabPanel.on{display:block}
+
+    .grid{
+      display:block;
+    }
+
+    .card{
+      background:rgba(255,255,255,.92);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:16px 18px 0;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .card .hd h3{
+      margin:0;
+      font-size:18px;
+      line-height:1.25;
+      font-weight:900;
+      letter-spacing:-.035em;
+    }
+    .card .bd{padding:16px 18px 18px}
+
+    .filterGroup{
+      margin:14px 4px 10px;
+      padding:8px 10px;
+      border-radius:12px;
+      background:#f1f7fb;
+      color:#155e75;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+    .filterGroup:first-child{margin-top:0}
+    .filters .sec{
+      margin:0 0 18px;
+      padding:0 4px;
+    }
+    .filters .sec h3{
+      margin:0;
+      font-size:13px;
+      line-height:1;
+      font-weight:900;
+      color:#0f172a;
+    }
+    .filters .sec .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin:0 0 9px;
+    }
+    .filters .sec .tools{
+      display:flex;
+      gap:5px;
+      margin-left:auto;
+    }
+    .filters .sec .tools .btn{
+      padding:6px 8px;
+      font-size:11.5px;
+      border-radius:10px;
+      min-width:38px;
+      box-shadow:none;
+    }
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+    }
+    .chip{
+      border:1px solid var(--line2);
+      background:#fff;
+      border-radius:12px;
+      padding:8px 10px;
+      min-width:44px;
+      text-align:center;
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+      transition:.12s ease;
+      color:#334155;
+    }
+    .chip:hover{border-color:#93c5fd;background:#f8fbff}
+    .chip.on{
+      border-color:#7aa3ff;
+      background:#eaf1ff;
+      color:#1746a2;
+      font-weight:800;
+      box-shadow:0 4px 12px rgba(122,163,255,.16);
+    }
+    .chip.disabled{
+      opacity:.34;
+      background:#f3f4f6;
+      color:#94a3b8;
+      cursor:not-allowed;
+      text-decoration:line-through;
+    }
+    .chip.disabled:hover{border-color:var(--line2);background:#f3f4f6}
+
+    .status{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:12px;
+    }
     .status .left{display:flex;gap:10px;align-items:center}
-    .grid.filters-collapsed .filtersWrap{display:none}
-    .btn.toggle{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 14px}
-    .btn.toggle .arrow{display:inline-block;width:18px;text-align:center;font-weight:700;color:#64748b}
+    #updatedText{color:var(--muted);font-size:12.5px}
 
-    @media (max-width: 1100px){
-      .grid{grid-template-columns:1fr}
-      .grid.filters-collapsed{grid-template-columns:1fr}
-      .kpis{grid-template-columns:repeat(2,1fr)}
+    .kpis{
+      display:grid;
+      grid-template-columns:repeat(8,minmax(0,1fr));
+      gap:10px;
+    }
+    .kpi{
+      position:relative;
+      background:linear-gradient(180deg,#eef4ff 0%,#e7eefc 100%);
+      border:1px solid #dbe7fb;
+      border-radius:16px;
+      padding:13px 12px;
+      min-height:104px;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      overflow:hidden;
+    }
+    .kpi::after{
+      content:"";
+      position:absolute;
+      width:52px;
+      height:52px;
+      border-radius:999px;
+      background:rgba(255,255,255,.4);
+      right:-18px;
+      bottom:-18px;
+    }
+    .kpi .k{
+      font-size:11.5px;
+      color:#475569;
+      line-height:1.35;
+      word-break:keep-all;
+      font-weight:700;
+      z-index:1;
+    }
+    .kpi .v{
+      font-size:18px;
+      font-weight:900;
+      margin-top:8px;
+      line-height:1.25;
+      word-break:keep-all;
+      z-index:1;
+    }
+
+    .charts{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      align-items:stretch;
+    }
+    .charts .span2{grid-column:1 / -1}
+    .chartBox{
+      position:relative;
+      height:318px;
+      min-height:318px;
+      overflow:hidden;
+    }
+    .chartBox.tall{height:366px;min-height:366px}
+    .chartBox.short{height:286px;min-height:286px}
+    .chartBox canvas{
+      position:absolute;
+      inset:0;
+      display:block;
+    }
+
+    .sidebarOverlay{
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.24);
+      z-index:19;
+    }
+
+    @media (max-width: 1180px){
+      .kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+      .title h1{font-size:24px}
+    }
+
+    @media (max-width: 900px){
+      .appShell{grid-template-columns:1fr}
+      .sidebar{
+        position:fixed;
+        left:0;
+        top:0;
+        width:min(86vw,var(--sidebar));
+        transform:translateX(-100%);
+        opacity:0;
+        pointer-events:none;
+      }
+      body:not(.sidebar-collapsed) .sidebar{
+        transform:translateX(0);
+        opacity:1;
+        pointer-events:auto;
+      }
+      body:not(.sidebar-collapsed) .sidebarOverlay{display:block}
+      .main{padding:14px 12px 24px}
+      .topbar{align-items:flex-start}
+      .topActions{gap:6px}
+      .tabs{justify-content:flex-start;overflow:auto;padding-bottom:2px}
+      .tabBtn{font-size:14px;min-width:104px;padding:10px 14px}
       .charts{grid-template-columns:1fr}
       .charts .span2{grid-column:auto}
-      .chartBox,.chartBox.tall,.chartBox.short{height:320px;min-height:320px}
-      .kpi{min-height:100px}
+      .chartBox,.chartBox.tall,.chartBox.short{height:318px;min-height:318px}
+      .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .kpi{min-height:96px}
       .kpi .v{font-size:17px}
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <div class="title">
-        <div style="font-size:28px">📊</div>
+  <div class="appShell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebarHeader">
+        <div class="sidebarTitle">🔎 필터</div>
+        <button class="iconBtn" id="btnCloseSidebar" title="필터 닫기">‹</button>
+      </div>
+      <div class="filterNote">선택 조건에 데이터가 없는 값은 자동으로 비활성화됩니다.</div>
+      <div class="filters filtersWrap" id="filtersCard">
+        <div id="filters"></div>
+      </div>
+    </aside>
+
+    <div class="sidebarOverlay" id="sidebarOverlay"></div>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="title">
+          <button class="iconBtn" id="btnToggleFilters" title="필터 열기/닫기">☰</button>
+          <div class="logoBadge">📊</div>
+          <div>
+            <h1>방송 매출 대시보드</h1>
+            <p>엑셀 슬라이서처럼 선택하면 KPI/차트가 즉시 변경됩니다.</p>
+          </div>
+        </div>
+
+        <div class="topActions">
+          <span class="pill" id="statusPill">상태: -</span>
+          <button class="btn" id="btnReset">↺ 전체 해제</button>
+          <button class="btn primary" id="btnRefresh">⟳ 새로고침</button>
+          <button class="btn" id="btnKey">🔑 키 변경</button>
+        </div>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button class="tabBtn on" data-tab="summary">📌 요약</button>
+        <button class="tabBtn" data-tab="detail">📺 방송상세</button>
+        <button class="tabBtn" data-tab="ppl">🎯 PPL</button>
+      </div>
+
+      <div class="grid" id="gridRoot">
         <div>
-          <h1>방송 매출 대시보드</h1>
-          <p>엑셀 슬라이서처럼 선택하면 KPI/차트가 즉시 변경됩니다.</p>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
-        <span class="pill" id="statusPill">상태: -</span>
-        <button class="btn toggle" id="btnToggleFilters" title="필터를 접거나 펼칩니다">
-          <span class="arrow" id="toggleArrow">▾</span>
-          <span id="toggleLabel">필터 접기</span>
-        </button>
-        <button class="btn" id="btnReset">전체 해제</button>
-        <button class="btn primary" id="btnRefresh">새로고침</button>
-        <button class="btn" id="btnKey">키 변경</button>
-      </div>
-    </div>
-
-    <div class="grid" id="gridRoot">
-      <div class="card filters filtersWrap" id="filtersCard">
-        <div class="hd"><h3 style="margin:0;font-size:16px">필터(슬라이서)</h3></div>
-        <div class="bd" id="filters"></div>
-        <div class="bd" style="padding-top:0;color:var(--muted);font-size:12px">
-          ※ 선택 조건에 데이터가 없는 값은 자동으로 비활성화됩니다.
-        </div>
-      </div>
-
-      <div>
         <div class="card" style="margin-bottom:14px">
           <div class="bd">
             <div class="status">
@@ -127,91 +503,138 @@
           </div>
         </div>
 
-        <div class="charts">
-          <div class="card">
-            <div class="hd"><h3 style="margin:0">방송채널별 (목표/실적/달성율)</h3></div>
-            <div class="bd"><div class="chartBox"><canvas id="chChannel"></canvas></div></div>
+        <div class="tabPanel on" id="tab-summary">
+          <div class="charts">
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">월별 목표/실적/달성율</h3></div>
+              <div class="bd"><div class="chartBox"><canvas id="chMonth"></canvas></div></div>
+            </div>
+
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">방송채널별 이익</h3></div>
+              <div class="bd"><div class="chartBox"><canvas id="chProfitChannel"></canvas></div></div>
+            </div>
+
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">아이템별 이익 TOP 10</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chProfitItem"></canvas></div></div>
+            </div>
+
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">제품별 비용투입률 TOP 10</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chInvestmentItem"></canvas></div></div>
+            </div>
+
+            <div class="card span2">
+              <div class="hd"><h3 style="margin:0">제품별 연간 매출액 추이 TOP 10</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chAnnualItemSales"></canvas></div></div>
+            </div>
+
+            <div class="card span2">
+              <div class="hd"><h3 style="margin:0">제품별 연간 달성율 추이 TOP 10</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chAnnualItemAchievement"></canvas></div></div>
+            </div>
           </div>
-          <div class="card">
-            <div class="hd"><h3 style="margin:0">월별 (목표/실적/달성율)</h3></div>
-            <div class="bd"><div class="chartBox"><canvas id="chMonth"></canvas></div></div>
+        </div>
+
+        <div class="tabPanel" id="tab-detail">
+          <div class="charts">
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">방송채널별 목표/실적/달성율</h3></div>
+              <div class="bd"><div class="chartBox"><canvas id="chChannel"></canvas></div></div>
+            </div>
+
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">아이템별 목표/실적/달성율</h3></div>
+              <div class="bd"><div class="chartBox"><canvas id="chItem"></canvas></div></div>
+            </div>
+
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">게스트별 목표/실적/달성율</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chGuest"></canvas></div></div>
+            </div>
+
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">시간대별 목표/실적/달성율</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chTimeSlot"></canvas></div></div>
+            </div>
+
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">요일별 목표/실적/달성율</h3></div>
+              <div class="bd"><div class="chartBox short"><canvas id="chDow"></canvas></div></div>
+            </div>
+
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">일자별 목표/실적/달성율 TOP 30</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chDay"></canvas></div></div>
+            </div>
+
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">방송채널별 수수료율</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chFeeChannel"></canvas></div></div>
+            </div>
+
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">아이템별 수수료율</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chFeeItem"></canvas></div></div>
+            </div>
+
+            <div class="card span2">
+              <div class="hd"><h3 style="margin:0">게스트별 이익</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chProfitGuest"></canvas></div></div>
+            </div>
           </div>
-          <div class="card">
-            <div class="hd"><h3 style="margin:0">요일별 (목표/실적/달성율)</h3></div>
-            <div class="bd"><div class="chartBox short"><canvas id="chDow"></canvas></div></div>
-          </div>
-          <div class="card">
-            <div class="hd"><h3 style="margin:0">일자별 (목표/실적/달성율) - TOP 30</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chDay"></canvas></div></div>
-          </div>
-          <div class="card span2">
-            <div class="hd"><h3 style="margin:0">아이템별 (목표/실적/달성율)</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chItem"></canvas></div></div>
+        </div>
+
+        <div class="tabPanel" id="tab-ppl">
+          <div class="card" style="margin-bottom:14px">
+            <div class="bd">
+              <div class="status">
+                <div class="left"><span class="pill">🎯 PPL 투자 효율</span></div>
+              </div>
+              <div class="kpis" id="pplKpis"></div>
+            </div>
           </div>
 
-          <div class="card span2">
-            <div class="hd"><h3 style="margin:0">제품별 연간 매출액 추이 TOP 10</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chAnnualItemSales"></canvas></div></div>
-          </div>
+          <div class="charts">
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">PPL 방송사별 목표/실적/달성율</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chPplBroadcaster"></canvas></div></div>
+            </div>
 
-          <div class="card span2">
-            <div class="hd"><h3 style="margin:0">제품별 연간 달성율 추이 TOP 10</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chAnnualItemAchievement"></canvas></div></div>
-          </div>
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">PPL 프로그램별 목표/실적/달성율</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chPplProgram"></canvas></div></div>
+            </div>
 
-          <div class="card span2">
-            <div class="hd"><h3 style="margin:0">PPL 방송사별 (목표/실적/달성율)</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chPplBroadcaster"></canvas></div></div>
-          </div>
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">PPL 방송사별 비용/효율</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chPplBroadcasterCost"></canvas></div></div>
+            </div>
 
-          <div class="card span2">
-            <div class="hd"><h3 style="margin:0">PPL 프로그램별 (목표/실적/달성율)</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chPplProgram"></canvas></div></div>
-          </div>
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">PPL 프로그램별 비용/효율</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chPplProgramCost"></canvas></div></div>
+            </div>
 
-          <div class="card">
-            <div class="hd"><h3 style="margin:0">PPL 방송사별 비용 / 효율</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chPplBroadcasterCost"></canvas></div></div>
-          </div>
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">PPL 구분별 목표/실적/달성율</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chPplType"></canvas></div></div>
+            </div>
 
-          <div class="card">
-            <div class="hd"><h3 style="margin:0">PPL 프로그램별 비용 / 효율</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chPplProgramCost"></canvas></div></div>
+            <div class="card">
+              <div class="hd"><h3 style="margin:0">PPL 구분별 비용/효율</h3></div>
+              <div class="bd"><div class="chartBox tall"><canvas id="chPplTypeCost"></canvas></div></div>
+            </div>
           </div>
-
-          <div class="card span2">
-            <div class="hd"><h3 style="margin:0">게스트별 (목표/실적/달성율)</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chGuest"></canvas></div></div>
-          </div>
-
-          <div class="card">
-            <div class="hd"><h3 style="margin:0">방송채널별 이익</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chProfitChannel"></canvas></div></div>
-          </div>
-          <div class="card">
-            <div class="hd"><h3 style="margin:0">아이템별 이익</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chProfitItem"></canvas></div></div>
-          </div>
-          <div class="card span2">
-            <div class="hd"><h3 style="margin:0">게스트별 이익</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chProfitGuest"></canvas></div></div>
-          </div>
-          <div class="card">
-            <div class="hd"><h3 style="margin:0">방송채널별 수수료율</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chFeeChannel"></canvas></div></div>
-          </div>
-          <div class="card">
-            <div class="hd"><h3 style="margin:0">아이템별 수수료율</h3></div>
-            <div class="bd"><div class="chartBox tall"><canvas id="chFeeItem"></canvas></div></div>
-          </div>
-
+        </div>
         </div>
       </div>
-    </div>
+    </main>
   </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwuL6RvNO_kZdpVpkNR3f3h5lxmcEd1BMFo_o3PsX29qSN1NdURKEIL05IR4FhSN-_9wQ/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwbrLek5SV43FoUqfuesPZybTaD85dtRUeiMc4TAdSKB2P4XFi9J4sCX93g4oG3SR4ecw/exec";
 const DEFAULT_KEY = "WHHS-PSM-221035";
 const FILTER_UI_KEY = "dash_filters_collapsed";
 const DOW_ORDER = ['일','월','화','수','목','금','토'];
@@ -222,7 +645,7 @@ const store = {
   options: null,
   availableOptions: null,
   charts: {
-    channel:null, month:null, dow:null, day:null, item:null, guest:null, annualItemSales:null, annualItemAchievement:null, pplBroadcaster:null, pplProgram:null, pplBroadcasterCost:null, pplProgramCost:null,
+    channel:null, month:null, dow:null, day:null, item:null, guest:null, annualItemSales:null, annualItemAchievement:null, investmentItem:null, timeSlot:null, pplBroadcaster:null, pplProgram:null, pplType:null, pplBroadcasterCost:null, pplProgramCost:null, pplTypeCost:null,
     profitChannel:null, profitItem:null, profitGuest:null,
     feeChannel:null, feeItem:null
   },
@@ -236,10 +659,33 @@ const elUpdated = document.getElementById('updatedText');
 const elFilters = document.getElementById('filters');
 const elKpis = document.getElementById('kpis');
 
-const gridRoot = document.getElementById("gridRoot");
+
+/** =========================
+ *  Tabs
+ *  ========================= */
+let activeTab = 'summary';
+
+function setActiveTab(tab){
+  activeTab = tab;
+
+  document.querySelectorAll('.tabBtn').forEach(btn=>{
+    btn.classList.toggle('on', btn.dataset.tab === tab);
+  });
+
+  document.querySelectorAll('.tabPanel').forEach(panel=>{
+    panel.classList.toggle('on', panel.id === 'tab-' + tab);
+  });
+
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if (store.lastData) renderFromData(store.lastData);
+  }));
+}
+
+document.querySelectorAll('.tabBtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>setActiveTab(btn.dataset.tab));
+});
+
 const btnToggleFilters = document.getElementById("btnToggleFilters");
-const toggleLabel = document.getElementById("toggleLabel");
-const toggleArrow = document.getElementById("toggleArrow");
 
 function setFiltersCollapsed(collapsed){
   if (collapsed) gridRoot.classList.add("filters-collapsed");
@@ -380,41 +826,63 @@ function renderFilters(){
   const opts = store.options;
   const available = store.availableOptions || opts;
 
-  const sections = [
-    { key:'years', label:'연도', values: sortedValues('years', opts.years) },
-    { key:'months', label:'월', values: sortedValues('months', opts.months) },
-    { key:'days', label:'일', values: sortedValues('days', opts.days) },
-    { key:'dows', label:'요일', values: sortedValues('dows', opts.dows) },
-    { key:'items', label:'아이템', values: sortedValues('items', opts.items) },
-    { key:'channels', label:'방송채널', values: sortedValues('channels', opts.channels) },
-    { key:'guests', label:'게스트', values: sortedValues('guests', opts.guests) },
-    { key:'pplBroadcasters', label:'PPL 방송사', values: sortedValues('pplBroadcasters', opts.pplBroadcasters) },
-    { key:'pplPrograms', label:'PPL 프로그램', values: sortedValues('pplPrograms', opts.pplPrograms) },
-    { key:'pplTypes', label:'PPL 구분', values: sortedValues('pplTypes', opts.pplTypes) },
+  const groups = [
+    {
+      title:'📅 기간',
+      sections:[
+        { key:'years', label:'연도', values: sortedValues('years', opts.years) },
+        { key:'months', label:'월', values: sortedValues('months', opts.months) },
+        { key:'days', label:'일', values: sortedValues('days', opts.days) },
+        { key:'dows', label:'요일', values: sortedValues('dows', opts.dows) },
+      ]
+    },
+    {
+      title:'📦 상품/방송',
+      sections:[
+        { key:'items', label:'아이템', values: sortedValues('items', opts.items) },
+        { key:'channels', label:'방송채널', values: sortedValues('channels', opts.channels) },
+        { key:'guests', label:'게스트', values: sortedValues('guests', opts.guests) },
+      ]
+    },
+    {
+      title:'🎯 PPL',
+      sections:[
+        { key:'pplBroadcasters', label:'PPL 방송사', values: sortedValues('pplBroadcasters', opts.pplBroadcasters) },
+        { key:'pplPrograms', label:'PPL 프로그램', values: sortedValues('pplPrograms', opts.pplPrograms) },
+        { key:'pplTypes', label:'PPL 구분', values: sortedValues('pplTypes', opts.pplTypes) },
+      ]
+    }
   ];
 
-  elFilters.innerHTML = sections.map(sec=>{
-    const sel = store.filters[sec.key] || [];
-    const availSet = new Set((available[sec.key] || []).map(String));
+  const sections = groups.flatMap(g=>g.sections);
 
+  elFilters.innerHTML = groups.map(group=>{
     return `
-      <div class="sec">
-        <div class="row">
-          <h3>${sec.label}</h3>
-          <div class="tools">
-            <button class="btn" data-act="all" data-key="${sec.key}">전체</button>
-            <button class="btn" data-act="clear" data-key="${sec.key}">해제</button>
+      <div class="filterGroup">${group.title}</div>
+      ${group.sections.map(sec=>{
+        const sel = store.filters[sec.key] || [];
+        const availSet = new Set((available[sec.key] || []).map(String));
+
+        return `
+          <div class="sec">
+            <div class="row">
+              <h3>${sec.label}</h3>
+              <div class="tools">
+                <button class="btn" data-act="all" data-key="${sec.key}">전체</button>
+                <button class="btn" data-act="clear" data-key="${sec.key}">해제</button>
+              </div>
+            </div>
+            <div class="chips">
+              ${sec.values.map(v=>{
+                const sv = String(v);
+                const on = sel.includes(sv);
+                const disabled = !on && !availSet.has(sv);
+                return `<div class="chip ${on?'on':''} ${disabled?'disabled':''}" data-key="${sec.key}" data-val="${sv}" data-disabled="${disabled ? '1':'0'}">${sv}</div>`;
+              }).join('')}
+            </div>
           </div>
-        </div>
-        <div class="chips">
-          ${sec.values.map(v=>{
-            const sv = String(v);
-            const on = sel.includes(sv);
-            const disabled = !on && !availSet.has(sv);
-            return `<div class="chip ${on?'on':''} ${disabled?'disabled':''}" data-key="${sec.key}" data-val="${sv}" data-disabled="${disabled ? '1':'0'}">${sv}</div>`;
-          }).join('')}
-        </div>
-      </div>
+        `;
+      }).join('')}
     `;
   }).join('');
 
@@ -460,10 +928,14 @@ function canvasIdMap(id){
     chGuest:'guest',
     chAnnualItemSales:'annualItemSales',
     chAnnualItemAchievement:'annualItemAchievement',
+    chInvestmentItem:'investmentItem',
+    chTimeSlot:'timeSlot',
     chPplBroadcaster:'pplBroadcaster',
     chPplProgram:'pplProgram',
+    chPplType:'pplType',
     chPplBroadcasterCost:'pplBroadcasterCost',
     chPplProgramCost:'pplProgramCost',
+    chPplTypeCost:'pplTypeCost',
     chProfitChannel:'profitChannel',
     chProfitItem:'profitItem',
     chProfitGuest:'profitGuest',
@@ -473,6 +945,9 @@ function canvasIdMap(id){
 }
 function prepareCanvas(canvasId){
   const canvas = document.getElementById(canvasId);
+  if (!canvas) return null;
+  const panel = canvas.closest('.tabPanel');
+  if (panel && !panel.classList.contains('on')) return null;
   const box = canvas.parentElement;
   const rect = box.getBoundingClientRect();
   const w = Math.max(10, Math.floor(rect.width));
@@ -488,6 +963,7 @@ function makeComboChart(canvasId, labels, goal, actual, ratePct, count){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
   const canvas = prepareCanvas(canvasId);
+  if (!canvas) return;
   const rate100 = normalizeRateArray(ratePct);
 
   store.charts[key] = new Chart(canvas, {
@@ -525,6 +1001,7 @@ function makeAnnualItemSalesChart(canvasId, annualData){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
   const canvas = prepareCanvas(canvasId);
+  if (!canvas) return;
 
   const years = safeArr(annualData?.years);
   const items = safeArr(annualData?.items);
@@ -580,6 +1057,7 @@ function makeAnnualItemAchievementChart(canvasId, annualData){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
   const canvas = prepareCanvas(canvasId);
+  if (!canvas) return;
 
   const years = safeArr(annualData?.years);
   const items = safeArr(annualData?.items);
@@ -618,18 +1096,23 @@ function makePplCostEfficiencyChart(canvasId, labels, pplCost, actual, costRate,
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
   const canvas = prepareCanvas(canvasId);
+  if (!canvas) return;
 
   const costArr = safeArr(pplCost).map(toNumberSafe);
   const actualArr = safeArr(actual).map(toNumberSafe);
   const costRateArr = safeArr(costRate).map(toNumberSafe);
+  const isInvestment = canvasId === 'chInvestmentItem';
+  const costLabel = isInvestment ? '총 투입비용' : 'PPL비용(순투입)';
+  const rateLabel = isInvestment ? '투입비용률(%)' : '비용률(%)';
+  const countLabel = isInvestment ? '비용 발생 방송수' : 'PPL건수';
 
   store.charts[key] = new Chart(canvas, {
     data:{
       labels:safeArr(labels),
       datasets:[
-        { type:'bar', label:'PPL비용(순투입)', data:costArr, yAxisID:'y', borderWidth:0, barPercentage:.75, categoryPercentage:.7 },
+        { type:'bar', label:costLabel, data:costArr, yAxisID:'y', borderWidth:0, barPercentage:.75, categoryPercentage:.7 },
         { type:'bar', label:'실적(합계)', data:actualArr, yAxisID:'y', borderWidth:0, barPercentage:.75, categoryPercentage:.7 },
-        { type:'line', label:'비용률(%)', data:costRateArr, yAxisID:'y1', tension:.25, pointRadius:3, pointHoverRadius:6 }
+        { type:'line', label:rateLabel, data:costRateArr, yAxisID:'y1', tension:.25, pointRadius:3, pointHoverRadius:6 }
       ]
     },
     options:{
@@ -646,8 +1129,8 @@ function makePplCostEfficiencyChart(canvasId, labels, pplCost, actual, costRate,
             if (i < 0) return '';
             return [
               `방송행수: ${fmt(count?.[i] ?? 0)}`,
-              `PPL건수: ${fmt(pplCount?.[i] ?? 0)}`,
-              `비용률: ${fmtPct(costRateArr?.[i] ?? 0, 1)}`
+              `${countLabel}: ${fmt(pplCount?.[i] ?? 0)}`,
+              `${rateLabel}: ${fmtPct(costRateArr?.[i] ?? 0, 1)}`
             ];
           }}
         }
@@ -664,6 +1147,7 @@ function makeProfitChart(canvasId, labels, profitSum, count){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
   const canvas = prepareCanvas(canvasId);
+  if (!canvas) return;
   const profitArr = safeArr(profitSum).map(toNumberSafe);
 
   store.charts[key] = new Chart(canvas, {
@@ -696,6 +1180,7 @@ function makeFeeStatsChart(canvasId, labels, avgFeeRate, minFeeRate, maxFeeRate,
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
   const canvas = prepareCanvas(canvasId);
+  if (!canvas) return;
 
   const avg100 = normalizeRateArray(avgFeeRate);
   const min100 = normalizeRateArray(minFeeRate);
@@ -739,19 +1224,39 @@ function makeFeeStatsChart(canvasId, labels, avgFeeRate, minFeeRate, maxFeeRate,
 function renderKpis(k){
   const items = [
     ['방송횟수', fmt(k?.broadcastCount)],
-    ['특약횟수', fmt(k?.specialCount)],
-    ['특약비용', fmt(k?.specialCost, 0)],
+    ['총 실적', fmt(k?.totalActual, 0)],
     ['평균달성율', fmtPct(k?.achievementRate, 1)],
-    ['방송시간(분)', fmt(k?.totalMinutes)],
-    ['시간당매출', fmt(k?.salesPerHour, 2)],
+    ['이익합계', fmt(k?.profitSum, 0)],
+    ['평균 이익', fmt(k?.profitAvg, 0)],
+    ['총 투입비용', fmt(k?.totalInvestment, 0)],
     ['평균 수수료율', fmtPct(k?.avgFeeRate, 1)],
-    ['이익합계(평균)', `${fmt(k?.profitSum, 0)} (${fmt(k?.profitAvg, 0)})`],
+    ['시간당매출', fmt(k?.salesPerHour, 2)],
   ];
   elKpis.innerHTML = items.map(([kk,v])=>`<div class="kpi"><div class="k">${kk}</div><div class="v">${v}</div></div>`).join('');
 }
 
+
+function renderPplKpis(k){
+  const el = document.getElementById('pplKpis');
+  if (!el) return;
+
+  const items = [
+    ['PPL 진행 건수', fmt(k?.pplCount)],
+    ['총 PPL 비용', fmt(k?.pplCost, 0)],
+    ['PPL 연결 실적', fmt(k?.pplActual, 0)],
+    ['PPL 연결 이익', fmt(k?.pplProfit, 0)],
+    ['PPL 비용률', fmtPct(k?.pplCostRate, 1)],
+    ['PPL 1건당 실적', fmt(k?.pplActualPerEvent, 1)],
+    ['PPL 연결 방송수', fmt(k?.pplRowCount)],
+    ['PPL 연결 달성율', fmtPct(k?.pplAchievementRate, 1)],
+  ];
+
+  el.innerHTML = items.map(([kk,v])=>`<div class="kpi"><div class="k">${kk}</div><div class="v">${v}</div></div>`).join('');
+}
+
 function renderFromData(data){
   renderKpis(data.kpis || {});
+  renderPplKpis(data.pplKpis || {});
 
   debounceRender(()=>{
     const charts = data.charts || {};
@@ -770,6 +1275,9 @@ function renderFromData(data){
     const dow = charts.dow || {};
     makeComboChart('chDow', dow.labels, dow.goal, dow.actual, dow.ratePct, dow.count);
 
+    const timeSlot = charts.timeSlot || {};
+    makeComboChart('chTimeSlot', timeSlot.labels, timeSlot.goal, timeSlot.actual, timeSlot.ratePct, timeSlot.count);
+
     const day = charts.day || {};
     makeComboChart('chDay', day.labels, day.goal, day.actual, day.ratePct, day.count);
 
@@ -779,17 +1287,33 @@ function renderFromData(data){
     makeAnnualItemSalesChart('chAnnualItemSales', charts.annualItemSales || { years:[], items:[], series:{} });
     makeAnnualItemAchievementChart('chAnnualItemAchievement', charts.annualItemAchievement || { years:[], items:[], series:{} });
 
+    const investmentItem = charts.investmentItem || {};
+    makePplCostEfficiencyChart('chInvestmentItem',
+      investmentItem.labels,
+      investmentItem.investmentCost,
+      investmentItem.actual,
+      investmentItem.investmentRate,
+      investmentItem.count,
+      investmentItem.investmentCount
+    );
+
     const pplBroadcaster = charts.pplBroadcaster || {};
     makeComboChart('chPplBroadcaster', pplBroadcaster.labels, pplBroadcaster.goal, pplBroadcaster.actual, pplBroadcaster.ratePct, pplBroadcaster.count);
 
     const pplProgram = charts.pplProgram || {};
     makeComboChart('chPplProgram', pplProgram.labels, pplProgram.goal, pplProgram.actual, pplProgram.ratePct, pplProgram.count);
 
+    const pplType = charts.pplType || {};
+    makeComboChart('chPplType', pplType.labels, pplType.goal, pplType.actual, pplType.ratePct, pplType.count);
+
     const pplBroadcasterCost = charts.pplBroadcasterCost || charts.pplBroadcaster || {};
     makePplCostEfficiencyChart('chPplBroadcasterCost', pplBroadcasterCost.labels, pplBroadcasterCost.pplCost, pplBroadcasterCost.actual, pplBroadcasterCost.costRate, pplBroadcasterCost.count, pplBroadcasterCost.pplCount);
 
     const pplProgramCost = charts.pplProgramCost || charts.pplProgram || {};
     makePplCostEfficiencyChart('chPplProgramCost', pplProgramCost.labels, pplProgramCost.pplCost, pplProgramCost.actual, pplProgramCost.costRate, pplProgramCost.count, pplProgramCost.pplCount);
+
+    const pplTypeCost = charts.pplTypeCost || charts.pplType || {};
+    makePplCostEfficiencyChart('chPplTypeCost', pplTypeCost.labels, pplTypeCost.pplCost, pplTypeCost.actual, pplTypeCost.costRate, pplTypeCost.count, pplTypeCost.pplCount);
 
     const guest = charts.guest || {};
     makeComboChart('chGuest', guest.labels, guest.goal, guest.actual, guest.ratePct, guest.count);
