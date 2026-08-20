@@ -257,15 +257,64 @@
 
     .filterGroup{
       margin:14px 4px 10px;
-      padding:8px 10px;
+      padding:0;
+    }
+    .filterGroup:first-child{margin-top:0}
+    .filterGroupBtn{
+      width:100%;
+      border:0;
       border-radius:12px;
       background:#f1f7fb;
       color:#155e75;
+      padding:9px 10px;
       font-size:12px;
       font-weight:900;
       letter-spacing:-.02em;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      cursor:pointer;
+      text-align:left;
     }
-    .filterGroup:first-child{margin-top:0}
+    .filterGroupBtn:hover{
+      background:#e6f4f8;
+    }
+    .filterGroupTitle{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      min-width:0;
+    }
+    .filterGroupMeta{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      color:#64748b;
+      font-size:11px;
+      font-weight:800;
+      flex:0 0 auto;
+    }
+    .filterGroupArrow{
+      width:18px;
+      height:18px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(255,255,255,.8);
+      color:#155e75;
+      transition:transform .15s ease;
+    }
+    .filterGroup.collapsed .filterGroupArrow{
+      transform:rotate(-90deg);
+    }
+    .filterGroupBody{
+      padding-top:2px;
+    }
+    .filterGroup.collapsed .filterGroupBody{
+      display:none;
+    }
     .filters .sec{
       margin:0 0 18px;
       padding:0 4px;
@@ -681,6 +730,7 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwjSN2IV3awKafRyhr6nIdSK_AExb-7UVkY5NX96sedyb6x75tpw9sdLqEfZSVk1F_lDA/exec";
 const DEFAULT_KEY = "WHHS-PSM-221035";
 const FILTER_UI_KEY = "dash_filters_collapsed";
+const FILTER_GROUP_UI_KEY = "dash_filter_group_collapsed";
 const DOW_ORDER = ['일','월','화','수','목','금','토'];
 
 const store = {
@@ -874,6 +924,27 @@ function sortedValues(key, values){
   return (values||[]).filter(v=>v && v!=='(비어있음)').sort((a,b)=>String(a).localeCompare(String(b),'ko'));
 }
 
+
+function getCollapsedFilterGroups(){
+  try{
+    return JSON.parse(localStorage.getItem(FILTER_GROUP_UI_KEY) || "{}") || {};
+  } catch(e){
+    return {};
+  }
+}
+
+function setCollapsedFilterGroup(groupKey, collapsed){
+  const state = getCollapsedFilterGroups();
+  state[groupKey] = !!collapsed;
+  localStorage.setItem(FILTER_GROUP_UI_KEY, JSON.stringify(state));
+}
+
+function selectedCountForGroup(group){
+  return group.sections.reduce((sum, sec)=>{
+    return sum + ((store.filters[sec.key] || []).length);
+  }, 0);
+}
+
 function renderFilters(){
   if (!store.options){
     elFilters.innerHTML = `<div style="color:var(--muted);font-size:13px">옵션 로딩 중...</div>`;
@@ -885,6 +956,7 @@ function renderFilters(){
 
   const groups = [
     {
+      key:'period',
       title:'📅 기간',
       sections:[
         { key:'years', label:'연도', values: sortedValues('years', opts.years) },
@@ -894,6 +966,7 @@ function renderFilters(){
       ]
     },
     {
+      key:'product',
       title:'📦 상품/방송',
       sections:[
         { key:'items', label:'아이템', values: sortedValues('items', opts.items) },
@@ -902,6 +975,7 @@ function renderFilters(){
       ]
     },
     {
+      key:'ppl',
       title:'🎯 PPL',
       sections:[
         { key:'pplBroadcasters', label:'PPL 방송사', values: sortedValues('pplBroadcasters', opts.pplBroadcasters) },
@@ -913,35 +987,60 @@ function renderFilters(){
 
   const sections = groups.flatMap(g=>g.sections);
 
-  elFilters.innerHTML = groups.map(group=>{
-    return `
-      <div class="filterGroup">${group.title}</div>
-      ${group.sections.map(sec=>{
-        const sel = store.filters[sec.key] || [];
-        const availSet = new Set((available[sec.key] || []).map(String));
+  const collapsedGroups = getCollapsedFilterGroups();
 
-        return `
-          <div class="sec">
-            <div class="row">
-              <h3>${sec.label}</h3>
-              <div class="tools">
-                <button class="btn" data-act="all" data-key="${sec.key}">전체</button>
-                <button class="btn" data-act="clear" data-key="${sec.key}">해제</button>
+  elFilters.innerHTML = groups.map(group=>{
+    const groupCollapsed = !!collapsedGroups[group.key];
+    const selectedCount = selectedCountForGroup(group);
+
+    return `
+      <div class="filterGroup ${groupCollapsed ? 'collapsed' : ''}" data-group="${group.key}">
+        <button class="filterGroupBtn" type="button" data-group-toggle="${group.key}">
+          <span class="filterGroupTitle">${group.title}</span>
+          <span class="filterGroupMeta">
+            ${selectedCount ? `<span>선택 ${selectedCount}</span>` : ''}
+            <span class="filterGroupArrow">▾</span>
+          </span>
+        </button>
+        <div class="filterGroupBody">
+          ${group.sections.map(sec=>{
+            const sel = store.filters[sec.key] || [];
+            const availSet = new Set((available[sec.key] || []).map(String));
+
+            return `
+              <div class="sec">
+                <div class="row">
+                  <h3>${sec.label}</h3>
+                  <div class="tools">
+                    <button class="btn" data-act="all" data-key="${sec.key}">전체</button>
+                    <button class="btn" data-act="clear" data-key="${sec.key}">해제</button>
+                  </div>
+                </div>
+                <div class="chips">
+                  ${sec.values.map(v=>{
+                    const sv = String(v);
+                    const on = sel.includes(sv);
+                    const disabled = !on && !availSet.has(sv);
+                    return `<div class="chip ${on?'on':''} ${disabled?'disabled':''}" data-key="${sec.key}" data-val="${sv}" data-disabled="${disabled ? '1':'0'}">${sv}</div>`;
+                  }).join('')}
+                </div>
               </div>
-            </div>
-            <div class="chips">
-              ${sec.values.map(v=>{
-                const sv = String(v);
-                const on = sel.includes(sv);
-                const disabled = !on && !availSet.has(sv);
-                return `<div class="chip ${on?'on':''} ${disabled?'disabled':''}" data-key="${sec.key}" data-val="${sv}" data-disabled="${disabled ? '1':'0'}">${sv}</div>`;
-              }).join('')}
-            </div>
-          </div>
-        `;
-      }).join('')}
+            `;
+          }).join('')}
+        </div>
+      </div>
     `;
   }).join('');
+
+  elFilters.querySelectorAll('[data-group-toggle]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const groupKey = btn.dataset.groupToggle;
+      const box = elFilters.querySelector(`.filterGroup[data-group="${groupKey}"]`);
+      const collapsed = !(box && box.classList.contains('collapsed'));
+      setCollapsedFilterGroup(groupKey, collapsed);
+      if (box) box.classList.toggle('collapsed', collapsed);
+    });
+  });
 
   elFilters.querySelectorAll('.chip').forEach(ch=>{
     ch.addEventListener('click', ()=>{
