@@ -376,6 +376,28 @@
       font-weight:700;
       z-index:1;
     }
+    .helpIcon{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:16px;
+      height:16px;
+      margin-left:5px;
+      border-radius:999px;
+      border:1px solid #cbd5e1;
+      background:#fff;
+      color:#64748b;
+      font-size:11px;
+      font-weight:900;
+      cursor:help;
+      vertical-align:middle;
+    }
+    .helpIcon:hover{
+      border-color:#7aa3ff;
+      color:#1746a2;
+      background:#f8fbff;
+    }
+
     .kpi .v{
       font-size:18px;
       font-weight:900;
@@ -446,7 +468,29 @@
       .chartBox,.chartBox.tall,.chartBox.short{height:318px;min-height:318px}
       .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
       .kpi{min-height:96px}
-      .kpi .v{font-size:17px}
+      .helpIcon{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:16px;
+      height:16px;
+      margin-left:5px;
+      border-radius:999px;
+      border:1px solid #cbd5e1;
+      background:#fff;
+      color:#64748b;
+      font-size:11px;
+      font-weight:900;
+      cursor:help;
+      vertical-align:middle;
+    }
+    .helpIcon:hover{
+      border-color:#7aa3ff;
+      color:#1746a2;
+      background:#f8fbff;
+    }
+
+    .kpi .v{font-size:17px}
     }
   </style>
 </head>
@@ -634,7 +678,7 @@
   </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwbrLek5SV43FoUqfuesPZybTaD85dtRUeiMc4TAdSKB2P4XFi9J4sCX93g4oG3SR4ecw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzIJQHODC0bMKmaiBTityyQZxwqxUkJpcAIFLR8TPqHTuohBErhDkAzrg1vHI6vhHIKMg/exec";
 const DEFAULT_KEY = "WHHS-PSM-221035";
 const FILTER_UI_KEY = "dash_filters_collapsed";
 const DOW_ORDER = ['일','월','화','수','목','금','토'];
@@ -972,7 +1016,7 @@ function prepareCanvas(canvasId){
   return canvas;
 }
 
-function makeComboChart(canvasId, labels, goal, actual, ratePct, count){
+function makeComboChart(canvasId, labels, goal, actual, ratePct, count, extraInfo){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
   const canvas = prepareCanvas(canvasId);
@@ -997,7 +1041,10 @@ function makeComboChart(canvasId, labels, goal, actual, ratePct, count){
           callbacks:{ afterBody:(items)=>{
             const i = items?.[0]?.dataIndex ?? -1;
             if (i<0) return '';
-            return [`방송횟수: ${fmt(count?.[i] ?? 0)}`, `달성율: ${fmtPct(rate100?.[i] ?? 0, 1)}`];
+            const lines = [`방송횟수: ${fmt(count?.[i] ?? 0)}`, `달성율: ${fmtPct(rate100?.[i] ?? 0, 1)}`];
+            const itemName = extraInfo?.itemNames?.[i];
+            if (itemName) lines.unshift(`아이템: ${itemName}`);
+            return lines;
           }}
         }
       },
@@ -1019,22 +1066,38 @@ function makeAnnualItemSalesChart(canvasId, annualData){
   const years = safeArr(annualData?.years);
   const items = safeArr(annualData?.items);
   const series = annualData?.series || {};
+  const singleYear = years.length <= 1;
+  const year = String(years[0] || '');
 
-  const datasets = items.map(item => ({
-    type:'line',
-    label:item,
-    data: years.map(y => toNumberSafe(series[item]?.[String(y)] ?? 0)),
-    yAxisID:'y',
-    tension:.25,
-    pointRadius:3,
-    pointHoverRadius:6
-  }));
+  let labels;
+  let datasets;
+
+  if (singleYear) {
+    labels = items;
+    datasets = [{
+      type:'bar',
+      label: year ? `${year}년 실적` : '실적',
+      data: items.map(item => toNumberSafe(series[item]?.[year] ?? 0)),
+      yAxisID:'y',
+      borderWidth:0,
+      barPercentage:.75,
+      categoryPercentage:.72
+    }];
+  } else {
+    labels = years;
+    datasets = items.map(item => ({
+      type:'line',
+      label:item,
+      data: years.map(y => toNumberSafe(series[item]?.[String(y)] ?? 0)),
+      yAxisID:'y',
+      tension:.25,
+      pointRadius:3,
+      pointHoverRadius:6
+    }));
+  }
 
   store.charts[key] = new Chart(canvas, {
-    data: {
-      labels: years,
-      datasets
-    },
+    data: { labels, datasets },
     options: {
       responsive:false,
       maintainAspectRatio:false,
@@ -1050,12 +1113,18 @@ function makeAnnualItemSalesChart(canvasId, annualData){
             },
             afterBody:(items)=>{
               const total = items.reduce((sum, it)=>sum + toNumberSafe(it.parsed.y), 0);
-              return `연간 합계: ${fmt(total, 0)}`;
+              return singleYear ? `선택연도 합계: ${fmt(total, 0)}` : `연간 합계: ${fmt(total, 0)}`;
             }
           }
         }
       },
       scales:{
+        x:{
+          ticks:{
+            maxRotation: singleYear ? 45 : 0,
+            minRotation: singleYear ? 35 : 0
+          }
+        },
         y:{
           beginAtZero:true,
           ticks:{ callback:(v)=> fmt(v) }
@@ -1064,7 +1133,6 @@ function makeAnnualItemSalesChart(canvasId, annualData){
     }
   });
 }
-
 
 function makeAnnualItemAchievementChart(canvasId, annualData){
   const key = canvasIdMap(canvasId);
@@ -1075,19 +1143,38 @@ function makeAnnualItemAchievementChart(canvasId, annualData){
   const years = safeArr(annualData?.years);
   const items = safeArr(annualData?.items);
   const series = annualData?.series || {};
+  const singleYear = years.length <= 1;
+  const year = String(years[0] || '');
 
-  const datasets = items.map(item => ({
-    type:'line',
-    label:item,
-    data: years.map(y => toNumberSafe(series[item]?.[String(y)] ?? 0)),
-    yAxisID:'y',
-    tension:.25,
-    pointRadius:3,
-    pointHoverRadius:6
-  }));
+  let labels;
+  let datasets;
+
+  if (singleYear) {
+    labels = items;
+    datasets = [{
+      type:'bar',
+      label: year ? `${year}년 달성율` : '달성율',
+      data: items.map(item => toNumberSafe(series[item]?.[year] ?? 0)),
+      yAxisID:'y',
+      borderWidth:0,
+      barPercentage:.75,
+      categoryPercentage:.72
+    }];
+  } else {
+    labels = years;
+    datasets = items.map(item => ({
+      type:'line',
+      label:item,
+      data: years.map(y => toNumberSafe(series[item]?.[String(y)] ?? 0)),
+      yAxisID:'y',
+      tension:.25,
+      pointRadius:3,
+      pointHoverRadius:6
+    }));
+  }
 
   store.charts[key] = new Chart(canvas, {
-    data:{ labels:years, datasets },
+    data:{ labels, datasets },
     options:{
       responsive:false,
       maintainAspectRatio:false,
@@ -1100,7 +1187,15 @@ function makeAnnualItemAchievementChart(canvasId, annualData){
           callbacks:{ label:(ctx)=>`${ctx.dataset.label}: ${fmtPct(ctx.parsed.y ?? 0, 1)}` }
         }
       },
-      scales:{ y:{ beginAtZero:true, ticks:{ callback:(v)=> v + '%' } } }
+      scales:{
+        x:{
+          ticks:{
+            maxRotation: singleYear ? 45 : 0,
+            minRotation: singleYear ? 35 : 0
+          }
+        },
+        y:{ beginAtZero:true, ticks:{ callback:(v)=> v + '%' } }
+      }
     }
   });
 }
@@ -1253,6 +1348,17 @@ function renderPplKpis(k){
   const el = document.getElementById('pplKpis');
   if (!el) return;
 
+  const help = {
+    'PPL 진행 건수': '중복 PPL을 제거한 실제 PPL 진행 건수입니다. 같은 PPL 방송이 여러 홈쇼핑사에 연결되어도 1건으로 계산합니다.',
+    '총 PPL 비용': 'PPL 개별광고비를 PPL건 기준으로 중복 제거하여 합산한 금액입니다. 단위는 data 시트 입력 단위를 따릅니다.',
+    'PPL 연결 실적': 'PPL 정보가 연결된 홈쇼핑 방송 행의 실적 합계입니다.',
+    'PPL 연결 이익': 'PPL 정보가 연결된 홈쇼핑 방송 행의 이익 합계입니다.',
+    'PPL 비용률': '총 PPL 비용 ÷ PPL 연결 실적 × 100입니다. 낮을수록 비용 부담이 낮습니다.',
+    'PPL 1건당 실적': 'PPL 연결 실적 ÷ PPL 진행 건수입니다.',
+    'PPL 연결 방송수': 'PPL 정보가 입력된 홈쇼핑 방송 행 수입니다. GS/SSG 동시 연결 시 각각의 방송 행으로 계산됩니다.',
+    'PPL 연결 달성율': 'PPL 연결 방송의 실적 합계 ÷ 취급목표 합계 × 100입니다.'
+  };
+
   const items = [
     ['PPL 진행 건수', fmt(k?.pplCount)],
     ['총 PPL 비용', fmt(k?.pplCost, 0)],
@@ -1264,7 +1370,10 @@ function renderPplKpis(k){
     ['PPL 연결 달성율', fmtPct(k?.pplAchievementRate, 1)],
   ];
 
-  el.innerHTML = items.map(([kk,v])=>`<div class="kpi"><div class="k">${kk}</div><div class="v">${v}</div></div>`).join('');
+  el.innerHTML = items.map(([kk,v])=>{
+    const title = help[kk] || '';
+    return `<div class="kpi"><div class="k">${kk}<span class="helpIcon" title="${title}">?</span></div><div class="v">${v}</div></div>`;
+  }).join('');
 }
 
 function renderFromData(data){
@@ -1292,7 +1401,7 @@ function renderFromData(data){
     makeComboChart('chTimeSlot', timeSlot.labels, timeSlot.goal, timeSlot.actual, timeSlot.ratePct, timeSlot.count);
 
     const day = charts.day || {};
-    makeComboChart('chDay', day.labels, day.goal, day.actual, day.ratePct, day.count);
+    makeComboChart('chDay', day.labels, day.goal, day.actual, day.ratePct, day.count, { itemNames: day.itemNames });
 
     const item = charts.item || {};
     makeComboChart('chItem', item.labels, item.goal, item.actual, item.ratePct, item.count);
