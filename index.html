@@ -652,12 +652,12 @@
             </div>
 
             <div class="card span2">
-              <div class="hd"><h3 style="margin:0">제품별 연간 매출액 추이 TOP 10</h3></div>
+              <div class="hd"><h3 style="margin:0">제품별 연간 매출액 비교 TOP 10</h3></div>
               <div class="bd"><div class="chartBox tall"><canvas id="chAnnualItemSales"></canvas></div></div>
             </div>
 
             <div class="card span2">
-              <div class="hd"><h3 style="margin:0">제품별 연간 달성율 추이 TOP 10</h3></div>
+              <div class="hd"><h3 style="margin:0">제품별 연간 달성율 비교 TOP 10</h3></div>
               <div class="bd"><div class="chartBox tall"><canvas id="chAnnualItemAchievement"></canvas></div></div>
             </div>
           </div>
@@ -1195,41 +1195,25 @@ function makeAnnualItemSalesChart(canvasId, annualData){
   const canvas = prepareCanvas(canvasId);
   if (!canvas) return;
 
-  const years = safeArr(annualData?.years);
+  const years = safeArr(annualData?.years).map(String);
   const items = safeArr(annualData?.items);
   const series = annualData?.series || {};
-  const singleYear = years.length <= 1;
-  const year = String(years[0] || '');
 
-  let labels;
-  let datasets;
-
-  if (singleYear) {
-    labels = items;
-    datasets = [{
-      type:'bar',
-      label: year ? `${year}년 실적` : '실적',
-      data: items.map(item => toNumberSafe(series[item]?.[year] ?? 0)),
-      yAxisID:'y',
-      borderWidth:0,
-      barPercentage:.75,
-      categoryPercentage:.72
-    }];
-  } else {
-    labels = years;
-    datasets = items.map(item => ({
-      type:'line',
-      label:item,
-      data: years.map(y => toNumberSafe(series[item]?.[String(y)] ?? 0)),
-      yAxisID:'y',
-      tension:.25,
-      pointRadius:3,
-      pointHoverRadius:6
-    }));
-  }
+  const datasets = years.map(year => ({
+    type:'bar',
+    label:`${year}년`,
+    data: items.map(item => toNumberSafe(series[item]?.[year] ?? 0)),
+    yAxisID:'y',
+    borderWidth:0,
+    barPercentage:.75,
+    categoryPercentage:.72
+  }));
 
   store.charts[key] = new Chart(canvas, {
-    data: { labels, datasets },
+    data: {
+      labels: items,
+      datasets
+    },
     options: {
       responsive:false,
       maintainAspectRatio:false,
@@ -1240,12 +1224,10 @@ function makeAnnualItemSalesChart(canvasId, annualData){
           intersect:false,
           mode:'index',
           callbacks:{
-            label:(ctx)=>{
-              return `${ctx.dataset.label}: ${fmt(ctx.parsed.y ?? 0, 0)}`;
-            },
-            afterBody:(items)=>{
-              const total = items.reduce((sum, it)=>sum + toNumberSafe(it.parsed.y), 0);
-              return singleYear ? `선택연도 합계: ${fmt(total, 0)}` : `연간 합계: ${fmt(total, 0)}`;
+            label:(ctx)=>`${ctx.dataset.label}: ${fmt(ctx.parsed.y ?? 0, 0)}`,
+            afterBody:(rows)=>{
+              const total = rows.reduce((sum, it)=>sum + toNumberSafe(it.parsed.y), 0);
+              return `아이템 합계: ${fmt(total, 0)}`;
             }
           }
         }
@@ -1253,8 +1235,8 @@ function makeAnnualItemSalesChart(canvasId, annualData){
       scales:{
         x:{
           ticks:{
-            maxRotation: singleYear ? 45 : 0,
-            minRotation: singleYear ? 35 : 0
+            maxRotation:45,
+            minRotation:35
           }
         },
         y:{
@@ -1272,41 +1254,25 @@ function makeAnnualItemAchievementChart(canvasId, annualData){
   const canvas = prepareCanvas(canvasId);
   if (!canvas) return;
 
-  const years = safeArr(annualData?.years);
+  const years = safeArr(annualData?.years).map(String);
   const items = safeArr(annualData?.items);
   const series = annualData?.series || {};
-  const singleYear = years.length <= 1;
-  const year = String(years[0] || '');
 
-  let labels;
-  let datasets;
-
-  if (singleYear) {
-    labels = items;
-    datasets = [{
-      type:'bar',
-      label: year ? `${year}년 달성율` : '달성율',
-      data: items.map(item => toNumberSafe(series[item]?.[year] ?? 0)),
-      yAxisID:'y',
-      borderWidth:0,
-      barPercentage:.75,
-      categoryPercentage:.72
-    }];
-  } else {
-    labels = years;
-    datasets = items.map(item => ({
-      type:'line',
-      label:item,
-      data: years.map(y => toNumberSafe(series[item]?.[String(y)] ?? 0)),
-      yAxisID:'y',
-      tension:.25,
-      pointRadius:3,
-      pointHoverRadius:6
-    }));
-  }
+  const datasets = years.map(year => ({
+    type:'bar',
+    label:`${year}년`,
+    data: items.map(item => toNumberSafe(series[item]?.[year] ?? 0)),
+    yAxisID:'y',
+    borderWidth:0,
+    barPercentage:.75,
+    categoryPercentage:.72
+  }));
 
   store.charts[key] = new Chart(canvas, {
-    data:{ labels, datasets },
+    data:{
+      labels: items,
+      datasets
+    },
     options:{
       responsive:false,
       maintainAspectRatio:false,
@@ -1316,17 +1282,22 @@ function makeAnnualItemAchievementChart(canvasId, annualData){
         tooltip:{
           intersect:false,
           mode:'index',
-          callbacks:{ label:(ctx)=>`${ctx.dataset.label}: ${fmtPct(ctx.parsed.y ?? 0, 1)}` }
+          callbacks:{
+            label:(ctx)=>`${ctx.dataset.label}: ${fmtPct(ctx.parsed.y ?? 0, 1)}`
+          }
         }
       },
       scales:{
         x:{
           ticks:{
-            maxRotation: singleYear ? 45 : 0,
-            minRotation: singleYear ? 35 : 0
+            maxRotation:45,
+            minRotation:35
           }
         },
-        y:{ beginAtZero:true, ticks:{ callback:(v)=> v + '%' } }
+        y:{
+          beginAtZero:true,
+          ticks:{ callback:(v)=> v + '%' }
+        }
       }
     }
   });
