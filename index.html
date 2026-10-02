@@ -8,621 +8,136 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
-    :root{
-      --bg:#f3f6fb;
-      --surface:#ffffff;
-      --surface2:#f8fafc;
-      --text:#0f172a;
-      --muted:#64748b;
-      --line:#e2e8f0;
-      --line2:#d9e2ef;
-      --brand:#155e75;
-      --brand2:#0f4f67;
-      --brandSoft:#e6f4f8;
-      --blueSoft:#eaf1ff;
-      --danger:#b91c1c;
-      --success:#166534;
-      --shadow:0 12px 30px rgba(15,23,42,.06);
-      --shadow2:0 8px 22px rgba(15,23,42,.08);
-      --radius:18px;
-      --sidebar:304px;
-    }
-
+    :root{--bg:#f3f4f6;--surface:#fff;--text:#17243b;--muted:#718096;--line:#dfe5ee;--brand:#2563eb;--brandSoft:#eff5ff;--radius:10px}
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(21,94,117,.08), transparent 32%),
-        linear-gradient(180deg,#f8fbff 0%, var(--bg) 48%, #eef3f9 100%);
-      color:var(--text);
-      letter-spacing:-.02em;
-    }
-
-    .appShell{
-      min-height:100vh;
-      display:grid;
-      grid-template-columns:var(--sidebar) 1fr;
-      transition:grid-template-columns .18s ease;
-    }
-    body.sidebar-collapsed .appShell{grid-template-columns:0 1fr}
-
-    .sidebar{
-      position:sticky;
-      top:0;
-      height:100vh;
-      overflow:auto;
-      padding:16px 12px;
-      background:rgba(255,255,255,.86);
-      backdrop-filter:blur(14px);
-      border-right:1px solid var(--line);
-      box-shadow:8px 0 26px rgba(15,23,42,.04);
-      z-index:20;
-      transition:transform .18s ease, opacity .18s ease;
-    }
-    body.sidebar-collapsed .sidebar{
-      transform:translateX(-100%);
-      opacity:0;
-      pointer-events:none;
-    }
-
-    .sidebarHeader{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:4px 6px 12px;
-      margin-bottom:8px;
-      border-bottom:1px solid var(--line);
-    }
-    .sidebarTitle{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size:15px;
-      font-weight:800;
-    }
-    .iconBtn{
-      width:36px;
-      height:36px;
-      border:1px solid var(--line);
-      background:var(--surface);
-      border-radius:12px;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      color:#334155;
-      box-shadow:0 2px 8px rgba(15,23,42,.04);
-    }
-    .iconBtn:hover{background:#f8fafc;border-color:#cbd5e1}
-    .filterNote{
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.45;
-      padding:8px 6px 12px;
-    }
-
-    .main{
-      min-width:0;
-      padding:18px 22px 28px;
-    }
-
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:14px;
-    }
-    .title{
-      min-width:0;
-      display:flex;
-      gap:12px;
-      align-items:center;
-    }
-    .logoBadge{
-      width:44px;
-      height:44px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:15px;
-      background:linear-gradient(135deg,#e0f2fe,#f0fdf4);
-      box-shadow:var(--shadow2);
-      font-size:25px;
-      flex:0 0 auto;
-    }
-    .title h1{
-      font-size:26px;
-      line-height:1.1;
-      margin:0;
-      font-weight:900;
-      letter-spacing:-.045em;
-    }
-    .title p{
-      margin:5px 0 0;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .topActions{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      justify-content:flex-end;
-      flex-wrap:wrap;
-    }
-
-    .btn{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.9);
-      border-radius:13px;
-      padding:9px 12px;
-      cursor:pointer;
-      color:#0f172a;
-      font-size:13px;
-      line-height:1;
-      display:inline-flex;
-      align-items:center;
-      gap:7px;
-      box-shadow:0 2px 10px rgba(15,23,42,.04);
-    }
-    .btn:hover{background:#f8fafc;border-color:#cbd5e1}
-    .btn.primary{
-      border-color:#b8ccff;
-      background:#eef4ff;
-      color:#1746a2;
-      font-weight:700;
-    }
-    .btn.toggle{border-radius:999px}
-    .btn .arrow{font-weight:900;color:#64748b}
-
-    .pill{
-      display:inline-flex;
-      gap:7px;
-      align-items:center;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.9);
-      border-radius:999px;
-      padding:8px 11px;
-      color:var(--muted);
-      font-size:12.5px;
-      box-shadow:0 2px 10px rgba(15,23,42,.04);
-    }
-
-    .tabs{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      justify-content:center;
-      margin:2px 0 14px;
-      flex-wrap:wrap;
-    }
-    .tabBtn{
-      min-width:136px;
-      border:1px solid #c8d7e4;
-      background:rgba(255,255,255,.82);
-      color:#334155;
-      border-radius:999px;
-      font-size:15px;
-      font-weight:800;
-      line-height:1;
-      padding:11px 18px;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      box-shadow:0 5px 14px rgba(15,23,42,.05);
-      transition:.15s ease;
-    }
-    .tabBtn:hover{transform:translateY(-1px);border-color:#8eb4c2}
-    .tabBtn.on{
-      background:linear-gradient(135deg,var(--brand),var(--brand2));
-      color:#fff;
-      border-color:rgba(15,79,103,.9);
-      box-shadow:0 10px 22px rgba(21,94,117,.22);
-    }
-    .tabPanel{display:none}
-    .tabPanel.on{display:block}
-
-    .grid{
-      display:block;
-    }
-
-    .card{
-      background:rgba(255,255,255,.92);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-    .card .hd{
-      padding:16px 18px 0;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .card .hd h3{
-      margin:0;
-      font-size:18px;
-      line-height:1.25;
-      font-weight:900;
-      letter-spacing:-.035em;
-    }
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;font-size:14px;line-height:1.5;letter-spacing:-.025em}
+    button{font:inherit;cursor:pointer;touch-action:manipulation}
+    button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid #93b4ff;outline-offset:3px}
+    button:disabled{cursor:not-allowed}
+    .main{max-width:1400px;margin:0 auto;padding:0 28px 40px;min-width:0}
+    .pageHeader{background:#fff;border-bottom:1px solid var(--line);box-shadow:0 0 0 100vmax #fff;clip-path:inset(0 -100vmax);margin-bottom:20px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px 0 22px}
+    .title h1{font-size:25px;line-height:1.3;letter-spacing:-.045em;margin:0;font-weight:800}
+    .title p{font-size:11px;letter-spacing:.13em;color:var(--muted);margin:6px 0 0}
+    .headerControls{display:flex;align-items:center;gap:24px;min-width:0}
+    .topActions{display:flex;gap:8px;align-items:center}
+    .btn,.iconBtn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);border-radius:6px;min-height:42px;padding:9px 13px;background:#fff;color:#43526a;font-size:13px;font-weight:600;white-space:nowrap}
+    .btn:hover,.iconBtn:hover{background:#f5f8fd;border-color:#b7c8e2}
+    .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+    .btn.primary:hover{background:#1d4ed8}
+    .btn svg,.iconBtn svg{width:17px;height:17px;flex:none}
+    .iconBtn{width:42px;padding:0}
+    .tabs{display:flex;gap:0}
+    .tabBtn{position:relative}
+    .tabBtn + .tabBtn::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);height:18px;border-left:1px solid var(--line);pointer-events:none}
+    .tabBtn{border:0;border-bottom:3px solid transparent;background:none;color:#67758b;font-size:14px;font-weight:700;min-height:48px;padding:12px 22px}
+    .tabBtn:hover{color:var(--brand)}
+    .tabBtn.on{color:var(--brand);border-bottom-color:var(--brand)}
+    .tabPanel{display:none}.tabPanel.on{display:block}
+    .status{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 16px;font-size:12px;color:var(--muted)}
+    .status .left{min-width:0}.pill{font-size:12px;color:var(--muted)}
+    #statusPill{display:none}#statusText::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:7px}
+    #updatedText{font-size:12px;color:var(--muted)}
+    .filterSummary{font-size:12px;color:var(--muted);line-height:1.6;overflow-wrap:anywhere;margin:12px 0 0}
+    .filterSection{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:20px}
+    .filterBar{display:flex;align-items:flex-end;gap:20px}
+    .quickFilters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;flex:1;min-width:0}
+    .quickFilters label{display:flex;flex-direction:column;gap:6px;color:#596b84;font-size:12px;min-width:0}
+    .quickFilters select{width:100%;min-width:0;min-height:42px;padding:8px 28px 8px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--text);font:inherit;font-size:13px}
+    select:focus-visible{outline:3px solid #93b4ff;outline-offset:2px}
+    .filterActions{display:flex;gap:8px;flex-shrink:0}
+    .advancedFilters{margin-top:18px;border-top:1px solid var(--line)}
+    .advancedFilters[hidden]{display:none}
+    .metricsPanel{margin-bottom:22px}.metricsPanel>.bd{padding:0}
+    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .kpi{min-width:0;padding:18px 20px;background:white;border:1px solid var(--line);border-radius:var(--radius)}
+    .kpi .k{font-size:12px;font-weight:500;color:#596b84;display:flex;align-items:center;gap:5px}
+    .kpi .v{color:var(--brand);font-size:27px;line-height:1.3;font-weight:750;font-variant-numeric:tabular-nums;margin-top:9px;letter-spacing:-.035em;overflow-wrap:anywhere}
+    .helpIcon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:1px solid #cbd5e1;color:var(--muted);font-size:10px;cursor:help}
+    .charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+    .charts .span2{grid-column:1/-1}
+    .card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);background:#fff;overflow:hidden}
+    .card .hd{padding:20px 20px 0;display:flex;justify-content:space-between;gap:12px}
+    .card .hd h3{font-size:15px;font-weight:750;line-height:1.5;margin:0}
     .card .bd{padding:16px 18px 18px}
-
-    .filterGroup{
-      margin:14px 4px 10px;
-      padding:0;
-    }
-    .filterGroup:first-child{margin-top:0}
-    .filterGroupBtn{
-      width:100%;
-      border:0;
-      border-radius:12px;
-      background:#f1f7fb;
-      color:#155e75;
-      padding:9px 10px;
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:-.02em;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:8px;
-      cursor:pointer;
-      text-align:left;
-    }
-    .filterGroupBtn:hover{
-      background:#e6f4f8;
-    }
-    .filterGroupTitle{
-      display:flex;
-      align-items:center;
-      gap:6px;
-      min-width:0;
-    }
-    .filterGroupMeta{
-      display:flex;
-      align-items:center;
-      gap:6px;
-      color:#64748b;
-      font-size:11px;
-      font-weight:800;
-      flex:0 0 auto;
-    }
-    .filterGroupArrow{
-      width:18px;
-      height:18px;
-      border-radius:999px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      background:rgba(255,255,255,.8);
-      color:#155e75;
-      transition:transform .15s ease;
-    }
-    .filterGroup.collapsed .filterGroupArrow{
-      transform:rotate(-90deg);
-    }
-    .filterGroupBody{
-      padding-top:2px;
-    }
-    .filterGroup.collapsed .filterGroupBody{
-      display:none;
-    }
-    .filters .sec{
-      margin:0 0 18px;
-      padding:0 4px;
-    }
-    .filters .sec h3{
-      margin:0;
-      font-size:13px;
-      line-height:1;
-      font-weight:900;
-      color:#0f172a;
-    }
-    .filters .sec .row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin:0 0 9px;
-    }
-    .filters .sec .tools{
-      display:flex;
-      gap:5px;
-      margin-left:auto;
-    }
-    .filters .sec .tools .btn{
-      padding:6px 8px;
-      font-size:11.5px;
-      border-radius:10px;
-      min-width:38px;
-      box-shadow:none;
-    }
-    .chips{
-      display:flex;
-      flex-wrap:wrap;
-      gap:7px;
-    }
-    .chip{
-      border:1px solid var(--line2);
-      background:#fff;
-      border-radius:12px;
-      padding:8px 10px;
-      min-width:44px;
-      text-align:center;
-      font-size:12px;
-      cursor:pointer;
-      user-select:none;
-      transition:.12s ease;
-      color:#334155;
-    }
-    .chip:hover{border-color:#93c5fd;background:#f8fbff}
-    .chip.on{
-      border-color:#7aa3ff;
-      background:#eaf1ff;
-      color:#1746a2;
-      font-weight:800;
-      box-shadow:0 4px 12px rgba(122,163,255,.16);
-    }
-    .chip.disabled{
-      opacity:.34;
-      background:#f3f4f6;
-      color:#94a3b8;
-      cursor:not-allowed;
-      text-decoration:line-through;
-    }
-    .chip.disabled:hover{border-color:var(--line2);background:#f3f4f6}
-
-    .status{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:12px;
-    }
-    .status .left{display:flex;gap:10px;align-items:center}
-    #updatedText{color:var(--muted);font-size:12.5px}
-
-    .kpis{
-      display:grid;
-      grid-template-columns:repeat(8,minmax(0,1fr));
-      gap:10px;
-    }
-    .kpi{
-      position:relative;
-      background:linear-gradient(180deg,#eef4ff 0%,#e7eefc 100%);
-      border:1px solid #dbe7fb;
-      border-radius:16px;
-      padding:13px 12px;
-      min-height:104px;
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-start;
-      overflow:hidden;
-    }
-    .kpi::after{
-      content:"";
-      position:absolute;
-      width:52px;
-      height:52px;
-      border-radius:999px;
-      background:rgba(255,255,255,.4);
-      right:-18px;
-      bottom:-18px;
-    }
-    .kpi .k{
-      font-size:11.5px;
-      color:#475569;
-      line-height:1.35;
-      word-break:keep-all;
-      font-weight:700;
-      z-index:1;
-    }
-    .helpIcon{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      width:16px;
-      height:16px;
-      margin-left:5px;
-      border-radius:999px;
-      border:1px solid #cbd5e1;
-      background:#fff;
-      color:#64748b;
-      font-size:11px;
-      font-weight:900;
-      cursor:help;
-      vertical-align:middle;
-    }
-    .helpIcon:hover{
-      border-color:#7aa3ff;
-      color:#1746a2;
-      background:#f8fbff;
-    }
-
-    .kpi .v{
-      font-size:18px;
-      font-weight:900;
-      margin-top:8px;
-      line-height:1.25;
-      word-break:keep-all;
-      z-index:1;
-    }
-
-    .charts{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      align-items:stretch;
-    }
-    .charts .span2{grid-column:1 / -1}
-    .chartBox{
-      position:relative;
-      height:318px;
-      min-height:318px;
-      overflow:hidden;
-    }
-    .chartBox.tall{height:366px;min-height:366px}
-    .chartBox.short{height:286px;min-height:286px}
-    .chartBox canvas{
-      position:absolute;
-      inset:0;
-      display:block;
-    }
-
-    .sidebarOverlay{
-      display:none;
-      position:fixed;
-      inset:0;
-      background:rgba(15,23,42,.24);
-      z-index:19;
-    }
-
-    @media (max-width: 1180px){
-      .kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
-      .title h1{font-size:24px}
-    }
-
-    @media (max-width: 900px){
-      .appShell{grid-template-columns:1fr}
-      .sidebar{
-        position:fixed;
-        left:0;
-        top:0;
-        width:min(86vw,var(--sidebar));
-        transform:translateX(-100%);
-        opacity:0;
-        pointer-events:none;
-      }
-      body:not(.sidebar-collapsed) .sidebar{
-        transform:translateX(0);
-        opacity:1;
-        pointer-events:auto;
-      }
-      body:not(.sidebar-collapsed) .sidebarOverlay{display:block}
-      .main{padding:14px 12px 24px}
-      .topbar{align-items:flex-start}
-      .topActions{gap:6px}
-      .tabs{justify-content:flex-start;overflow:auto;padding-bottom:2px}
-      .tabBtn{font-size:14px;min-width:104px;padding:10px 14px}
-      .charts{grid-template-columns:1fr}
-      .charts .span2{grid-column:auto}
-      .chartBox,.chartBox.tall,.chartBox.short{height:318px;min-height:318px}
-      .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .kpi{min-height:96px}
-      .helpIcon{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      width:16px;
-      height:16px;
-      margin-left:5px;
-      border-radius:999px;
-      border:1px solid #cbd5e1;
-      background:#fff;
-      color:#64748b;
-      font-size:11px;
-      font-weight:900;
-      cursor:help;
-      vertical-align:middle;
-    }
-    .helpIcon:hover{
-      border-color:#7aa3ff;
-      color:#1746a2;
-      background:#f8fbff;
-    }
-
-    .kpi .v{font-size:17px}
-    }
-  
-    /* ✅ 필터 그룹 접기/펼치기 표시 강화 */
-    .filterGroupBtn{
-      position:relative;
-      border:1px solid #dbeafe !important;
-      box-shadow:0 2px 8px rgba(15,23,42,.04);
-    }
-    .filterGroupBtn::after{
-      content:"접기";
-      font-size:10px;
-      font-weight:800;
-      color:#64748b;
-      background:#fff;
-      border:1px solid #dbe3ef;
-      border-radius:999px;
-      padding:3px 7px;
-      margin-left:auto;
-    }
-    .filterGroup.collapsed .filterGroupBtn::after{
-      content:"펼치기";
-    }
-    .filterGroupArrow{
-      font-size:13px !important;
-      font-weight:900 !important;
-      border:1px solid #cbd5e1;
-    }
-    .filterGroup.collapsed .filterGroupArrow{
-      transform:rotate(-90deg);
-      background:#eaf1ff;
-      color:#1746a2;
-      border-color:#9bb8ff;
-    }
-
-  </style>
+    .chartScroll{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
+    .chartBox{height:290px;position:relative;min-width:0}.chartBox.tall{height:320px}.chartBox.short{height:270px}
+    .chartBox canvas{display:block}
+    .scrollHint{display:none;font-size:11px;color:var(--muted);margin:0 0 8px}
+    .sidebarHeader{display:flex;align-items:center;justify-content:space-between;padding:14px 0 8px;gap:12px}
+    .sidebarTitle{font-size:14px;font-weight:750}
+    .filterNote{font-size:12px;color:var(--muted);padding:0 0 16px;margin:0}
+    .filters{max-height:55vh;overflow:auto;overscroll-behavior:contain;padding:4px 4px 4px 0}
+    #filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:start}
+    .filterGroup{margin-bottom:22px}
+    .filterGroupBtn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;border:0;border-radius:6px;background:var(--brandSoft);color:var(--brand);font-size:13px;font-weight:700;padding:12px;text-align:left}
+    .filterGroupMeta{display:flex;gap:8px;align-items:center;font-size:11px}.filterGroupArrow{font-size:18px;line-height:1;transition:transform .15s}
+    .filterGroup.collapsed .filterGroupArrow{transform:rotate(-90deg)}.filterGroup.collapsed .filterGroupBody{display:none}
+    .filterGroupBody{padding-top:16px}.filters .sec{margin-bottom:20px}.filters .row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
+    .filters h3{font-size:13px;margin:0}.tools{display:flex;gap:6px}.tools .btn{font-size:11px;min-height:32px;padding:5px 9px}
+    .chips{display:flex;flex-wrap:wrap;gap:7px}
+    .chip{min-height:40px;min-width:40px;border:1px solid var(--line);border-radius:6px;background:#fff;color:#4b5d75;padding:8px 11px;font-size:12px;overflow-wrap:anywhere;max-width:100%}
+    .chip:hover{border-color:#93b4ff;background:#f7faff}.chip.on{background:#eaf1ff;border-color:#8aafff;color:#1d4ed8;font-weight:700}
+    .chip:disabled{opacity:.42;background:#f5f6f8}.filterFooter{display:flex;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--line)}
+    .pageFooter{display:flex;justify-content:space-between;gap:12px;margin-top:30px;padding-top:20px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+    @media(max-width:900px){.main{padding:0 20px 28px}.topbar{gap:16px}.title h1{font-size:22px}.topActions{gap:6px}.btn{padding:9px 10px;font-size:12px}.charts{grid-template-columns:1fr}.charts .span2{grid-column:auto}.kpi{padding:16px}.kpi .v{font-size:25px}}
+    @media(max-width:600px){.main{padding:0 16px 24px}.pageHeader{margin-bottom:16px}.topbar{display:block;padding:22px 0 12px}.title h1{font-size:22px}.title p{font-size:10px;margin-top:5px}.topActions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:18px}.topActions .btn{padding:8px 4px;min-height:44px;font-size:11px;gap:4px}.topActions svg{width:14px;height:14px}.tabs{gap:0;display:grid;grid-template-columns:repeat(3,1fr)}.tabBtn{padding:12px 4px;min-height:48px;font-size:13px}.status{gap:4px;margin-bottom:12px;align-items:flex-start;flex-direction:column;font-size:11px}.pill,#updatedText{font-size:11px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.kpi{padding:14px 16px}.kpi .k{font-size:11px}.kpi .v{font-size:25px;margin-top:7px}.metricsPanel{margin-bottom:18px}.charts{gap:14px}.card .hd{padding:17px 16px 0}.card .hd h3{font-size:14px}.card .bd{padding:12px 12px 16px}.chartBox,.chartBox.tall,.chartBox.short{height:280px;min-width:var(--chart-min,0px)}.scrollHint{display:block}.sidebar{width:min(92vw,410px)}.filterNote{padding-left:18px;padding-right:18px}.filters{padding-left:18px;padding-right:18px}.chip{min-height:44px}.pageFooter{font-size:10px}}
+    @media(max-width:1100px){.topbar{align-items:flex-start;flex-direction:column;gap:14px;padding-bottom:12px}.headerControls{width:100%;justify-content:space-between}.filterBar{flex-wrap:wrap}.quickFilters{flex-basis:100%}.filterActions{margin-left:auto}}
+    @media(max-width:600px){.headerControls{gap:10px;margin-top:14px}.tabs{display:flex;gap:0;flex:1}.tabBtn{flex:1;font-size:12px;padding:12px 4px}.topActions{display:flex;margin:0;gap:5px}.topActions .iconBtn{width:40px;min-height:44px}.topActions svg{width:18px;height:18px}.filterSection{padding:14px;margin-bottom:16px}.filterBar{gap:12px}.quickFilters{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.quickFilters select{min-height:44px;font-size:14px}.filterActions .btn{min-height:44px}.filterSummary{font-size:11px}.filters{padding:4px 4px 4px 0}#filters{grid-template-columns:1fr;gap:0}.filterNote{padding:0 0 12px}.sidebarHeader{padding:12px 0}.filterGroup{margin-bottom:16px}}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
 </head>
 
 <body>
   <div class="appShell">
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebarHeader">
-        <div class="sidebarTitle">🔎 필터</div>
-        <button class="iconBtn" id="btnCloseSidebar" title="필터 닫기">‹</button>
-      </div>
-      <div class="filterNote">선택 조건에 데이터가 없는 값은 자동으로 비활성화됩니다.</div>
-      <div class="filters filtersWrap" id="filtersCard">
-        <div id="filters"></div>
-      </div>
-    </aside>
-
-    <div class="sidebarOverlay" id="sidebarOverlay"></div>
-
     <main class="main">
+<header class="pageHeader">
       <div class="topbar">
-        <div class="title">
-          <button class="iconBtn" id="btnToggleFilters" title="필터 열기/닫기">☰</button>
-          <div class="logoBadge">📊</div>
-          <div>
-            <h1>방송 매출 대시보드</h1><div style="margin-top:6px;color:#155e75;font-size:12px;font-weight:800">v5.1 · 연간 제품 그래프 = 아이템축/연도별 막대</div>
-            <p>엑셀 슬라이서처럼 선택하면 KPI/차트가 즉시 변경됩니다.</p>
+        <div class="title"><h1>방송 매출 대시보드</h1><p>WHOLEBERRY</p></div>
+        <div class="headerControls">
+      <nav class="tabs" id="tabs" aria-label="분석 화면">
+        <button class="tabBtn on" data-tab="summary" aria-pressed="true" aria-controls="tab-summary">요약</button>
+        <button class="tabBtn" data-tab="detail" aria-pressed="false" aria-controls="tab-detail">방송상세</button>
+        <button class="tabBtn" data-tab="ppl" aria-pressed="false" aria-controls="tab-ppl">PPL</button>
+      </nav>
+        <div class="topActions">
+          <button class="iconBtn" id="btnRefresh" title="새로고침" aria-label="새로고침"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5M19 12a7 7 0 1 0-2 5"/></svg></button>
+          <button class="iconBtn" id="btnKey" title="키 변경" aria-label="키 변경"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="15" cy="8" r="4"/><path d="m12 11-8 8v2h3v-3h3l4-4"/></svg></button>
+          <span id="statusPill" hidden></span>
+        </div>
+        </div>
+      </div>
+      </header>
+      <section class="filterSection" aria-label="조회 필터">
+        <div class="filterBar">
+          <div class="quickFilters" id="quickFilters">
+            <label>연도<select data-key="years" aria-label="연도"><option value="">전체</option></select></label>
+            <label>월<select data-key="months" aria-label="월"><option value="">전체</option></select></label>
+            <label>아이템<select data-key="items" aria-label="아이템"><option value="">전체</option></select></label>
+            <label>방송채널<select data-key="channels" aria-label="방송채널"><option value="">전체</option></select></label>
+          </div>
+          <div class="filterActions">
+            <button class="btn" id="btnReset">전체 해제</button>
+            <button class="btn primary" id="btnToggleFilters" aria-controls="advancedFilters" aria-expanded="false">상세검색</button>
           </div>
         </div>
-
-        <div class="topActions">
-          <span class="pill" id="statusPill">상태: -</span>
-          <button class="btn" id="btnReset">↺ 전체 해제</button>
-          <button class="btn primary" id="btnRefresh">⟳ 새로고침</button>
-          <button class="btn" id="btnKey">🔑 키 변경</button>
+        <div class="filterSummary" id="filterSummary">전체 조건으로 조회 중</div>
+        <div class="advancedFilters" id="advancedFilters" hidden>
+          <div class="sidebarHeader">
+            <div class="sidebarTitle" id="filterTitle">상세검색</div>
+            <button class="btn" id="btnCloseSidebar">닫기</button>
+          </div>
+          <p class="filterNote">여러 조건을 선택할 수 있습니다. 선택 즉시 반영되며, 데이터가 없는 값은 비활성화됩니다.</p>
+          <div class="filters" id="filtersCard"><div id="filters"></div></div>
+          <div class="filterFooter"><button class="btn" id="btnViewResults">상세검색 접기</button></div>
         </div>
-      </div>
-
-      <div class="tabs" id="tabs">
-        <button class="tabBtn on" data-tab="summary">📌 요약</button>
-        <button class="tabBtn" data-tab="detail">📺 방송상세</button>
-        <button class="tabBtn" data-tab="ppl">🎯 PPL</button>
-      </div>
-
+      </section>
       <div class="grid" id="gridRoot">
         <div>
-        <div class="card" style="margin-bottom:14px">
+        <div class="metricsPanel">
           <div class="bd">
             <div class="status">
-              <div class="left"><span class="pill" id="statusText">상태: -</span></div>
+              <div class="left"><span class="pill" id="statusText" role="status" aria-live="polite">상태: -</span></div>
               <div style="color:var(--muted);font-size:13px" id="updatedText">업데이트: -</div>
             </div>
             <div class="kpis" id="kpis"></div>
@@ -713,10 +228,10 @@
         </div>
 
         <div class="tabPanel" id="tab-ppl">
-          <div class="card" style="margin-bottom:14px">
+          <div class="metricsPanel">
             <div class="bd">
               <div class="status">
-                <div class="left"><span class="pill">🎯 PPL 투자 효율</span></div>
+                <div class="left"><span class="pill">PPL 투자 효율</span></div>
               </div>
               <div class="kpis" id="pplKpis"></div>
             </div>
@@ -756,13 +271,45 @@
         </div>
         </div>
       </div>
-    </main>
+    <footer class="pageFooter"><span>WHOLEBERRY · 방송 매출</span><span>금액 단위는 원본 데이터 기준</span></footer></main>
   </div>
 
 <script>
+document.querySelectorAll('.chartBox').forEach(box => {
+  const scroll = document.createElement('div');
+  scroll.className = 'chartScroll';
+  scroll.tabIndex = 0;
+  scroll.setAttribute('role', 'region');
+  scroll.setAttribute('aria-label', box.closest('.card').querySelector('h3').textContent + ' 그래프');
+  const hint = document.createElement('p');
+  hint.className = 'scrollHint';
+  hint.textContent = '좌우로 밀어 전체 그래프를 확인하세요';
+  box.before(hint, scroll);
+  scroll.append(box);
+  const canvas = box.querySelector('canvas');
+  canvas.setAttribute('role', 'img');
+  canvas.setAttribute('aria-label', scroll.getAttribute('aria-label'));
+});
+if (typeof Chart !== 'undefined') {
+  Chart.defaults.font.family = '"Malgun Gothic", "Apple SD Gothic Neo", sans-serif';
+  Chart.defaults.font.size = 11;
+  Chart.defaults.color = '#718096';
+  Chart.defaults.borderColor = '#edf0f5';
+  Chart.defaults.plugins.legend.labels.boxWidth = 10;
+  Chart.defaults.plugins.legend.labels.boxHeight = 10;
+  Chart.defaults.plugins.legend.labels.padding = 16;
+  Chart.register({id:'portalColors', beforeUpdate(chart){
+    const colors = ['#93b4f8','#2563eb','#0f9b8e','#a78bfa'];
+    chart.data.datasets.forEach((dataset, index) => {
+      const color = chart.data.datasets.length === 1 ? '#3b82f6' : colors[index % colors.length];
+      dataset.backgroundColor = color;
+      dataset.borderColor = color;
+      if (dataset.type === 'bar') dataset.borderRadius = 3;
+    });
+  }});
+}
 const API_URL = "https://script.google.com/macros/s/AKfycbwjSN2IV3awKafRyhr6nIdSK_AExb-7UVkY5NX96sedyb6x75tpw9sdLqEfZSVk1F_lDA/exec";
 const DEFAULT_KEY = "WHHS-PSM-221035";
-const FILTER_UI_KEY = "dash_filters_collapsed";
 const FILTER_GROUP_UI_KEY = "dash_filter_group_collapsed";
 const DOW_ORDER = ['일','월','화','수','목','금','토'];
 
@@ -797,6 +344,7 @@ function setActiveTab(tab){
 
   document.querySelectorAll('.tabBtn').forEach(btn=>{
     btn.classList.toggle('on', btn.dataset.tab === tab);
+    btn.setAttribute('aria-pressed', String(btn.dataset.tab === tab));
   });
 
   document.querySelectorAll('.tabPanel').forEach(panel=>{
@@ -817,28 +365,27 @@ document.querySelectorAll('.tabBtn').forEach(btn=>{
  *  ========================= */
 const btnToggleFilters = document.getElementById("btnToggleFilters");
 const btnCloseSidebar = document.getElementById("btnCloseSidebar");
-const sidebarOverlay = document.getElementById("sidebarOverlay");
+const filterPanel = document.getElementById('advancedFilters');
 
 function setFiltersCollapsed(collapsed){
-  document.body.classList.toggle("sidebar-collapsed", collapsed);
-  localStorage.setItem(FILTER_UI_KEY, collapsed ? "1" : "0");
-
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    if (store.lastData) renderFromData(store.lastData);
-  }));
+  filterPanel.hidden = collapsed;
+  btnToggleFilters.setAttribute('aria-expanded', String(!collapsed));
+  btnToggleFilters.textContent = collapsed ? '상세검색' : '상세검색 닫기';
+  if (collapsed) btnToggleFilters.focus({preventScroll:true});
 }
-
-btnToggleFilters?.addEventListener("click", ()=>{
-  setFiltersCollapsed(!document.body.classList.contains("sidebar-collapsed"));
+btnToggleFilters.addEventListener('click', () => setFiltersCollapsed(!filterPanel.hidden));
+btnCloseSidebar.addEventListener('click', () => setFiltersCollapsed(true));
+document.getElementById('btnViewResults').addEventListener('click', () => setFiltersCollapsed(true));
+filterPanel.addEventListener('keydown', event => {
+  if (event.key === 'Escape') setFiltersCollapsed(true);
 });
-btnCloseSidebar?.addEventListener("click", ()=>setFiltersCollapsed(true));
-sidebarOverlay?.addEventListener("click", ()=>setFiltersCollapsed(true));
-
-(function initFiltersCollapsed(){
-  const saved = localStorage.getItem(FILTER_UI_KEY);
-  const mobile = window.matchMedia("(max-width: 900px)").matches;
-  setFiltersCollapsed(saved === "1" || mobile);
-})();
+document.querySelectorAll('#quickFilters select').forEach(select => {
+  select.addEventListener('change', () => {
+    store.filters[select.dataset.key] = select.value ? [select.value] : [];
+    renderFilters();
+    loadAll(false);
+  });
+});
 
 document.getElementById('btnKey').addEventListener('click', () => {
   const k = prompt("접속 키를 입력하세요", store.key || "");
@@ -978,7 +525,32 @@ function selectedCountForGroup(group){
   }, 0);
 }
 
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
+function renderQuickFilters(){
+  document.querySelectorAll('#quickFilters select').forEach(select => {
+    const key = select.dataset.key;
+    const selected = store.filters[key];
+    const available = new Set((store.availableOptions?.[key] || store.options?.[key] || []).map(String));
+    select.disabled = !store.options;
+    select.innerHTML = '<option value="">전체</option>' +
+      (selected.length > 1 ? `<option value="" selected disabled>${selected.length}개 선택 · 상세검색에서 변경</option>` : '') +
+      sortedValues(key, store.options?.[key] || []).map(value => {
+        const chosen = selected.includes(String(value));
+        return `<option value="${escapeHtml(value)}" ${selected.length === 1 && chosen ? 'selected' : ''} ${!chosen && !available.has(String(value)) ? 'disabled' : ''}>${escapeHtml(value)}</option>`;
+      }).join('');
+  });
+}
 function renderFilters(){
+  const focused = elFilters.contains(document.activeElement) ? {...document.activeElement.dataset} : null;
+  const selected = Object.values(store.filters).flat();
+  renderQuickFilters();
+  const names = {years:'연도',months:'월',days:'일',dows:'요일',items:'아이템',channels:'방송채널',guests:'게스트',pplBroadcasters:'PPL 방송사',pplPrograms:'PPL 프로그램',pplTypes:'PPL 구분'};
+  document.getElementById('filterSummary').textContent = selected.length
+    ? Object.entries(store.filters).filter(([,values]) => values.length).map(([key,values]) => names[key] + ': ' + values.join(', ')).join(' / ')
+    : '전체 조건으로 조회 중';
+
   if (!store.options){
     elFilters.innerHTML = `<div style="color:var(--muted);font-size:13px">옵션 로딩 중...</div>`;
     return;
@@ -990,7 +562,7 @@ function renderFilters(){
   const groups = [
     {
       key:'period',
-      title:'📅 기간',
+      title:'기간',
       sections:[
         { key:'years', label:'연도', values: sortedValues('years', opts.years) },
         { key:'months', label:'월', values: sortedValues('months', opts.months) },
@@ -1000,7 +572,7 @@ function renderFilters(){
     },
     {
       key:'product',
-      title:'📦 상품/방송',
+      title:'상품 / 방송',
       sections:[
         { key:'items', label:'아이템', values: sortedValues('items', opts.items) },
         { key:'channels', label:'방송채널', values: sortedValues('channels', opts.channels) },
@@ -1009,7 +581,7 @@ function renderFilters(){
     },
     {
       key:'ppl',
-      title:'🎯 PPL',
+      title:'PPL',
       sections:[
         { key:'pplBroadcasters', label:'PPL 방송사', values: sortedValues('pplBroadcasters', opts.pplBroadcasters) },
         { key:'pplPrograms', label:'PPL 프로그램', values: sortedValues('pplPrograms', opts.pplPrograms) },
@@ -1028,7 +600,7 @@ function renderFilters(){
 
     return `
       <div class="filterGroup ${groupCollapsed ? 'collapsed' : ''}" data-group="${group.key}">
-        <button class="filterGroupBtn" type="button" data-group-toggle="${group.key}" title="클릭하면 이 필터 구간을 접거나 펼칩니다">
+        <button class="filterGroupBtn" type="button" aria-expanded="${!groupCollapsed}" data-group-toggle="${group.key}" title="클릭하면 이 필터 구간을 접거나 펼칩니다">
           <span class="filterGroupTitle">${group.title}</span>
           <span class="filterGroupMeta">
             ${selectedCount ? `<span>선택 ${selectedCount}</span>` : ''}
@@ -1054,7 +626,7 @@ function renderFilters(){
                     const sv = String(v);
                     const on = sel.includes(sv);
                     const disabled = !on && !availSet.has(sv);
-                    return `<div class="chip ${on?'on':''} ${disabled?'disabled':''}" data-key="${sec.key}" data-val="${sv}" data-disabled="${disabled ? '1':'0'}">${sv}</div>`;
+                    return `<button type="button" class="chip ${on?'on':''} ${disabled?'disabled':''}" data-key="${sec.key}" data-val="${escapeHtml(sv)}" data-disabled="${disabled ? '1':'0'}" aria-pressed="${on}" ${disabled ? 'disabled' : ''}>${escapeHtml(sv)}</button>`;
                   }).join('')}
                 </div>
               </div>
@@ -1072,6 +644,7 @@ function renderFilters(){
       const collapsed = !(box && box.classList.contains('collapsed'));
       setCollapsedFilterGroup(groupKey, collapsed);
       if (box) box.classList.toggle('collapsed', collapsed);
+      btn.setAttribute('aria-expanded', String(!collapsed));
     });
   });
 
@@ -1104,6 +677,11 @@ function renderFilters(){
       loadAll(false);
     });
   });
+  if (focused) {
+    [...elFilters.querySelectorAll('button')].find(button =>
+      button.dataset.key === focused.key && button.dataset.val === focused.val && button.dataset.act === focused.act
+    )?.focus({preventScroll:true});
+  }
 }
 
 function destroyChart(ch){ if (ch && typeof ch.destroy === 'function') ch.destroy(); }
@@ -1132,26 +710,20 @@ function canvasIdMap(id){
     chFeeItem:'feeItem'
   }[id];
 }
-function prepareCanvas(canvasId){
+function prepareCanvas(canvasId, labels){
   const canvas = document.getElementById(canvasId);
   if (!canvas) return null;
   const panel = canvas.closest('.tabPanel');
   if (panel && !panel.classList.contains('on')) return null;
-  const box = canvas.parentElement;
-  const rect = box.getBoundingClientRect();
-  const w = Math.max(10, Math.floor(rect.width));
-  const h = Math.max(10, Math.floor(rect.height));
-  canvas.style.width = w + "px";
-  canvas.style.height = h + "px";
-  canvas.width = w;
-  canvas.height = h;
+  const count = safeArr(labels).length;
+  canvas.parentElement.style.setProperty('--chart-min', count > 6 ? (count * 48 + 100) + 'px' : '0px');
   return canvas;
 }
 
 function makeComboChart(canvasId, labels, goal, actual, ratePct, count, extraInfo){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
-  const canvas = prepareCanvas(canvasId);
+  const canvas = prepareCanvas(canvasId, labels);
   if (!canvas) return;
   const rate100 = normalizeRateArray(ratePct);
 
@@ -1165,7 +737,7 @@ function makeComboChart(canvasId, labels, goal, actual, ratePct, count, extraInf
       ]
     },
     options: {
-      responsive:false, maintainAspectRatio:false, animation:false,
+      responsive:true, maintainAspectRatio:false, animation:false,
       plugins:{
         legend:{ position:'top' },
         tooltip:{
@@ -1192,7 +764,7 @@ function makeComboChart(canvasId, labels, goal, actual, ratePct, count, extraInf
 function makeAnnualItemSalesChart(canvasId, annualData){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
-  const canvas = prepareCanvas(canvasId);
+  const canvas = prepareCanvas(canvasId, annualData?.items);
   if (!canvas) return;
 
   const years = safeArr(annualData?.years).map(String);
@@ -1215,7 +787,7 @@ function makeAnnualItemSalesChart(canvasId, annualData){
       datasets
     },
     options: {
-      responsive:false,
+      responsive:true,
       maintainAspectRatio:false,
       animation:false,
       plugins:{
@@ -1251,7 +823,7 @@ function makeAnnualItemSalesChart(canvasId, annualData){
 function makeAnnualItemAchievementChart(canvasId, annualData){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
-  const canvas = prepareCanvas(canvasId);
+  const canvas = prepareCanvas(canvasId, annualData?.items);
   if (!canvas) return;
 
   const years = safeArr(annualData?.years).map(String);
@@ -1274,7 +846,7 @@ function makeAnnualItemAchievementChart(canvasId, annualData){
       datasets
     },
     options:{
-      responsive:false,
+      responsive:true,
       maintainAspectRatio:false,
       animation:false,
       plugins:{
@@ -1306,7 +878,7 @@ function makeAnnualItemAchievementChart(canvasId, annualData){
 function makePplCostEfficiencyChart(canvasId, labels, pplCost, actual, costRate, count, pplCount){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
-  const canvas = prepareCanvas(canvasId);
+  const canvas = prepareCanvas(canvasId, labels);
   if (!canvas) return;
 
   const costArr = safeArr(pplCost).map(toNumberSafe);
@@ -1327,7 +899,7 @@ function makePplCostEfficiencyChart(canvasId, labels, pplCost, actual, costRate,
       ]
     },
     options:{
-      responsive:false,
+      responsive:true,
       maintainAspectRatio:false,
       animation:false,
       plugins:{
@@ -1357,7 +929,7 @@ function makePplCostEfficiencyChart(canvasId, labels, pplCost, actual, costRate,
 function makeProfitChart(canvasId, labels, profitSum, count){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
-  const canvas = prepareCanvas(canvasId);
+  const canvas = prepareCanvas(canvasId, labels);
   if (!canvas) return;
   const profitArr = safeArr(profitSum).map(toNumberSafe);
 
@@ -1369,7 +941,7 @@ function makeProfitChart(canvasId, labels, profitSum, count){
       ]
     },
     options: {
-      responsive:false, maintainAspectRatio:false, animation:false,
+      responsive:true, maintainAspectRatio:false, animation:false,
       plugins:{
         legend:{ position:'top' },
         tooltip:{
@@ -1390,7 +962,7 @@ function makeProfitChart(canvasId, labels, profitSum, count){
 function makeFeeStatsChart(canvasId, labels, avgFeeRate, minFeeRate, maxFeeRate, count, minFeeDate, maxFeeDate){
   const key = canvasIdMap(canvasId);
   destroyChart(store.charts[key]);
-  const canvas = prepareCanvas(canvasId);
+  const canvas = prepareCanvas(canvasId, labels);
   if (!canvas) return;
 
   const avg100 = normalizeRateArray(avgFeeRate);
@@ -1407,7 +979,7 @@ function makeFeeStatsChart(canvasId, labels, avgFeeRate, minFeeRate, maxFeeRate,
       ]
     },
     options: {
-      responsive:false, maintainAspectRatio:false, animation:false,
+      responsive:true, maintainAspectRatio:false, animation:false,
       plugins:{
         legend:{ position:'top' },
         tooltip:{
