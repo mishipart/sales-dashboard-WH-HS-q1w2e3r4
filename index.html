@@ -19,14 +19,15 @@
     .topbar{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px 0 22px}
     .title h1{font-size:25px;line-height:1.3;letter-spacing:-.045em;margin:0;font-weight:800}
     .title p{font-size:11px;letter-spacing:.13em;color:var(--muted);margin:6px 0 0}
-    .topActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .headerControls{display:flex;align-items:center;gap:24px;min-width:0}
+    .topActions{display:flex;gap:8px;align-items:center}
     .btn,.iconBtn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);border-radius:6px;min-height:42px;padding:9px 13px;background:#fff;color:#43526a;font-size:13px;font-weight:600;white-space:nowrap}
     .btn:hover,.iconBtn:hover{background:#f5f8fd;border-color:#b7c8e2}
     .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
     .btn.primary:hover{background:#1d4ed8}
     .btn svg,.iconBtn svg{width:17px;height:17px;flex:none}
     .iconBtn{width:42px;padding:0}
-    .tabs{display:flex;gap:26px}
+    .tabs{display:flex;gap:8px}
     .tabBtn{border:0;border-bottom:3px solid transparent;background:none;color:#67758b;font-size:14px;font-weight:700;min-height:48px;padding:12px 22px}
     .tabBtn:hover{color:var(--brand)}
     .tabBtn.on{color:var(--brand);border-bottom-color:var(--brand)}
@@ -35,7 +36,16 @@
     .status .left{min-width:0}.pill{font-size:12px;color:var(--muted)}
     #statusPill{display:none}#statusText::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:7px}
     #updatedText{font-size:12px;color:var(--muted)}
-    .filterSummary{font-size:12px;color:var(--brand);line-height:1.6;overflow-wrap:anywhere;margin:0 0 14px}.filterSummary:empty{display:none}
+    .filterSummary{font-size:12px;color:var(--muted);line-height:1.6;overflow-wrap:anywhere;margin:12px 0 0}
+    .filterSection{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:20px}
+    .filterBar{display:flex;align-items:flex-end;gap:20px}
+    .quickFilters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;flex:1;min-width:0}
+    .quickFilters label{display:flex;flex-direction:column;gap:6px;color:#596b84;font-size:12px;min-width:0}
+    .quickFilters select{width:100%;min-width:0;min-height:42px;padding:8px 28px 8px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--text);font:inherit;font-size:13px}
+    select:focus-visible{outline:3px solid #93b4ff;outline-offset:2px}
+    .filterActions{display:flex;gap:8px;flex-shrink:0}
+    .advancedFilters{margin-top:18px;border-top:1px solid var(--line)}
+    .advancedFilters[hidden]{display:none}
     .metricsPanel{margin-bottom:22px}.metricsPanel>.bd{padding:0}
     .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
     .kpi{min-width:0;padding:18px 20px;background:white;border:1px solid var(--line);border-radius:var(--radius)}
@@ -52,13 +62,11 @@
     .chartBox{height:290px;position:relative;min-width:0}.chartBox.tall{height:320px}.chartBox.short{height:270px}
     .chartBox canvas{display:block}
     .scrollHint{display:none;font-size:11px;color:var(--muted);margin:0 0 8px}
-    .sidebar{position:fixed;inset:0 0 0 auto;margin:0;border:0;border-left:1px solid var(--line);width:410px;max-width:100%;height:100dvh;max-height:100dvh;padding:0;background:#fff;color:var(--text)}
-    .sidebar::backdrop{background:rgba(15,23,42,.32)}
-    body:has(.sidebar[open]){overflow:hidden}
-    .sidebarHeader{position:sticky;top:0;z-index:2;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line)}
-    .sidebarTitle{font-size:18px;font-weight:750}
-    .filterNote{font-size:12px;color:var(--muted);padding:16px 22px 8px}
-    .filters{padding:10px 22px 90px}
+    .sidebarHeader{display:flex;align-items:center;justify-content:space-between;padding:14px 0 8px;gap:12px}
+    .sidebarTitle{font-size:14px;font-weight:750}
+    .filterNote{font-size:12px;color:var(--muted);padding:0 0 16px;margin:0}
+    .filters{max-height:55vh;overflow:auto;overscroll-behavior:contain;padding:4px 4px 4px 0}
+    #filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:start}
     .filterGroup{margin-bottom:22px}
     .filterGroupBtn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;border:0;border-radius:6px;background:var(--brandSoft);color:var(--brand);font-size:13px;font-weight:700;padding:12px;text-align:left}
     .filterGroupMeta{display:flex;gap:8px;align-items:center;font-size:11px}.filterGroupArrow{font-size:18px;line-height:1;transition:transform .15s}
@@ -68,47 +76,60 @@
     .chips{display:flex;flex-wrap:wrap;gap:7px}
     .chip{min-height:40px;min-width:40px;border:1px solid var(--line);border-radius:6px;background:#fff;color:#4b5d75;padding:8px 11px;font-size:12px;overflow-wrap:anywhere;max-width:100%}
     .chip:hover{border-color:#93b4ff;background:#f7faff}.chip.on{background:#eaf1ff;border-color:#8aafff;color:#1d4ed8;font-weight:700}
-    .chip:disabled{opacity:.42;background:#f5f6f8}.filterFooter{position:sticky;bottom:0;padding:14px 22px max(14px,env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line)}
-    .filterFooter .btn{width:100%}.pageFooter{display:flex;justify-content:space-between;gap:12px;margin-top:30px;padding-top:20px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .chip:disabled{opacity:.42;background:#f5f6f8}.filterFooter{display:flex;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--line)}
+    .pageFooter{display:flex;justify-content:space-between;gap:12px;margin-top:30px;padding-top:20px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
     @media(max-width:900px){.main{padding:0 20px 28px}.topbar{gap:16px}.title h1{font-size:22px}.topActions{gap:6px}.btn{padding:9px 10px;font-size:12px}.charts{grid-template-columns:1fr}.charts .span2{grid-column:auto}.kpi{padding:16px}.kpi .v{font-size:25px}}
     @media(max-width:600px){.main{padding:0 16px 24px}.pageHeader{margin-bottom:16px}.topbar{display:block;padding:22px 0 12px}.title h1{font-size:22px}.title p{font-size:10px;margin-top:5px}.topActions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:18px}.topActions .btn{padding:8px 4px;min-height:44px;font-size:11px;gap:4px}.topActions svg{width:14px;height:14px}.tabs{gap:0;display:grid;grid-template-columns:repeat(3,1fr)}.tabBtn{padding:12px 4px;min-height:48px;font-size:13px}.status{gap:4px;margin-bottom:12px;align-items:flex-start;flex-direction:column;font-size:11px}.pill,#updatedText{font-size:11px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.kpi{padding:14px 16px}.kpi .k{font-size:11px}.kpi .v{font-size:25px;margin-top:7px}.metricsPanel{margin-bottom:18px}.charts{gap:14px}.card .hd{padding:17px 16px 0}.card .hd h3{font-size:14px}.card .bd{padding:12px 12px 16px}.chartBox,.chartBox.tall,.chartBox.short{height:280px;min-width:var(--chart-min,0px)}.scrollHint{display:block}.sidebar{width:min(92vw,410px)}.filterNote{padding-left:18px;padding-right:18px}.filters{padding-left:18px;padding-right:18px}.chip{min-height:44px}.pageFooter{font-size:10px}}
+    @media(max-width:1100px){.topbar{align-items:flex-start;flex-direction:column;gap:14px;padding-bottom:12px}.headerControls{width:100%;justify-content:space-between}.filterBar{flex-wrap:wrap}.quickFilters{flex-basis:100%}.filterActions{margin-left:auto}}
+    @media(max-width:600px){.headerControls{gap:10px;margin-top:14px}.tabs{display:flex;gap:0;flex:1}.tabBtn{flex:1;font-size:12px;padding:12px 4px}.topActions{display:flex;margin:0;gap:5px}.topActions .iconBtn{width:40px;min-height:44px}.topActions svg{width:18px;height:18px}.filterSection{padding:14px;margin-bottom:16px}.filterBar{gap:12px}.quickFilters{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.quickFilters select{min-height:44px;font-size:14px}.filterActions .btn{min-height:44px}.filterSummary{font-size:11px}.filters{padding:4px 4px 4px 0}#filters{grid-template-columns:1fr;gap:0}.filterNote{padding:0 0 12px}.sidebarHeader{padding:12px 0}.filterGroup{margin-bottom:16px}}
     @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 
 <body>
   <div class="appShell">
-    <dialog class="sidebar" id="sidebar" aria-labelledby="filterTitle">
-      <div class="sidebarHeader">
-        <div class="sidebarTitle" id="filterTitle">조회 필터</div>
-        <button class="iconBtn" id="btnCloseSidebar" title="필터 닫기" aria-label="필터 닫기" autofocus><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
-      </div>
-      <div class="filterNote">선택 조건에 데이터가 없는 값은 자동으로 비활성화됩니다.</div>
-      <div class="filters filtersWrap" id="filtersCard">
-        <div id="filters"></div>
-      </div>
-    <div class="filterFooter"><button class="btn primary" id="btnViewResults">결과 보기</button></div></dialog>
-
-    
-
     <main class="main">
 <header class="pageHeader">
       <div class="topbar">
         <div class="title"><h1>방송 매출 대시보드</h1><p>WHOLEBERRY</p></div>
-        <div class="topActions">
-          <button class="btn primary" id="btnToggleFilters" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16M7 12h10M10 19h4"/></svg><span id="filterButtonText">필터</span></button>
-          <button class="btn" id="btnReset">전체 해제</button>
-          <button class="btn" id="btnRefresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5M19 12a7 7 0 1 0-2 5"/></svg>새로고침</button>
-          <button class="btn" id="btnKey"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="15" cy="8" r="4"/><path d="m12 11-8 8v2h3v-3h3l4-4"/></svg>키 변경</button>
-          <span id="statusPill" hidden></span>
-        </div>
-      </div>
+        <div class="headerControls">
       <nav class="tabs" id="tabs" aria-label="분석 화면">
         <button class="tabBtn on" data-tab="summary" aria-pressed="true" aria-controls="tab-summary">요약</button>
         <button class="tabBtn" data-tab="detail" aria-pressed="false" aria-controls="tab-detail">방송상세</button>
         <button class="tabBtn" data-tab="ppl" aria-pressed="false" aria-controls="tab-ppl">PPL</button>
       </nav>
+        <div class="topActions">
+          <button class="iconBtn" id="btnRefresh" title="새로고침" aria-label="새로고침"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5M19 12a7 7 0 1 0-2 5"/></svg></button>
+          <button class="iconBtn" id="btnKey" title="키 변경" aria-label="키 변경"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="15" cy="8" r="4"/><path d="m12 11-8 8v2h3v-3h3l4-4"/></svg></button>
+          <span id="statusPill" hidden></span>
+        </div>
+        </div>
+      </div>
       </header>
+      <section class="filterSection" aria-label="조회 필터">
+        <div class="filterBar">
+          <div class="quickFilters" id="quickFilters">
+            <label>연도<select data-key="years" aria-label="연도"><option value="">전체</option></select></label>
+            <label>월<select data-key="months" aria-label="월"><option value="">전체</option></select></label>
+            <label>아이템<select data-key="items" aria-label="아이템"><option value="">전체</option></select></label>
+            <label>방송채널<select data-key="channels" aria-label="방송채널"><option value="">전체</option></select></label>
+          </div>
+          <div class="filterActions">
+            <button class="btn" id="btnReset">전체 해제</button>
+            <button class="btn primary" id="btnToggleFilters" aria-controls="advancedFilters" aria-expanded="false">상세검색</button>
+          </div>
+        </div>
+        <div class="filterSummary" id="filterSummary">전체 조건으로 조회 중</div>
+        <div class="advancedFilters" id="advancedFilters" hidden>
+          <div class="sidebarHeader">
+            <div class="sidebarTitle" id="filterTitle">상세검색</div>
+            <button class="btn" id="btnCloseSidebar">닫기</button>
+          </div>
+          <p class="filterNote">여러 조건을 선택할 수 있습니다. 선택 즉시 반영되며, 데이터가 없는 값은 비활성화됩니다.</p>
+          <div class="filters" id="filtersCard"><div id="filters"></div></div>
+          <div class="filterFooter"><button class="btn" id="btnViewResults">상세검색 접기</button></div>
+        </div>
+      </section>
       <div class="grid" id="gridRoot">
         <div>
         <div class="metricsPanel">
@@ -117,7 +138,7 @@
               <div class="left"><span class="pill" id="statusText" role="status" aria-live="polite">상태: -</span></div>
               <div style="color:var(--muted);font-size:13px" id="updatedText">업데이트: -</div>
             </div>
-            <div class="filterSummary" id="filterSummary"></div><div class="kpis" id="kpis"></div>
+            <div class="kpis" id="kpis"></div>
           </div>
         </div>
 
@@ -342,20 +363,26 @@ document.querySelectorAll('.tabBtn').forEach(btn=>{
  *  ========================= */
 const btnToggleFilters = document.getElementById("btnToggleFilters");
 const btnCloseSidebar = document.getElementById("btnCloseSidebar");
-const filterDialog = document.getElementById('sidebar');
+const filterPanel = document.getElementById('advancedFilters');
 
 function setFiltersCollapsed(collapsed){
-  if (collapsed) filterDialog.close();
-  else if (!filterDialog.open) filterDialog.showModal();
+  filterPanel.hidden = collapsed;
   btnToggleFilters.setAttribute('aria-expanded', String(!collapsed));
+  btnToggleFilters.textContent = collapsed ? '상세검색' : '상세검색 닫기';
+  if (collapsed) btnToggleFilters.focus({preventScroll:true});
 }
-btnToggleFilters.addEventListener('click', () => setFiltersCollapsed(false));
+btnToggleFilters.addEventListener('click', () => setFiltersCollapsed(!filterPanel.hidden));
 btnCloseSidebar.addEventListener('click', () => setFiltersCollapsed(true));
 document.getElementById('btnViewResults').addEventListener('click', () => setFiltersCollapsed(true));
-filterDialog.addEventListener('close', () => btnToggleFilters.setAttribute('aria-expanded', 'false'));
-filterDialog.addEventListener('click', event => {
-  const rect = filterDialog.getBoundingClientRect();
-  if (event.target === filterDialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) setFiltersCollapsed(true);
+filterPanel.addEventListener('keydown', event => {
+  if (event.key === 'Escape') setFiltersCollapsed(true);
+});
+document.querySelectorAll('#quickFilters select').forEach(select => {
+  select.addEventListener('change', () => {
+    store.filters[select.dataset.key] = select.value ? [select.value] : [];
+    renderFilters();
+    loadAll(false);
+  });
 });
 
 document.getElementById('btnKey').addEventListener('click', () => {
@@ -499,11 +526,28 @@ function selectedCountForGroup(group){
 function escapeHtml(value){
   return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 }
+function renderQuickFilters(){
+  document.querySelectorAll('#quickFilters select').forEach(select => {
+    const key = select.dataset.key;
+    const selected = store.filters[key];
+    const available = new Set((store.availableOptions?.[key] || store.options?.[key] || []).map(String));
+    select.disabled = !store.options;
+    select.innerHTML = '<option value="">전체</option>' +
+      (selected.length > 1 ? `<option value="" selected disabled>${selected.length}개 선택 · 상세검색에서 변경</option>` : '') +
+      sortedValues(key, store.options?.[key] || []).map(value => {
+        const chosen = selected.includes(String(value));
+        return `<option value="${escapeHtml(value)}" ${selected.length === 1 && chosen ? 'selected' : ''} ${!chosen && !available.has(String(value)) ? 'disabled' : ''}>${escapeHtml(value)}</option>`;
+      }).join('');
+  });
+}
 function renderFilters(){
   const focused = elFilters.contains(document.activeElement) ? {...document.activeElement.dataset} : null;
   const selected = Object.values(store.filters).flat();
-  document.getElementById('filterButtonText').textContent = selected.length ? '필터 ' + selected.length : '필터';
-  document.getElementById('filterSummary').textContent = selected.length ? '선택 조건 · ' + selected.join(' / ') : '';
+  renderQuickFilters();
+  const names = {years:'연도',months:'월',days:'일',dows:'요일',items:'아이템',channels:'방송채널',guests:'게스트',pplBroadcasters:'PPL 방송사',pplPrograms:'PPL 프로그램',pplTypes:'PPL 구분'};
+  document.getElementById('filterSummary').textContent = selected.length
+    ? Object.entries(store.filters).filter(([,values]) => values.length).map(([key,values]) => names[key] + ': ' + values.join(', ')).join(' / ')
+    : '전체 조건으로 조회 중';
 
   if (!store.options){
     elFilters.innerHTML = `<div style="color:var(--muted);font-size:13px">옵션 로딩 중...</div>`;
