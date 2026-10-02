@@ -27,7 +27,9 @@
     .btn.primary:hover{background:#1d4ed8}
     .btn svg,.iconBtn svg{width:17px;height:17px;flex:none}
     .iconBtn{width:42px;padding:0}
-    .tabs{display:flex;gap:8px}
+    .tabs{display:flex;gap:0}
+    .tabBtn{position:relative}
+    .tabBtn + .tabBtn::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);height:18px;border-left:1px solid var(--line);pointer-events:none}
     .tabBtn{border:0;border-bottom:3px solid transparent;background:none;color:#67758b;font-size:14px;font-weight:700;min-height:48px;padding:12px 22px}
     .tabBtn:hover{color:var(--brand)}
     .tabBtn.on{color:var(--brand);border-bottom-color:var(--brand)}
