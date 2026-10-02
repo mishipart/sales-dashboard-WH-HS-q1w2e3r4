@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>방송 매출 대시보드</title>
 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
     :root{--bg:#f3f4f6;--surface:#fff;--text:#17243b;--muted:#718096;--line:#dfe5ee;--brand:#2563eb;--brandSoft:#eff5ff;--radius:10px}
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;font-size:14px;line-height:1.5;letter-spacing:-.025em}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"Pretendard",system-ui,sans-serif;font-size:14px;line-height:1.5;letter-spacing:-.025em}
+    input,select,textarea{font-family:inherit}
     button{font:inherit;cursor:pointer;touch-action:manipulation}
     button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid #93b4ff;outline-offset:3px}
     button:disabled{cursor:not-allowed}
@@ -291,7 +293,8 @@ document.querySelectorAll('.chartBox').forEach(box => {
   canvas.setAttribute('aria-label', scroll.getAttribute('aria-label'));
 });
 if (typeof Chart !== 'undefined') {
-  Chart.defaults.font.family = '"Malgun Gothic", "Apple SD Gothic Neo", sans-serif';
+  Chart.defaults.font.family = '"Pretendard", sans-serif';
+  document.fonts.ready.then(()=>Object.values(Chart.instances).forEach(chart=>chart.update('none')));
   Chart.defaults.font.size = 11;
   Chart.defaults.color = '#718096';
   Chart.defaults.borderColor = '#edf0f5';
